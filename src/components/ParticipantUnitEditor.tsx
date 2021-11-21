@@ -33,7 +33,7 @@ export function ParticipantUnitEditor({ role }: Props) {
                         {Object.values(UnitType).map((unitType) => {
                             const count: number = participant.units[unitType] ?? 0;
                             return (
-                                <TableRow>
+                                <TableRow key={unitType}>
                                     <TableCell>{unitType}</TableCell>
                                     <TableCell>
                                         <IconButton size="small" disabled={count === 0} onClick={() => handleDecrementUnitCount(unitType)}>

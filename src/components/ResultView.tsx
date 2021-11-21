@@ -12,8 +12,8 @@ export function ResultView() {
 
     return (
         <List>
-            {outcomes.map((outcome) => (
-                <ListItem>
+            {outcomes.map((outcome, i) => (
+                <ListItem key={i}>
                     {round(outcome.propability * 100, 2)}%: {outcome.victor}
                 </ListItem>
             ))}
