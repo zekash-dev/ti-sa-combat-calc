@@ -31,6 +31,7 @@ export type SparseDictionary<TKey extends string | number | symbol, TValue> = {
 };
 
 export interface Outcome {
-    propability: number;
+    probability: number;
     victor: ParticipantRole | null;
+    hits: number[];
 }

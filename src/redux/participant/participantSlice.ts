@@ -1,4 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { max } from "lodash";
 
 import { Faction, KeyedDictionary, Participant, ParticipantRole, UnitMap, UnitType } from "model/common";
 import { RootState } from "redux/store";
@@ -65,7 +66,7 @@ const participantSlice = createSlice({
         setUnitCount: (state: ParticipantState, action: PayloadAction<SetUnitCountPayload>) => {
             const { unit, role, count } = action.payload;
             const unitMap: UnitMap = state.participants[role].units;
-            unitMap[unit] = count;
+            unitMap[unit] = max([count, 0]);
         },
     },
 });

@@ -1,10 +1,17 @@
-import { Add, Remove } from "@mui/icons-material";
-import { Box, IconButton, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from "@mui/material";
+import { Add, Delete, Remove } from "@mui/icons-material";
+import { Box, IconButton, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField } from "@mui/material";
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 import { Participant, ParticipantRole, UnitType } from "model/common";
-import { decrementUnitCount, incrementUnitCount, selectParticipant } from "redux/participant/participantSlice";
+import {
+    clearParticipantUnitsOfType,
+    decrementUnitCount,
+    incrementUnitCount,
+    selectParticipant,
+    setUnitCount,
+} from "redux/participant/participantSlice";
+import { isInteger } from "lodash";
 
 interface Props {
     role: ParticipantRole;
@@ -15,8 +22,14 @@ export function ParticipantUnitEditor({ role }: Props) {
     const participant: Participant = useSelector(selectParticipant(role));
 
     const handleDecrementUnitCount = (unit: UnitType) => dispatch(decrementUnitCount({ role, unit }));
-
     const handleIncrementUnitCount = (unit: UnitType) => dispatch(incrementUnitCount({ role, unit }));
+    const handleSetUnitCount = (unit: UnitType, count: string) => {
+        const convertedCount: number = Number(count);
+        if (isInteger(convertedCount)) {
+            dispatch(setUnitCount({ role, unit, count: convertedCount }));
+        }
+    };
+    const handleClearUnitCount = (unit: UnitType) => dispatch(clearParticipantUnitsOfType({ role, unit }));
 
     return (
         <Box sx={{ width: 400, p: 4 }}>
@@ -27,6 +40,7 @@ export function ParticipantUnitEditor({ role }: Props) {
                         <TableRow>
                             <TableCell>Unit</TableCell>
                             <TableCell>Count</TableCell>
+                            <TableCell />
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -36,13 +50,26 @@ export function ParticipantUnitEditor({ role }: Props) {
                                 <TableRow key={unitType}>
                                     <TableCell>{unitType}</TableCell>
                                     <TableCell>
-                                        <IconButton size="small" disabled={count === 0} onClick={() => handleDecrementUnitCount(unitType)}>
+                                        {/* <IconButton size="small" disabled={count === 0} onClick={() => handleDecrementUnitCount(unitType)}>
                                             <Remove />
-                                        </IconButton>
-                                        <span>{count}</span>
-                                        <IconButton size="small" onClick={() => handleIncrementUnitCount(unitType)}>
+                                        </IconButton> */}
+                                        <TextField
+                                            type="number"
+                                            size="small"
+                                            sx={{ width: 80 }}
+                                            value={count}
+                                            onChange={(e) => handleSetUnitCount(unitType, e.target.value)}
+                                        />
+                                        {/* <IconButton size="small" onClick={() => handleIncrementUnitCount(unitType)}>
                                             <Add />
-                                        </IconButton>
+                                        </IconButton> */}
+                                    </TableCell>
+                                    <TableCell sx={{ width: 34 }}>
+                                        {count > 0 && (
+                                            <IconButton size="small" onClick={() => handleClearUnitCount(unitType)}>
+                                                <Delete />
+                                            </IconButton>
+                                        )}
                                     </TableCell>
                                 </TableRow>
                             );
