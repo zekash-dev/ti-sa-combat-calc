@@ -1,26 +1,78 @@
 import { round, sum } from "lodash";
 
-import { KeyedDictionary, Outcome, Participant, ParticipantRole, UnitType } from "model/common";
+import {
+    AggregatedOutcome,
+    CombatRoundInput,
+    KeyedDictionary,
+    OutcomeInstance,
+    Participant,
+    ParticipantRole,
+    UnitType,
+} from "model/common";
 
-export function calculateCombatOutcome(attacker: Participant, defender: Participant): Outcome[] {
+export function calculateCombatOutcome(attacker: Participant, defender: Participant): OutcomeInstance[] {
     const attackerShipCount: number = sum(Object.values(attacker.units));
     const defShipCount: number = sum(Object.values(defender.units));
 
     if (attackerShipCount === 0 && defShipCount === 0) return [];
 
-    const victoryChance = attackerShipCount / (attackerShipCount + defShipCount);
-    return [
-        {
-            probability: victoryChance,
-            victor: ParticipantRole.Attacker,
-            hits: calculateHits(attacker),
-        },
-        {
-            probability: 1 - victoryChance,
-            victor: ParticipantRole.Defender,
-            hits: calculateHits(defender),
-        },
-    ];
+    const outcomes: OutcomeInstance[] = runCombatRound({
+        attacker,
+        defender,
+        combatRound: 1,
+        initAttackerHits: 0,
+        initDefenderHits: 0,
+        initProbability: 1.0,
+    });
+
+    // const aggregates: AggregatedOutcome[] = aggregateOutcomes(outcomes);
+    return outcomes;
+}
+
+function runCombatRound(input: CombatRoundInput): OutcomeInstance[] {
+    const outcomes: OutcomeInstance[] = [];
+    const attackerHits: number[] = calculateHits(input.attacker);
+    const defenderHits: number[] = calculateHits(input.defender);
+    for (let att = 0; att < attackerHits.length; att++) {
+        for (let def = 0; def < defenderHits.length; def++) {
+            const probability: number = input.initProbability * attackerHits[att] * defenderHits[def];
+            if (probability < PROBABILITY_BREAKPOINT) continue;
+
+            const nextAttacker: Participant = assignHits(input.attacker, def);
+            const nextDefender: Participant = assignHits(input.defender, att);
+            let victor: ParticipantRole | null | undefined = undefined; // todo: better differentiation between draw and continuation
+            if (!hasUnits(nextAttacker)) {
+                if (!hasUnits(nextDefender)) {
+                    victor = null;
+                } else {
+                    victor = ParticipantRole.Defender;
+                }
+            } else if (!hasUnits(nextDefender)) {
+                victor = ParticipantRole.Attacker;
+            }
+            if (victor !== undefined) {
+                outcomes.push({
+                    probability,
+                    victor,
+                    combatRounds: input.combatRound,
+                    attackerHits: input.initAttackerHits + att,
+                    defenderHits: input.initDefenderHits + def,
+                });
+            } else {
+                outcomes.push(
+                    ...runCombatRound({
+                        attacker: nextAttacker,
+                        defender: nextDefender,
+                        initProbability: probability,
+                        initAttackerHits: input.initAttackerHits + att,
+                        initDefenderHits: input.initDefenderHits + def,
+                        combatRound: input.combatRound + 1,
+                    })
+                );
+            }
+        }
+    }
+    return outcomes;
 }
 
 function calculateHits(participant: Participant): number[] {
@@ -49,10 +101,56 @@ function addHitChance(hitChances: number[], hitProbability: number): number[] {
     return nextHitChances;
 }
 
-const baseCombatValues: KeyedDictionary<UnitType, number> = {
-    fighter: 2,
-    destroyer: 2,
-};
+function assignHits(participant: Participant, hits: number): Participant {
+    // todo: need to handle hit sources
+    let next: Participant = participant;
+    for (let i = 0; i < hits; i++) {
+        for (let unitType of Object.keys(participant.units)) {
+            const unitsOfType: number | undefined = participant.units[unitType as UnitType];
+            if (unitsOfType !== undefined && unitsOfType > 0) {
+                next = {
+                    ...next,
+                    units: {
+                        ...next.units,
+                        [unitType as UnitType]: unitsOfType - 1 < 1 ? undefined : unitsOfType - 1,
+                    },
+                };
+            }
+        }
+    }
+    return next;
+}
+
+function hasUnits(participant: Participant): boolean {
+    return Object.keys(participant.units).some((unitType: string) => !!participant.units[unitType as UnitType]);
+}
+
+export function aggregateOutcomes(outcomes: OutcomeInstance[]): AggregatedOutcome[] {
+    const aggregates: AggregatedOutcome[] = [];
+    for (let outcome of outcomes) {
+        let aggregate: AggregatedOutcome | undefined = aggregates.find(
+            (agg) => agg.victor === outcome.victor && agg.combatRounds === outcome.combatRounds
+        );
+        if (!aggregate) {
+            aggregate = {
+                probability: 0.0,
+                victor: outcome.victor,
+                combatRounds: outcome.combatRounds,
+                avgAttackerHits: 0.0,
+                avgDefenderHits: 0.0,
+            };
+            aggregates.push(aggregate);
+        }
+        aggregate.probability += outcome.probability;
+        aggregate.avgAttackerHits += outcome.probability * outcome.attackerHits;
+        aggregate.avgDefenderHits += outcome.probability * outcome.defenderHits;
+    }
+    for (let aggregate of aggregates) {
+        aggregate.avgAttackerHits /= aggregate.probability;
+        aggregate.avgDefenderHits /= aggregate.probability;
+    }
+    return aggregates;
+}
 
 export function calculateAverageHits(hitChances: number[]): number {
     return round(
@@ -60,3 +158,10 @@ export function calculateAverageHits(hitChances: number[]): number {
         2
     );
 }
+
+const baseCombatValues: KeyedDictionary<UnitType, number> = {
+    fighter: 2,
+    destroyer: 2,
+};
+
+const PROBABILITY_BREAKPOINT: number = 0.000001;

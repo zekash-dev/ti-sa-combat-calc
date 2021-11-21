@@ -1,6 +1,6 @@
 import { v4 as uuidV4 } from "uuid";
 
-import { Outcome } from "model/common";
+import { OutcomeInstance } from "model/common";
 import { ParticipantState, selectparticipantState } from "redux/participant/participantSlice";
 import { setCalculating, setResult } from "redux/result/resultSlice";
 import { AppThunk } from "redux/store";
@@ -14,7 +14,7 @@ export const runCalculation = (): AppThunk => async (dispatch, getState) => {
     dispatch(setCalculating({ calculationKey }));
     const participantState: ParticipantState = selectparticipantState(getState());
 
-    const outcomes: Outcome[] = await worker.runCalculationWorker(
+    const outcomes: OutcomeInstance[] = await worker.runCalculationWorker(
         participantState.participants.attacker,
         participantState.participants.defender
     );

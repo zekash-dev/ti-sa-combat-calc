@@ -30,8 +30,32 @@ export type SparseDictionary<TKey extends string | number | symbol, TValue> = {
     [key in TKey]?: TValue;
 };
 
-export interface Outcome {
+export interface CombatRoundInput {
+    [ParticipantRole.Attacker]: Participant;
+    [ParticipantRole.Defender]: Participant;
+    initProbability: number;
+    initAttackerHits: number;
+    initDefenderHits: number;
+    combatRound: number;
+}
+
+export interface OutcomeInstance {
     probability: number;
     victor: ParticipantRole | null;
-    hits: number[];
+    attackerHits: number;
+    defenderHits: number;
+    combatRounds: number;
+}
+
+export interface AggregatedOutcome {
+    probability: number;
+    victor: ParticipantRole | null;
+    avgAttackerHits: number;
+    avgDefenderHits: number;
+    combatRounds: number;
+}
+
+export interface OutcomeRoundCount {
+    count: number;
+    probability: number;
 }

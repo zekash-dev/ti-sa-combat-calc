@@ -1,10 +1,11 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { aggregateOutcomes } from "logic/calculator";
 
-import { Outcome } from "model/common";
+import { OutcomeInstance } from "model/common";
 import { RootState } from "redux/store";
 
 export interface ResultState {
-    outcomes: Outcome[];
+    outcomes: OutcomeInstance[];
     calculating: boolean;
     calculationKey: string;
 }
@@ -21,7 +22,7 @@ interface StartCalculationPayload {
 
 interface SetResultPayload {
     calculationKey: string;
-    outcomes: Outcome[];
+    outcomes: OutcomeInstance[];
 }
 
 const resultSlice = createSlice({
@@ -47,5 +48,7 @@ export const { setCalculating, setResult } = resultSlice.actions;
 
 export const selectOutcomes = (rootState: RootState) => rootState.result.outcomes;
 export const selectCalculating = (rootState: RootState) => rootState.result.calculating;
+
+export const selectAggregateOutcomes = createSelector([selectOutcomes], (outcomes) => aggregateOutcomes(outcomes));
 
 export default resultSlice.reducer;
