@@ -1,7 +1,17 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { max } from "lodash";
 
-import { Faction, KeyedDictionary, Participant, ParticipantRole, UnitMap, UnitType } from "model/common";
+import { unitDefinitions } from "logic/simulator";
+import {
+    CombatParticipant,
+    CombatParticipants,
+    Faction,
+    KeyedDictionary,
+    Participant,
+    ParticipantRole,
+    UnitMap,
+    UnitType,
+} from "model/common";
 import { RootState } from "redux/store";
 
 export interface ParticipantState {
@@ -76,5 +86,32 @@ export const { setFaction, clearParticipantUnits, clearParticipantUnitsOfType, i
 
 export const selectparticipantState = (rootState: RootState) => rootState.participant;
 export const selectParticipant = (role: ParticipantRole) => (rootState: RootState) => rootState.participant.participants[role];
+
+export const selectCombatParticipants = createSelector([selectparticipantState], (participantState): CombatParticipants => {
+    return {
+        attacker: toCombatParticipant(participantState.participants.attacker),
+        defender: toCombatParticipant(participantState.participants.defender),
+    };
+});
+
+function toCombatParticipant(participant: Participant): CombatParticipant {
+    const combatParticipant: CombatParticipant = {
+        faction: participant.faction,
+        units: [],
+    };
+    for (let unitType of Object.keys(participant.units)) {
+        const unitCount: number | undefined = participant.units[unitType as UnitType];
+        if (unitCount) {
+            for (let i = 0; i < unitCount; i++) {
+                combatParticipant.units.push({
+                    ...unitDefinitions[unitType as UnitType],
+                    alive: true,
+                    scoredHits: [],
+                });
+            }
+        }
+    }
+    return combatParticipant;
+}
 
 export default participantSlice.reducer;

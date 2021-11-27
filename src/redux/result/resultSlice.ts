@@ -1,28 +1,28 @@
 import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { aggregateOutcomes } from "logic/calculator";
+import { aggregateCombatResults } from "logic/simulator";
 
-import { OutcomeInstance } from "model/common";
+import { AggregatedCombatResult, SimulatedCombatResult } from "model/common";
 import { RootState } from "redux/store";
 
 export interface ResultState {
-    outcomes: OutcomeInstance[];
-    calculating: boolean;
-    calculationKey: string;
+    results: SimulatedCombatResult[];
+    simulating: boolean;
+    simulationKey: string;
 }
 
 export const initialState: ResultState = {
-    outcomes: [],
-    calculating: false,
-    calculationKey: "",
+    results: [],
+    simulating: false,
+    simulationKey: "",
 };
 
-interface StartCalculationPayload {
-    calculationKey: string;
+interface StartSimulationPayload {
+    simulationKey: string;
 }
 
 interface SetResultPayload {
-    calculationKey: string;
-    outcomes: OutcomeInstance[];
+    simulationKey: string;
+    results: SimulatedCombatResult[];
 }
 
 const resultSlice = createSlice({
@@ -30,25 +30,27 @@ const resultSlice = createSlice({
     initialState: initialState,
     reducers: {
         setResult: (state: ResultState, action: PayloadAction<SetResultPayload>) => {
-            const { calculationKey, outcomes } = action.payload;
-            if (calculationKey === state.calculationKey) {
-                state.outcomes = outcomes;
-                state.calculating = false;
+            const { simulationKey, results } = action.payload;
+            if (simulationKey === state.simulationKey) {
+                state.results = results;
+                state.simulating = false;
             }
         },
-        setCalculating: (state: ResultState, action: PayloadAction<StartCalculationPayload>) => {
-            const { calculationKey } = action.payload;
-            state.calculationKey = calculationKey;
-            state.calculating = true;
+        setSimulating: (state: ResultState, action: PayloadAction<StartSimulationPayload>) => {
+            const { simulationKey } = action.payload;
+            state.simulationKey = simulationKey;
+            state.simulating = true;
         },
     },
 });
 
-export const { setCalculating, setResult } = resultSlice.actions;
+export const { setSimulating, setResult } = resultSlice.actions;
 
-export const selectOutcomes = (rootState: RootState) => rootState.result.outcomes;
-export const selectCalculating = (rootState: RootState) => rootState.result.calculating;
+export const selectResults = (rootState: RootState) => rootState.result.results;
+export const selectSimulating = (rootState: RootState) => rootState.result.simulating;
 
-export const selectAggregateOutcomes = createSelector([selectOutcomes], (outcomes) => aggregateOutcomes(outcomes));
+export const selectAggregateResults = createSelector([selectResults], (results): AggregatedCombatResult[] =>
+    aggregateCombatResults(results)
+);
 
 export default resultSlice.reducer;

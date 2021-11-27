@@ -162,6 +162,10 @@ export function calculateAverageHits(hitChances: number[]): number {
 const baseCombatValues: KeyedDictionary<UnitType, number> = {
     fighter: 2,
     destroyer: 2,
+    cruiser: 4,
+    dreadnought: 6,
+    warSun: 8,
+    carrier: 2,
 };
 
 const PROBABILITY_BREAKPOINT: number = 0.000001;

@@ -3,6 +3,8 @@ declare module "comlink-loader!*" {
         constructor();
 
         runCalculationWorker(attacker: Participant, defender: Participant): Promise<Outcome[]>;
+
+        runSimulationWorker(attacker: CombatParticipant, defender: CombatParticipant, iterations: number): Promise<SimulatedCombatResult[]>;
     }
 
     export = WebpackWorker;

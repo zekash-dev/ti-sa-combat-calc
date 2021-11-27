@@ -1,28 +1,26 @@
-import { CircularProgress, List, ListItem } from "@mui/material";
+import { List, ListItem } from "@mui/material";
 import { round } from "lodash";
 import React from "react";
 import { useSelector } from "react-redux";
 
-import { AggregatedOutcome } from "model/common";
-import { selectAggregateOutcomes, selectCalculating } from "redux/result/resultSlice";
+import { AggregatedCombatResult } from "model/common";
+import { selectAggregateResults } from "redux/result/resultSlice";
 
 export function ResultView() {
-    const outcomes: AggregatedOutcome[] = useSelector(selectAggregateOutcomes);
-    const calculating: boolean = useSelector(selectCalculating);
+    const results: AggregatedCombatResult[] = useSelector(selectAggregateResults);
 
     return (
         <List>
-            {outcomes.map((outcome, i) => (
+            {results.map((outcome, i) => (
                 <>
                     <ListItem key={i}>
-                        {round(outcome.probability * 100, 2)}%: {outcome.victor ?? "DRAW"} (round {outcome.combatRounds})
+                        {round(outcome.probability * 100, 1)}%: {outcome.victor}
                     </ListItem>
-                    <ListItem key={i + "-hits"}>
+                    {/* <ListItem key={i + "-hits"}>
                         Avg. attacker hits: {outcome.avgAttackerHits}; Avg. defender hits: {outcome.avgDefenderHits};
-                    </ListItem>
+                    </ListItem> */}
                 </>
             ))}
-            {calculating && <CircularProgress />}
         </List>
     );
 }
