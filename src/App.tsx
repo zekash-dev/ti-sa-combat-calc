@@ -1,3 +1,4 @@
+import { CssBaseline } from "@mui/material";
 import { ThemeProvider } from "@mui/system";
 import React from "react";
 import { Provider } from "react-redux";
@@ -9,6 +10,7 @@ import { theme } from "./theme";
 function App() {
     return (
         <ThemeProvider theme={theme}>
+            <CssBaseline />
             <Provider store={store}>
                 <Home />
             </Provider>

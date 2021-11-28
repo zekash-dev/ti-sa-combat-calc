@@ -1,4 +1,4 @@
-import { List, ListItem } from "@mui/material";
+import { List, ListItem, Typography } from "@mui/material";
 import { round } from "lodash";
 import React from "react";
 import { useSelector } from "react-redux";
@@ -14,7 +14,9 @@ export function ResultView() {
             {results.map((outcome, i) => (
                 <>
                     <ListItem key={i}>
-                        {round(outcome.probability * 100, 1)}%: {outcome.victor}
+                        <Typography>
+                            {round(outcome.probability * 100, 1)}%: {outcome.victor}
+                        </Typography>
                     </ListItem>
                     {/* <ListItem key={i + "-hits"}>
                         Avg. attacker hits: {outcome.avgAttackerHits}; Avg. defender hits: {outcome.avgDefenderHits};

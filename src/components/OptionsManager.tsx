@@ -1,4 +1,4 @@
-import { Box, Button, CircularProgress, Grid, MenuItem, TextField } from "@mui/material";
+import { Box, Button, CircularProgress, Grid, MenuItem, TextField, Typography } from "@mui/material";
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -22,7 +22,7 @@ export function OptionsManager() {
 
     return (
         <Box sx={{ width: 400, p: 4 }}>
-            <h2>OPTIONS</h2>
+            <Typography variant="h2">OPTIONS</Typography>
             <Grid>
                 <TextField
                     select

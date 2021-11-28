@@ -1,5 +1,17 @@
 import { Add, Delete, Remove } from "@mui/icons-material";
-import { Box, IconButton, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField } from "@mui/material";
+import {
+    Box,
+    IconButton,
+    Paper,
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TableRow,
+    TextField,
+    Typography,
+} from "@mui/material";
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -33,7 +45,7 @@ export function ParticipantUnitEditor({ role }: Props) {
 
     return (
         <Box sx={{ width: 400, p: 4 }}>
-            <h2>{role.toUpperCase()}</h2>
+            <Typography variant="h2">{role.toUpperCase()}</Typography>
             <TableContainer component={Paper}>
                 <Table size="small">
                     <TableHead>
