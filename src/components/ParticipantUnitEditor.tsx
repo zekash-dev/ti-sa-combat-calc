@@ -15,10 +15,11 @@ import {
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 
-import { Participant, ParticipantRole, UnitType } from "model/common";
+import { ParticipantInput, ParticipantRole, UnitType } from "model/common";
 import {
     clearParticipantUnitsOfType,
     decrementUnitCount,
+    getUnitCount,
     incrementUnitCount,
     selectParticipant,
     setUnitCount,
@@ -31,7 +32,7 @@ interface Props {
 
 export function ParticipantUnitEditor({ role }: Props) {
     const dispatch = useDispatch();
-    const participant: Participant = useSelector(selectParticipant(role));
+    const participant: ParticipantInput = useSelector(selectParticipant(role));
 
     const handleDecrementUnitCount = (unit: UnitType) => dispatch(decrementUnitCount({ role, unit }));
     const handleIncrementUnitCount = (unit: UnitType) => dispatch(incrementUnitCount({ role, unit }));
@@ -57,7 +58,7 @@ export function ParticipantUnitEditor({ role }: Props) {
                     </TableHead>
                     <TableBody>
                         {Object.values(UnitType).map((unitType) => {
-                            const count: number = participant.units[unitType] ?? 0;
+                            const count: number = getUnitCount(participant, unitType);
                             return (
                                 <TableRow key={unitType}>
                                     <TableCell>{unitType}</TableCell>

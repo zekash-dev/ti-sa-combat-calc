@@ -3,25 +3,21 @@ import { round } from "lodash";
 import React from "react";
 import { useSelector } from "react-redux";
 
-import { AggregatedCombatResult } from "model/common";
-import { selectAggregateResults } from "redux/result/resultSlice";
+import { CalculationOutput, CombatVictor } from "model/common";
+import { selectOutput } from "redux/result/resultSlice";
 
 export function ResultView() {
-    const results: AggregatedCombatResult[] = useSelector(selectAggregateResults);
+    const output: CalculationOutput | null = useSelector(selectOutput);
 
+    if (!output) return null;
     return (
         <List>
-            {results.map((outcome, i) => (
-                <>
-                    <ListItem key={i}>
-                        <Typography>
-                            {round(outcome.probability * 100, 1)}%: {outcome.victor}
-                        </Typography>
-                    </ListItem>
-                    {/* <ListItem key={i + "-hits"}>
-                        Avg. attacker hits: {outcome.avgAttackerHits}; Avg. defender hits: {outcome.avgDefenderHits};
-                    </ListItem> */}
-                </>
+            {Object.keys(output.victorProbabilites).map((victor, i) => (
+                <ListItem key={victor}>
+                    <Typography>
+                        {round(output.victorProbabilites[victor as CombatVictor] * 100, 1)}%: {victor}
+                    </Typography>
+                </ListItem>
             ))}
         </List>
     );

@@ -1,32 +1,23 @@
 import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { max } from "lodash";
 
-import { unitDefinitions } from "logic/simulator";
-import {
-    CombatParticipant,
-    CombatParticipants,
-    Faction,
-    KeyedDictionary,
-    Participant,
-    ParticipantRole,
-    UnitMap,
-    UnitType,
-} from "model/common";
+import { CalculationInput, Faction, KeyedDictionary, ParticipantInput, ParticipantRole, UnitType } from "model/common";
 import { RootState } from "redux/store";
 
 export interface ParticipantState {
-    participants: KeyedDictionary<ParticipantRole, Participant>;
+    participants: KeyedDictionary<ParticipantRole, ParticipantInput>;
 }
 
 export const initialState: ParticipantState = {
     participants: {
         attacker: {
             faction: Faction.Hacan,
-            units: {},
+            units: [],
+            tags: {},
         },
         defender: {
             faction: Faction.JolNar,
-            units: {},
+            units: [],
+            tags: {},
         },
     },
 };
@@ -54,32 +45,52 @@ const participantSlice = createSlice({
             state.participants[role].faction = faction;
         },
         clearParticipantUnits: (state: ParticipantState, action: PayloadAction<ParticipantRole>) => {
-            state.participants[action.payload].units = {};
+            state.participants[action.payload].units = [];
         },
         clearParticipantUnitsOfType: (state: ParticipantState, action: PayloadAction<ModifyUnitCountPayload>) => {
             const { unit, role } = action.payload;
-            delete state.participants[role].units[unit];
+            state.participants[role].units = state.participants[role].units.filter((u) => u.type !== unit);
         },
         incrementUnitCount: (state: ParticipantState, action: PayloadAction<ModifyUnitCountPayload>) => {
             const { unit, role } = action.payload;
-            const unitMap: UnitMap = state.participants[role].units;
-            unitMap[unit] = (unitMap[unit] ?? 0) + 1;
+            addUnits(state.participants[role], unit, 1);
         },
         decrementUnitCount: (state: ParticipantState, action: PayloadAction<ModifyUnitCountPayload>) => {
             const { unit, role } = action.payload;
-            const unitMap: UnitMap = state.participants[role].units;
-            unitMap[unit] = (unitMap[unit] ?? 0) - 1;
-            if (unitMap[unit]! < 1) {
-                delete unitMap[unit];
-            }
+            removeUnits(state.participants[role], unit, 1);
         },
         setUnitCount: (state: ParticipantState, action: PayloadAction<SetUnitCountPayload>) => {
             const { unit, role, count } = action.payload;
-            const unitMap: UnitMap = state.participants[role].units;
-            unitMap[unit] = max([count, 0]);
+            const currentCount: number = getUnitCount(state.participants[role], unit);
+            if (count > currentCount) {
+                addUnits(state.participants[role], unit, count - currentCount);
+            } else {
+                removeUnits(state.participants[role], unit, currentCount - count);
+            }
         },
     },
 });
+
+export function getUnitCount(participant: ParticipantInput, unitType: UnitType): number {
+    return participant.units.filter((u) => u.type === unitType).length;
+}
+
+function addUnits(participant: ParticipantInput, unitType: UnitType, count: number) {
+    for (let i = 0; i < count; i++) {
+        participant.units.push({ type: unitType });
+    }
+}
+
+function removeUnits(participant: ParticipantInput, unitType: UnitType, count: number) {
+    for (let i = 0; i < count; i++) {
+        const idx: number = participant.units.findIndex((u) => u.type === unitType);
+        if (idx !== -1) {
+            participant.units.splice(idx, 1);
+        } else {
+            break;
+        }
+    }
+}
 
 export const { setFaction, clearParticipantUnits, clearParticipantUnitsOfType, incrementUnitCount, decrementUnitCount, setUnitCount } =
     participantSlice.actions;
@@ -87,31 +98,11 @@ export const { setFaction, clearParticipantUnits, clearParticipantUnitsOfType, i
 export const selectparticipantState = (rootState: RootState) => rootState.participant;
 export const selectParticipant = (role: ParticipantRole) => (rootState: RootState) => rootState.participant.participants[role];
 
-export const selectCombatParticipants = createSelector([selectparticipantState], (participantState): CombatParticipants => {
+export const selectCalculationInput = createSelector([selectparticipantState], (participantState): CalculationInput => {
     return {
-        attacker: toCombatParticipant(participantState.participants.attacker),
-        defender: toCombatParticipant(participantState.participants.defender),
+        attacker: participantState.participants.attacker,
+        defender: participantState.participants.defender,
     };
 });
-
-function toCombatParticipant(participant: Participant): CombatParticipant {
-    const combatParticipant: CombatParticipant = {
-        faction: participant.faction,
-        units: [],
-    };
-    for (let unitType of Object.keys(participant.units)) {
-        const unitCount: number | undefined = participant.units[unitType as UnitType];
-        if (unitCount) {
-            for (let i = 0; i < unitCount; i++) {
-                combatParticipant.units.push({
-                    ...unitDefinitions[unitType as UnitType],
-                    alive: true,
-                    scoredHits: [],
-                });
-            }
-        }
-    }
-    return combatParticipant;
-}
 
 export default participantSlice.reducer;

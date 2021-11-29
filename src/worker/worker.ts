@@ -1,9 +1,9 @@
 import { calculateCombatOutcome } from "logic/calculator";
 import { simulateCombat } from "logic/simulator";
-import { Participant, OutcomeInstance, SimulatedCombatResult, CombatParticipant } from "model/common";
+import { SimulatedCombatResult, CombatParticipant, CalculationInput, CalculationOutput } from "model/common";
 
-export function runCalculationWorker(attacker: Participant, defender: Participant): OutcomeInstance[] {
-    return calculateCombatOutcome(attacker, defender);
+export function runCalculationWorker(input: CalculationInput): CalculationOutput {
+    return calculateCombatOutcome(input);
 }
 
 export function runSimulationWorker(attacker: CombatParticipant, defender: CombatParticipant, iterations: number): SimulatedCombatResult[] {

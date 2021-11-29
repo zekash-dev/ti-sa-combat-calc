@@ -1,3 +1,13 @@
+import { Dictionary } from "lodash";
+
+export type KeyedDictionary<TKey extends string | number | symbol, TValue> = {
+    [key in TKey]: TValue;
+};
+
+export type SparseDictionary<TKey extends string | number | symbol, TValue> = {
+    [key in TKey]?: TValue;
+};
+
 export enum UnitType {
     WarSun = "warSun",
     Dreadnought = "dreadnought",
@@ -41,51 +51,78 @@ export enum ParticipantRole {
 
 export type CombatVictor = ParticipantRole.Attacker | ParticipantRole.Defender | "draw" | "timeout";
 
-export interface Participant {
-    faction: Faction;
-    units: UnitMap;
-}
-
-export type UnitMap = SparseDictionary<UnitType, number>;
-
-export type KeyedDictionary<TKey extends string | number | symbol, TValue> = {
-    [key in TKey]: TValue;
-};
-
-export type SparseDictionary<TKey extends string | number | symbol, TValue> = {
-    [key in TKey]?: TValue;
-};
-
 // Calculation
-export interface CombatRoundInput {
-    [ParticipantRole.Attacker]: Participant;
-    [ParticipantRole.Defender]: Participant;
-    initProbability: number;
-    initAttackerHits: number;
-    initDefenderHits: number;
-    combatRound: number;
+export enum CombatStage {
+    SpaceMines = "sm",
+    PDS = "pds",
+    StartOfBattle = "sob",
+    PreCombat = "pc",
+    AntiFighterBarrage = "afb",
+    Round1 = "r1",
+    Round2 = "r2",
+    RoundN = "rN",
 }
 
-export interface OutcomeInstance {
+/**
+ * Key = hash of CombatState
+ * Value = all states with the same hash (since hash doesn't guarantee uniqueness) and their respective probability
+ */
+export type CombatStateDictionary = Dictionary<CombatStateProbability[]>;
+
+export interface CombatStateProbability {
+    state: CombatState;
     probability: number;
-    victor: ParticipantRole | null;
-    attackerHits: number;
-    defenderHits: number;
-    combatRounds: number;
 }
 
-export interface AggregatedOutcome {
-    probability: number;
-    victor: ParticipantRole | null;
-    avgAttackerHits: number;
-    avgDefenderHits: number;
-    combatRounds: number;
+/**
+ * Base "node" of a combat state. Hashable and equatable.
+ * When new states are created, they should first be compared against existing states to see if they are equal.
+ */
+export interface CombatState {
+    stage: CombatStage;
+    [ParticipantRole.Attacker]: ParticipantState;
+    [ParticipantRole.Defender]: ParticipantState;
 }
 
-export interface OutcomeRoundCount {
-    count: number;
-    probability: number;
+export interface ParticipantState {
+    tags: any; // placeholder to keep track of spent abilities etc.
+    units: UnitState[];
 }
+
+export interface UnitState {
+    type: UnitType;
+    sustainedHits?: number;
+    tags?: CombatStateTags; // placeholder to keep track of spent abilities etc.
+}
+
+export interface CalculationInput {
+    [ParticipantRole.Attacker]: ParticipantInput;
+    [ParticipantRole.Defender]: ParticipantInput;
+}
+
+export interface CalculationOutput {
+    victorProbabilites: KeyedDictionary<CombatVictor, number>;
+    resultStates: CombatStateProbability[];
+}
+
+export interface ParticipantInput {
+    faction: Faction;
+    units: UnitState[];
+    tags: CombatStateTags; // techs, upgrades, AC's, PC's, ...
+}
+
+/**
+ * All tags in CombatState need to be easy to hash and equate.
+ * Implement as string keys and number values.
+ */
+export interface CombatStateTags {
+    [key: string]: number;
+}
+
+/**
+ * Computed snapshot that takes has applied the bonus effect of all tags to the unit state.
+ */
+export interface ComputedUnitSnapshot extends UnitDefinition, UnitState {}
 
 // Simulation
 
