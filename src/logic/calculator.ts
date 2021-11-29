@@ -28,9 +28,26 @@ const emptyOutput: CalculationOutput = {
     resultStates: [],
 };
 
+const defaultPerformanceObj = {
+    calculateCombatOutcome: 0,
+    resolveCombatRound: 0,
+    appendCombatStateProbability: 0,
+    assignHit: 0,
+    calculateHits: 0,
+    mergeIdenticalStates: 0,
+    combatStateComparer: 0,
+    hashCombatState: 0,
+    unitStateComparer: 0,
+    hashUnitState: 0,
+    getStringHashCode: 0,
+};
+
+let performanceObj = defaultPerformanceObj;
+
 export function calculateCombatOutcome(input: CalculationInput): CalculationOutput {
     if (input.attacker.units.length === 0 && input.defender.units.length === 0) return emptyOutput;
-
+    performanceObj = defaultPerformanceObj;
+    const p0 = performance.now();
     let activeState: CombatStateProbability | undefined = {
         state: getInitialState(input),
         probability: 1.0,
@@ -41,6 +58,8 @@ export function calculateCombatOutcome(input: CalculationInput): CalculationOutp
         appendCombatStateProbabilities(stateDictionary, nextStates);
         activeState = popNextActiveState(stateDictionary);
     }
+    performanceObj.calculateCombatOutcome += performance.now() - p0;
+    console.log("PERFORMANCE:", JSON.stringify(performanceObj));
     return createCalculationOutput(stateDictionary);
 }
 
@@ -144,6 +163,7 @@ function resolveState(currentState: CombatStateProbability, input: CalculationIn
 }
 
 function mergeIdenticalStates(stateProbabilities: CombatStateProbability[]) {
+    const p0 = performance.now();
     let mergeFound = true;
     while (mergeFound) {
         mergeFound = false;
@@ -161,6 +181,7 @@ function mergeIdenticalStates(stateProbabilities: CombatStateProbability[]) {
             }
         }
     }
+    performanceObj.mergeIdenticalStates += performance.now() - p0;
 }
 
 function resolveSpaceMines(state: CombatState, input: CalculationInput): CombatStateProbability[] {
@@ -197,6 +218,7 @@ function resolveStageNyi(state: CombatState) {
 }
 
 function resolveCombatRound(state: CombatState, input: CalculationInput, round: 1 | 2 | "n"): CombatStateProbability[] {
+    const p0 = performance.now();
     const nextStates: CombatStateProbability[] = [];
 
     const attackerHits: number[] = calculateHits(state.attacker, input);
@@ -218,10 +240,12 @@ function resolveCombatRound(state: CombatState, input: CalculationInput, round: 
             });
         }
     }
+    performanceObj.resolveCombatRound += performance.now() - p0;
     return nextStates;
 }
 
 function calculateHits(participant: ParticipantState, input: CalculationInput): number[] {
+    const p0 = performance.now();
     // todo: add role as part of input; tags are dependent on it.
     let hitChances: number[] = [1.0]; // Initial probability: 100% chance for 0 hits.
     for (let unit of participant.units) {
@@ -233,6 +257,7 @@ function calculateHits(participant: ParticipantState, input: CalculationInput): 
             hitChances = addHitChance(hitChances, hitProbability);
         }
     }
+    performanceObj.calculateHits += performance.now() - p0;
     return hitChances;
 }
 
@@ -257,6 +282,8 @@ function assignHits(participant: ParticipantState, hits: number): ParticipantSta
 }
 
 function assignHit(participant: ParticipantState): ParticipantState {
+    const p0 = performance.now();
+    let nextState: ParticipantState = participant;
     const units: ComputedUnitSnapshot[] = participant.units.map(getUnitSnapshot);
     const sortedUnits: ComputedUnitSnapshot[] = units.sort(compareHitPriorityOrder);
     // account for "can't assign fighter hits" etc.? Loop list until we find a unit that it can be assigned to?
@@ -269,13 +296,13 @@ function assignHit(participant: ParticipantState): ParticipantState {
         } else {
             nextUnits = participant.units.map((u, i) => (i === idx ? { type: u.type, sustainedHits: (u.sustainedHits ?? 0) + 1 } : u));
         }
-        return {
+        nextState = {
             units: nextUnits,
             tags: participant.tags,
         };
     }
-    // Could not assign the hit to anything
-    return participant;
+    performanceObj.assignHit += performance.now() - p0;
+    return nextState;
 }
 
 function getUnitSnapshot(unit: UnitState): ComputedUnitSnapshot {
@@ -343,39 +370,6 @@ function determineVictor(state: CombatState): CombatVictor | undefined {
     return undefined;
 }
 
-function combatStateComparer(a: CombatState, b: CombatState): number {
-    if (a.stage !== b.stage) return a.stage.localeCompare(b.stage);
-    for (let role of [ParticipantRole.Attacker, ParticipantRole.Defender]) {
-        const unitsA: UnitState[] = a[role].units.sort(unitStateComparer);
-        const unitsB: UnitState[] = b[role].units.sort(unitStateComparer);
-        if (unitsA.length !== unitsB.length) return unitsA.length - unitsB.length;
-        for (let i = 0; i < unitsA.length; i++) {
-            const comparison: number = unitStateComparer(unitsA[i], unitsB[i]);
-            if (comparison !== 0) return comparison;
-        }
-    }
-    return 0;
-}
-
-function unitStateComparer(a: UnitState, b: UnitState): number {
-    if (a.type !== b.type) return a.type.localeCompare(b.type);
-    if (a.sustainedHits !== b.sustainedHits) return (a.sustainedHits ?? 0) - (b.sustainedHits ?? 0);
-    return combatStateTagsComparer(a.tags, b.tags);
-}
-
-function combatStateTagsComparer(a: CombatStateTags | undefined, b: CombatStateTags | undefined): number {
-    if (a || b) {
-        if (!a || !b) return Number(!!a) - Number(!!b);
-        const aKeys: string[] = Object.keys(a.tags);
-        const bKeys: string[] = Object.keys(b.tags);
-        if (aKeys.length !== bKeys.length) return aKeys.length - bKeys.length;
-        for (let key of aKeys) {
-            if (a[key] !== b[key]) return (a[key] ?? 0) - (b[key] ?? 0);
-        }
-    }
-    return 0;
-}
-
 function appendCombatStateProbabilities(dict: CombatStateDictionary, stateProbabilities: CombatStateProbability[]) {
     for (let stateProbability of stateProbabilities) {
         appendCombatStateProbability(dict, stateProbability);
@@ -383,13 +377,8 @@ function appendCombatStateProbabilities(dict: CombatStateDictionary, stateProbab
     logStatistics(dict);
 }
 
-function logStatistics(dict: CombatStateDictionary) {
-    const states: CombatStateProbability[] = Object.values(dict).flat();
-    const finished: CombatStateProbability[] = states.filter((sp: CombatStateProbability) => combatStateIsFinished(sp.state));
-    console.log(`State count: ${states.length} (finished: ${finished.length})`);
-}
-
 function appendCombatStateProbability(dict: CombatStateDictionary, stateProbability: CombatStateProbability) {
+    const p0 = performance.now();
     const hash: number = hashCombatState(stateProbability.state);
     const list: CombatStateProbability[] | undefined = dict[hash];
     if (list) {
@@ -414,18 +403,83 @@ function appendCombatStateProbability(dict: CombatStateDictionary, stateProbabil
     } else {
         dict[hash] = [stateProbability];
     }
+    performanceObj.appendCombatStateProbability += performance.now() - p0;
+}
+
+// Next steps: reduce footprint of comparer/hash functions:
+// * Sort combatState.units when creating the state, assume that it is sorted in comparer/hash functions
+// * Replace string with number for unit type, stage
+// * Oh, and remove the (() => {})() wrappers. Check performance impact.
+// * Move performance tracker to a parameter?
+
+function combatStateComparer(a: CombatState, b: CombatState): number {
+    const p0 = performance.now();
+    const ret = (() => {
+        const aHash: number = hashCombatState(a);
+        const bHash: number = hashCombatState(b);
+        if (aHash !== bHash) return aHash - bHash;
+        if (a.stage !== b.stage) return a.stage.localeCompare(b.stage);
+        for (let role of [ParticipantRole.Attacker, ParticipantRole.Defender]) {
+            const unitsA: UnitState[] = a[role].units.sort(unitStateComparer);
+            const unitsB: UnitState[] = b[role].units.sort(unitStateComparer);
+            if (unitsA.length !== unitsB.length) return unitsA.length - unitsB.length;
+            for (let i = 0; i < unitsA.length; i++) {
+                const comparison: number = unitStateComparer(unitsA[i], unitsB[i]);
+                if (comparison !== 0) return comparison;
+            }
+        }
+        return 0;
+    })();
+    performanceObj.combatStateComparer += performance.now() - p0;
+    return ret;
+}
+
+function unitStateComparer(a: UnitState, b: UnitState): number {
+    const p0 = performance.now();
+    const ret = (() => {
+        const aHash: number = hashUnitState(a);
+        const bHash: number = hashUnitState(b);
+        if (aHash !== bHash) return aHash - bHash;
+        if (a.type !== b.type) return a.type.localeCompare(b.type);
+        if (a.sustainedHits !== b.sustainedHits) return (a.sustainedHits ?? 0) - (b.sustainedHits ?? 0);
+        return combatStateTagsComparer(a.tags, b.tags);
+    })();
+    performanceObj.unitStateComparer += performance.now() - p0;
+    return ret;
+}
+
+function combatStateTagsComparer(a: CombatStateTags | undefined, b: CombatStateTags | undefined): number {
+    if (a || b) {
+        if (!a || !b) return Number(!!a) - Number(!!b);
+        const aKeys: string[] = Object.keys(a.tags);
+        const bKeys: string[] = Object.keys(b.tags);
+        if (aKeys.length !== bKeys.length) return aKeys.length - bKeys.length;
+        for (let key of aKeys) {
+            if (a[key] !== b[key]) return (a[key] ?? 0) - (b[key] ?? 0);
+        }
+    }
+    return 0;
 }
 
 function hashCombatState(state: CombatState): number {
+    const p0 = performance.now();
     let hash: number = getStringHashCode(state.stage);
     for (let participant of [state.attacker, state.defender]) {
         for (let unit of participant.units.sort(unitStateComparer)) {
-            hash = (hash << 5) - hash + getStringHashCode(unit.type);
-            hash = (hash << 5) - hash + (unit.sustainedHits ?? 0);
-            hash = (hash << 5) - hash + hashCombatStateTags(unit.tags);
+            hash = (hash << 5) - hash + hashUnitState(unit);
         }
         hash = (hash << 5) - hash + hashCombatStateTags(participant.tags);
     }
+    performanceObj.hashCombatState += performance.now() - p0;
+    return hash;
+}
+
+function hashUnitState(unit: UnitState): number {
+    const p0 = performance.now();
+    let hash: number = getStringHashCode(unit.type);
+    hash = (hash << 5) - hash + (unit.sustainedHits ?? 0);
+    hash = (hash << 5) - hash + hashCombatStateTags(unit.tags);
+    performanceObj.hashUnitState += performance.now() - p0;
     return hash;
 }
 
@@ -441,11 +495,19 @@ function hashCombatStateTags(tags: CombatStateTags | undefined): number {
 }
 
 function getStringHashCode(str: string): number {
+    const p0 = performance.now();
     let hash: number = 0;
     for (var i = 0; i < str.length; i++) {
         const character: number = str.charCodeAt(i);
         hash = (hash << 5) - hash + character;
         hash = hash & hash; // Convert to 32bit integer
     }
+    performanceObj.getStringHashCode += performance.now() - p0;
     return hash;
+}
+
+function logStatistics(dict: CombatStateDictionary) {
+    const states: CombatStateProbability[] = Object.values(dict).flat();
+    const finished: CombatStateProbability[] = states.filter((sp: CombatStateProbability) => combatStateIsFinished(sp.state));
+    console.log(`State count: ${states.length} (finished: ${finished.length})`);
 }
