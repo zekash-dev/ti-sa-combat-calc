@@ -161,32 +161,32 @@ export function aggregateCombatResults(results: SimulatedCombatResult[]): Aggreg
 }
 
 export const unitDefinitions: KeyedDictionary<UnitType, UnitDefinition> = {
-    warSun: {
+    [UnitType.WarSun]: {
         type: UnitType.WarSun,
         combatValue: 3,
         combatRolls: 3,
         sustainDamage: 2,
     },
-    dreadnought: {
+    [UnitType.Dreadnought]: {
         type: UnitType.Dreadnought,
         combatValue: 5,
         combatRolls: 2,
         sustainDamage: 1,
     },
-    cruiser: {
+    [UnitType.Cruiser]: {
         type: UnitType.Cruiser,
         combatValue: 7,
     },
-    destroyer: {
+    [UnitType.Destroyer]: {
         type: UnitType.Destroyer,
         combatValue: 9,
         antiFigherBarrage: 2,
     },
-    carrier: {
+    [UnitType.Carrier]: {
         type: UnitType.Carrier,
         combatValue: 9,
     },
-    fighter: {
+    [UnitType.Fighter]: {
         type: UnitType.Fighter,
         combatValue: 9,
     },

@@ -15,7 +15,7 @@ export function ResultView() {
             {Object.keys(output.victorProbabilites).map((victor, i) => (
                 <ListItem key={victor}>
                     <Typography>
-                        {round(output.victorProbabilites[victor as CombatVictor] * 100, 1)}%: {victor}
+                        {round(output.victorProbabilites[victor as CombatVictor] * 100, 3)}%: {victor}
                     </Typography>
                 </ListItem>
             ))}

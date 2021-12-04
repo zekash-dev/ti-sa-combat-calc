@@ -12,6 +12,7 @@ import {
     TextField,
     Typography,
 } from "@mui/material";
+import { isInteger } from "lodash";
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -24,7 +25,6 @@ import {
     selectParticipant,
     setUnitCount,
 } from "redux/participant/participantSlice";
-import { isInteger } from "lodash";
 
 interface Props {
     role: ParticipantRole;
@@ -57,36 +57,38 @@ export function ParticipantUnitEditor({ role }: Props) {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {Object.values(UnitType).map((unitType) => {
-                            const count: number = getUnitCount(participant, unitType);
-                            return (
-                                <TableRow key={unitType}>
-                                    <TableCell>{unitType}</TableCell>
-                                    <TableCell>
-                                        {/* <IconButton size="small" disabled={count === 0} onClick={() => handleDecrementUnitCount(unitType)}>
+                        {Object.values(UnitType)
+                            .filter((v): v is number => typeof v === "number")
+                            .map((unitType: number) => {
+                                const count: number = getUnitCount(participant, unitType);
+                                return (
+                                    <TableRow key={unitType}>
+                                        <TableCell>{UnitType[unitType]}</TableCell>
+                                        <TableCell>
+                                            {/* <IconButton size="small" disabled={count === 0} onClick={() => handleDecrementUnitCount(unitType)}>
                                             <Remove />
                                         </IconButton> */}
-                                        <TextField
-                                            type="number"
-                                            size="small"
-                                            sx={{ width: 80 }}
-                                            value={count}
-                                            onChange={(e) => handleSetUnitCount(unitType, e.target.value)}
-                                        />
-                                        {/* <IconButton size="small" onClick={() => handleIncrementUnitCount(unitType)}>
+                                            <TextField
+                                                type="number"
+                                                size="small"
+                                                sx={{ width: 80 }}
+                                                value={count}
+                                                onChange={(e) => handleSetUnitCount(unitType, e.target.value)}
+                                            />
+                                            {/* <IconButton size="small" onClick={() => handleIncrementUnitCount(unitType)}>
                                             <Add />
                                         </IconButton> */}
-                                    </TableCell>
-                                    <TableCell sx={{ width: 34 }}>
-                                        {count > 0 && (
-                                            <IconButton size="small" onClick={() => handleClearUnitCount(unitType)}>
-                                                <Delete />
-                                            </IconButton>
-                                        )}
-                                    </TableCell>
-                                </TableRow>
-                            );
-                        })}
+                                        </TableCell>
+                                        <TableCell sx={{ width: 34 }}>
+                                            {count > 0 && (
+                                                <IconButton size="small" onClick={() => handleClearUnitCount(unitType)}>
+                                                    <Delete />
+                                                </IconButton>
+                                            )}
+                                        </TableCell>
+                                    </TableRow>
+                                );
+                            })}
                     </TableBody>
                 </Table>
             </TableContainer>

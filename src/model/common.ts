@@ -1,5 +1,7 @@
 import { Dictionary } from "lodash";
 
+import { CombatState, CombatStateOutput, UnitState, UnitStatePrototype } from "./combatState";
+
 export type KeyedDictionary<TKey extends string | number | symbol, TValue> = {
     [key in TKey]: TValue;
 };
@@ -9,12 +11,12 @@ export type SparseDictionary<TKey extends string | number | symbol, TValue> = {
 };
 
 export enum UnitType {
-    WarSun = "warSun",
-    Dreadnought = "dreadnought",
-    Cruiser = "cruiser",
-    Destroyer = "destroyer",
-    Carrier = "carrier",
-    Fighter = "fighter",
+    WarSun = 101,
+    Dreadnought = 102,
+    Cruiser = 103,
+    Destroyer = 104,
+    Carrier = 105,
+    Fighter = 106,
 }
 
 export interface UnitDefinition {
@@ -53,14 +55,14 @@ export type CombatVictor = ParticipantRole.Attacker | ParticipantRole.Defender |
 
 // Calculation
 export enum CombatStage {
-    SpaceMines = "sm",
-    PDS = "pds",
-    StartOfBattle = "sob",
-    PreCombat = "pc",
-    AntiFighterBarrage = "afb",
-    Round1 = "r1",
-    Round2 = "r2",
-    RoundN = "rN",
+    SpaceMines = 1,
+    PDS = 2,
+    StartOfBattle = 3,
+    PreCombat = 4,
+    AntiFighterBarrage = 5,
+    Round1 = 6,
+    Round2 = 7,
+    RoundN = 8,
 }
 
 /**
@@ -74,27 +76,6 @@ export interface CombatStateProbability {
     probability: number;
 }
 
-/**
- * Base "node" of a combat state. Hashable and equatable.
- * When new states are created, they should first be compared against existing states to see if they are equal.
- */
-export interface CombatState {
-    stage: CombatStage;
-    [ParticipantRole.Attacker]: ParticipantState;
-    [ParticipantRole.Defender]: ParticipantState;
-}
-
-export interface ParticipantState {
-    tags: any; // placeholder to keep track of spent abilities etc.
-    units: UnitState[];
-}
-
-export interface UnitState {
-    type: UnitType;
-    sustainedHits?: number;
-    tags?: CombatStateTags; // placeholder to keep track of spent abilities etc.
-}
-
 export interface CalculationInput {
     [ParticipantRole.Attacker]: ParticipantInput;
     [ParticipantRole.Defender]: ParticipantInput;
@@ -102,12 +83,17 @@ export interface CalculationInput {
 
 export interface CalculationOutput {
     victorProbabilites: KeyedDictionary<CombatVictor, number>;
-    resultStates: CombatStateProbability[];
+    resultStates: CombatStateProbabilityOutput[];
+}
+
+export interface CombatStateProbabilityOutput {
+    state: CombatStateOutput;
+    probability: number;
 }
 
 export interface ParticipantInput {
     faction: Faction;
-    units: UnitState[];
+    units: UnitStatePrototype[];
     tags: CombatStateTags; // techs, upgrades, AC's, PC's, ...
 }
 
@@ -122,7 +108,9 @@ export interface CombatStateTags {
 /**
  * Computed snapshot that takes has applied the bonus effect of all tags to the unit state.
  */
-export interface ComputedUnitSnapshot extends UnitDefinition, UnitState {}
+export interface ComputedUnitSnapshot extends UnitDefinition, UnitStatePrototype {
+    base: UnitState;
+}
 
 // Simulation
 
@@ -184,4 +172,23 @@ export interface AggregatedCombatResult {
 export interface CountProbability {
     count: number;
     probability: number;
+}
+
+export interface PerformanceTracker {
+    calculateCombatOutcome: number;
+    resolveCombatRound: number;
+    appendCombatStateProbability: number;
+    assignHit: number;
+    getUnitSnapshot: number;
+    sortUnitsByPriorityOrder: number;
+    resolveHit: number;
+    calculateHits: number;
+    mergeIdenticalStates: number;
+    combatStateComparer: number;
+    hashCombatState: number;
+    participantStateComparer: number;
+    hashParticipantState: number;
+    unitStateComparer: number;
+    hashUnitState: number;
+    hashCollissions: number;
 }
