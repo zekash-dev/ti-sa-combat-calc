@@ -1,6 +1,8 @@
 import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
 
-import { CalculationInput, Faction, KeyedDictionary, ParticipantInput, ParticipantRole, UnitType } from "model/common";
+import { Faction, KeyedDictionary } from "model/common";
+import { CalculationInput, ParticipantInput, ParticipantRole } from "model/calculation";
+import { UnitType } from "model/unit";
 import { RootState } from "redux/store";
 
 export interface ParticipantState {
@@ -10,12 +12,10 @@ export interface ParticipantState {
 export const initialState: ParticipantState = {
     participants: {
         attacker: {
-            faction: Faction.Hacan,
             units: [],
             tags: {},
         },
         defender: {
-            faction: Faction.JolNar,
             units: [],
             tags: {},
         },
@@ -41,8 +41,8 @@ const participantSlice = createSlice({
     initialState: initialState,
     reducers: {
         setFaction: (state: ParticipantState, action: PayloadAction<SetFactionPayload>) => {
-            const { faction, role } = action.payload;
-            state.participants[role].faction = faction;
+            // const { faction, role } = action.payload;
+            // state.participants[role].faction = faction;
         },
         clearParticipantUnits: (state: ParticipantState, action: PayloadAction<ParticipantRole>) => {
             state.participants[action.payload].units = [];

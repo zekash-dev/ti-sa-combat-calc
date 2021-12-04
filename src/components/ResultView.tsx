@@ -3,7 +3,7 @@ import { round } from "lodash";
 import React from "react";
 import { useSelector } from "react-redux";
 
-import { CalculationOutput, CombatVictor } from "model/common";
+import { CalculationOutput, CombatVictor } from "model/calculation";
 import { selectOutput } from "redux/result/resultSlice";
 
 export function ResultView() {

@@ -1,30 +1,33 @@
 import { clamp, round } from "lodash";
 
-import { CombatState, CombatStateOutput, ParticipantState, UnitState } from "model/combatState";
+import {
+    CombatState,
+    CombatStateDictionary,
+    CombatStateProbability,
+    CombatStateResolution,
+    CombatStateResolutionDictionary,
+    ComputedUnitSnapshot,
+    ParticipantState,
+    UnitState,
+} from "model/combatState";
+import { KeyedDictionary } from "model/common";
 import {
     CalculationInput,
     CalculationOutput,
     CombatStage,
-    CombatStateDictionary,
-    CombatStateProbability,
+    CombatStateOutput,
     CombatStateProbabilityOutput,
-    CombatStateResolution,
-    CombatStateResolutionDictionary,
     CombatVictor,
-    ComputedUnitSnapshot,
-    KeyedDictionary,
     ParticipantInput,
     ParticipantRole,
-    UnitDefinition,
-} from "model/common";
-import { unitDefinitions } from "./simulator";
+} from "model/calculation";
+import { UnitDefinition, unitDefinitions } from "model/unit";
 
 const emptyOutput: CalculationOutput = {
     victorProbabilites: {
         attacker: 0,
         defender: 0,
         draw: 0,
-        timeout: 0,
     },
     resultStates: [],
 };
@@ -53,19 +56,16 @@ export function calculateCombatOutcome(input: CalculationInput): CalculationOutp
 }
 
 function getInitialState(input: CalculationInput): CombatState {
-    return new CombatState({
-        stage: CombatStage.RoundN,
-        attacker: getInitialParticipantState(input.attacker),
-        defender: getInitialParticipantState(input.defender),
-    });
+    return new CombatState(CombatStage.RoundN, getInitialParticipantState(input.attacker), getInitialParticipantState(input.defender));
 }
 
 function getInitialParticipantState(participant: ParticipantInput): ParticipantState {
     // todo: add role as input here; might affect some tags?
-    return new ParticipantState({
-        units: participant.units.map((up) => new UnitState(up)),
-        tags: {}, // todo: convert to inital tag values (only need to track tags with a state that can change during combat)
-    });
+    // todo: convert to inital tag values (only need to track tags with a state that can change during combat)
+    return new ParticipantState(
+        participant.units.map((up) => new UnitState(up.type, up.sustainedHits, up.tags)),
+        {}
+    );
 }
 
 function getNextStage(stage: CombatStage): CombatStage {
@@ -98,7 +98,6 @@ function createCalculationOutput(stateDictionary: CombatStateDictionary): Calcul
         attacker: 0,
         defender: 0,
         draw: 0,
-        timeout: 0,
     };
     // console.log(JSON.stringify(resultStatesOutput));
     for (let resultState of resultStatesOutput) {
@@ -200,11 +199,7 @@ function resolveStageNyi(state: CombatState): CombatStateProbability[] {
     return [
         {
             probability: 1.0,
-            state: new CombatState({
-                stage: getNextStage(state.stage),
-                attacker: state.attacker,
-                defender: state.defender,
-            }),
+            state: new CombatState(getNextStage(state.stage), state.attacker, state.defender),
         },
     ];
 }
@@ -226,11 +221,7 @@ function resolveCombatRound(state: CombatState, input: CalculationInput, stage: 
             const nextDefender: ParticipantState = assignHits(state.defender, defenderUnits, att);
             nextStates.push({
                 probability,
-                state: new CombatState({
-                    stage: getNextStage(state.stage),
-                    attacker: nextAttacker,
-                    defender: nextDefender,
-                }),
+                state: new CombatState(getNextStage(state.stage), nextAttacker, nextDefender),
             });
         }
     }
@@ -306,10 +297,10 @@ function assignHits(participant: ParticipantState, units: ComputedUnitSnapshot[]
     for (let i = 0; i < hits; i++) {
         assignHit(newUnits);
     }
-    return new ParticipantState({
-        units: newUnits.map((u) => u.base),
-        tags: participant.tags,
-    });
+    return new ParticipantState(
+        newUnits.map((u) => u.base),
+        participant.tags
+    );
 }
 
 function assignHit(units: ComputedUnitSnapshot[]) {
@@ -325,7 +316,7 @@ function assignHit(units: ComputedUnitSnapshot[]) {
                 const newUnit: ComputedUnitSnapshot = {
                     ...selectedUnit,
                     sustainedHits,
-                    base: new UnitState({ type: selectedUnit.type, sustainedHits, tags: selectedUnit.base.tags }),
+                    base: new UnitState(selectedUnit.type, sustainedHits, selectedUnit.base.tags),
                 };
                 units[hitIndex] = newUnit;
             }

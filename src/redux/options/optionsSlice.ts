@@ -1,27 +1,17 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { createSlice } from "@reduxjs/toolkit";
 
 import { RootState } from "redux/store";
 
-export interface OptionsState {
-    iterations: number;
-}
+export interface OptionsState {}
 
-export const initialState: OptionsState = {
-    iterations: 1000,
-};
+export const initialState: OptionsState = {};
 
 const optionsSlice = createSlice({
     name: "options",
     initialState: initialState,
-    reducers: {
-        setIterations: (state: OptionsState, action: PayloadAction<number>) => {
-            state.iterations = action.payload;
-        },
-    },
+    reducers: {},
 });
 
-export const { setIterations } = optionsSlice.actions;
-
-export const selectIterations = (rootState: RootState): number => rootState.options.iterations;
+export const selectOptions = (rootState: RootState): OptionsState => rootState.options;
 
 export default optionsSlice.reducer;

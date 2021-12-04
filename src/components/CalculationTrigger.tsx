@@ -1,16 +1,14 @@
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { selectIterations } from "redux/options/optionsSlice";
 
 import { selectparticipantState } from "redux/participant/participantSlice";
-import { runSimulation } from "redux/thunks/runSimulation";
+import { runCalculation } from "redux/thunks/runCalculation";
 
-export function SimulationTrigger() {
+export function CalculationTrigger() {
     const dispatch = useDispatch();
     const participantState = useSelector(selectparticipantState);
-    const iterations = useSelector(selectIterations);
     useEffect(() => {
-        dispatch(runSimulation());
-    }, [dispatch, participantState, iterations]);
+        dispatch(runCalculation());
+    }, [dispatch, participantState]);
     return null;
 }

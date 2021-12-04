@@ -1,21 +1,21 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
-import { CalculationOutput } from "model/common";
+import { CalculationOutput } from "model/calculation";
 import { RootState } from "redux/store";
 
 export interface ResultState {
     output: CalculationOutput | null;
-    simulating: boolean;
+    calculating: boolean;
     calculationKey: string;
 }
 
 export const initialState: ResultState = {
     output: null,
-    simulating: false,
+    calculating: false,
     calculationKey: "",
 };
 
-interface StartSimulationPayload {
+interface StartCalculationPayload {
     calculationKey: string;
 }
 
@@ -32,20 +32,20 @@ const resultSlice = createSlice({
             const { calculationKey, output: results } = action.payload;
             if (calculationKey === state.calculationKey) {
                 state.output = results;
-                state.simulating = false;
+                state.calculating = false;
             }
         },
-        setSimulating: (state: ResultState, action: PayloadAction<StartSimulationPayload>) => {
+        setCalculating: (state: ResultState, action: PayloadAction<StartCalculationPayload>) => {
             const { calculationKey } = action.payload;
             state.calculationKey = calculationKey;
-            state.simulating = true;
+            state.calculating = true;
         },
     },
 });
 
-export const { setSimulating, setOutput } = resultSlice.actions;
+export const { setCalculating, setOutput } = resultSlice.actions;
 
 export const selectOutput = (rootState: RootState) => rootState.result.output;
-export const selectSimulating = (rootState: RootState) => rootState.result.simulating;
+export const selectCalculating = (rootState: RootState) => rootState.result.calculating;
 
 export default resultSlice.reducer;

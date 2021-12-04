@@ -1,4 +1,4 @@
-import { Add, Delete, Remove } from "@mui/icons-material";
+import { Delete } from "@mui/icons-material";
 import {
     Box,
     IconButton,
@@ -16,15 +16,9 @@ import { isInteger } from "lodash";
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 
-import { ParticipantInput, ParticipantRole, UnitType } from "model/common";
-import {
-    clearParticipantUnitsOfType,
-    decrementUnitCount,
-    getUnitCount,
-    incrementUnitCount,
-    selectParticipant,
-    setUnitCount,
-} from "redux/participant/participantSlice";
+import { ParticipantInput, ParticipantRole } from "model/calculation";
+import { UnitType } from "model/unit";
+import { clearParticipantUnitsOfType, getUnitCount, selectParticipant, setUnitCount } from "redux/participant/participantSlice";
 
 interface Props {
     role: ParticipantRole;
@@ -34,8 +28,6 @@ export function ParticipantUnitEditor({ role }: Props) {
     const dispatch = useDispatch();
     const participant: ParticipantInput = useSelector(selectParticipant(role));
 
-    const handleDecrementUnitCount = (unit: UnitType) => dispatch(decrementUnitCount({ role, unit }));
-    const handleIncrementUnitCount = (unit: UnitType) => dispatch(incrementUnitCount({ role, unit }));
     const handleSetUnitCount = (unit: UnitType, count: string) => {
         const convertedCount: number = Number(count);
         if (isInteger(convertedCount)) {

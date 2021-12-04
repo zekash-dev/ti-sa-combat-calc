@@ -1,16 +1,16 @@
 import { Grid } from "@mui/material";
 import React from "react";
 
-import { ParticipantRole } from "model/common";
+import { ParticipantRole } from "model/calculation";
+import { CalculationTrigger } from "./CalculationTrigger";
 import { OptionsManager } from "./OptionsManager";
 import { ParticipantUnitEditor } from "./ParticipantUnitEditor";
 import { ResultView } from "./ResultView";
-import { SimulationTrigger } from "./SimulationTrigger";
 
 export function Home() {
     return (
         <div>
-            <SimulationTrigger />
+            <CalculationTrigger />
             <Grid container>
                 <Grid item>
                     <ParticipantUnitEditor role={ParticipantRole.Attacker} />

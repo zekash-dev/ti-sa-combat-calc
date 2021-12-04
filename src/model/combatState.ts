@@ -1,15 +1,28 @@
-import { CombatStage, UnitType } from "./common";
+import { Dictionary } from "lodash";
 
-export interface CombatStatePrototype {
-    stage: CombatStage;
-    attacker: ParticipantState;
-    defender: ParticipantState;
+import { CombatStage, CombatStateOutput, CombatStateTags, ParticipantInput, UnitInput } from "./calculation";
+import { UnitType } from "./unit";
+
+/**
+ * Key = hash of CombatState
+ * Value = all states with the same hash (since hash doesn't guarantee uniqueness) and their respective probability
+ */
+export type CombatStateDictionary = Dictionary<CombatStateProbability[]>;
+
+/**
+ * Key = hash of CombatState
+ * Value = known resolutions for an input state
+ */
+export type CombatStateResolutionDictionary = Dictionary<CombatStateResolution[]>;
+
+export interface CombatStateResolution {
+    input: CombatState;
+    nextStates: CombatStateProbability[];
 }
 
-export interface CombatStateOutput {
-    stage: CombatStage;
-    attacker: ParticipantStateOutput;
-    defender: ParticipantStateOutput;
+export interface CombatStateProbability {
+    state: CombatState;
+    probability: number;
 }
 
 /**
@@ -22,7 +35,7 @@ export class CombatState {
     defender: ParticipantState;
     hash: number;
 
-    constructor({ stage, attacker, defender }: CombatStatePrototype) {
+    constructor(stage: CombatStage, attacker: ParticipantState, defender: ParticipantState) {
         this.stage = stage;
         this.attacker = attacker;
         this.defender = defender;
@@ -54,22 +67,12 @@ export class CombatState {
     }
 }
 
-export interface ParticipantStatePrototype {
-    tags: CombatStateTags;
-    units: UnitState[];
-}
-
-export interface ParticipantStateOutput {
-    tags: CombatStateTags;
-    units: UnitStatePrototype[];
-}
-
 export class ParticipantState {
     units: UnitState[];
     tags: CombatStateTags;
     hash: number;
 
-    constructor({ units, tags }: ParticipantStatePrototype) {
+    constructor(units: UnitState[], tags: CombatStateTags) {
         this.units = [...units].sort();
         this.tags = tags;
         this.hash = this.calculateHash();
@@ -84,7 +87,7 @@ export class ParticipantState {
         return hash;
     }
 
-    public toOutput(): ParticipantStateOutput {
+    public toOutput(): ParticipantInput {
         return {
             units: this.units.map((u) => u.toOutput()),
             tags: this.tags,
@@ -102,19 +105,13 @@ export class ParticipantState {
     }
 }
 
-export interface UnitStatePrototype {
-    type: UnitType;
-    sustainedHits: number;
-    tags?: CombatStateTags;
-}
-
 export class UnitState {
     type: UnitType;
     sustainedHits: number;
     tags?: CombatStateTags;
     hash: number;
 
-    constructor({ type, sustainedHits, tags }: UnitStatePrototype) {
+    constructor(type: UnitType, sustainedHits: number, tags: CombatStateTags | undefined) {
         this.type = type;
         this.sustainedHits = sustainedHits;
         this.tags = tags;
@@ -128,7 +125,7 @@ export class UnitState {
         return hash;
     }
 
-    public toOutput(): UnitStatePrototype {
+    public toOutput(): UnitInput {
         return {
             type: this.type,
             sustainedHits: this.sustainedHits,
@@ -144,8 +141,13 @@ export class UnitState {
     }
 }
 
-export interface CombatStateTags {
-    [key: number]: number;
+export interface ComputedUnitSnapshot {
+    base: UnitState;
+    type: UnitType;
+    combatValue: number;
+    rolls: number;
+    sustainDamage: number;
+    sustainedHits: number;
 }
 
 function hashCombatStateTags(tags: CombatStateTags | undefined): number {
