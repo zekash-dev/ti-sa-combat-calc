@@ -8,6 +8,8 @@ import {
     CombatStateDictionary,
     CombatStateProbability,
     CombatStateProbabilityOutput,
+    CombatStateResolution,
+    CombatStateResolutionDictionary,
     CombatVictor,
     ComputedUnitSnapshot,
     KeyedDictionary,
@@ -30,8 +32,12 @@ const emptyOutput: CalculationOutput = {
 
 const defaultPerformanceObj: PerformanceTracker = {
     calculateCombatOutcome: 0,
+    getInitialState: 0,
+    resolveState: 0,
     resolveCombatRound: 0,
     appendCombatStateProbability: 0,
+    popNextActiveState: 0,
+    addMemoizedResolutions: 0,
     assignHit: 0,
     getUnitSnapshot: 0,
     sortUnitsByPriorityOrder: 0,
@@ -44,7 +50,11 @@ const defaultPerformanceObj: PerformanceTracker = {
     hashParticipantState: 0,
     unitStateComparer: 0,
     hashUnitState: 0,
+    getMemoizedResolutions: 0,
+    computeNextStates: 0,
     hashCollissions: 0,
+    memoizedResolutions: 0,
+    calculatedResolutions: 0,
 };
 
 let performanceObj = defaultPerformanceObj;
@@ -57,9 +67,11 @@ export function calculateCombatOutcome(input: CalculationInput): CalculationOutp
         state: getInitialState(input),
         probability: 1.0,
     };
+    performanceObj.getInitialState += performance.now() - p0;
     const stateDictionary: CombatStateDictionary = {};
+    const stateResolutions: CombatStateResolutionDictionary = {};
     while (activeState !== undefined) {
-        const nextStates: CombatStateProbability[] = resolveState(activeState, input);
+        const nextStates: CombatStateProbability[] = resolveState(activeState, input, stateResolutions);
         appendCombatStateProbabilities(stateDictionary, nextStates);
         activeState = popNextActiveState(stateDictionary);
     }
@@ -135,7 +147,32 @@ function createCalculationOutput(stateDictionary: CombatStateDictionary): Calcul
     };
 }
 
-function resolveState(currentState: CombatStateProbability, input: CalculationInput): CombatStateProbability[] {
+function resolveState(
+    currentState: CombatStateProbability,
+    input: CalculationInput,
+    stateResolutions: CombatStateResolutionDictionary
+): CombatStateProbability[] {
+    const p0 = performance.now();
+    let nextStates: CombatStateProbability[];
+    const memoizedResolutions: CombatStateProbability[] | undefined = getMemoizedResolutions(currentState.state, stateResolutions);
+    if (memoizedResolutions) {
+        nextStates = memoizedResolutions;
+        performanceObj.memoizedResolutions++;
+    } else {
+        nextStates = computeNextStates(currentState, input);
+        addMemoizedResolutions(currentState.state, nextStates, stateResolutions);
+    }
+    nextStates = nextStates.map((sp: CombatStateProbability) => ({
+        state: sp.state,
+        probability: sp.probability * currentState.probability,
+    }));
+    performanceObj.calculatedResolutions++;
+    performanceObj.resolveState += performance.now() - p0;
+    return nextStates;
+}
+
+function computeNextStates(currentState: CombatStateProbability, input: CalculationInput): CombatStateProbability[] {
+    const p0 = performance.now();
     let nextStates: CombatStateProbability[];
     switch (currentState.state.stage) {
         case CombatStage.SpaceMines:
@@ -165,17 +202,18 @@ function resolveState(currentState: CombatStateProbability, input: CalculationIn
     }
     // mergeIdenticalStates(nextStates);
     const identicalStateIdx: number = nextStates.findIndex((sp) => CombatState.compare(sp.state, currentState.state) === 0);
-    let totalProbability: number = currentState.probability;
     if (identicalStateIdx !== -1) {
-        // Remove paths that lead to the current state.
+        // Remove path that lead to the current state (neither side scores a hit in round N)
         const [identicalState] = nextStates.splice(identicalStateIdx, 1);
-        // Remove this state's probability from the total
-        totalProbability /= 1 - identicalState.probability;
+        // Inflate probability of remaining states to compensate for the removed path
+        const totalProbability = 1 / (1 - identicalState.probability);
+        nextStates = nextStates.map((sp: CombatStateProbability) => ({
+            state: sp.state,
+            probability: sp.probability * totalProbability,
+        }));
     }
-    return nextStates.map((sp: CombatStateProbability) => ({
-        state: sp.state,
-        probability: sp.probability * totalProbability,
-    }));
+    performanceObj.computeNextStates += performance.now() - p0;
+    return nextStates;
 }
 
 // function mergeIdenticalStates(stateProbabilities: CombatStateProbability[]) {
@@ -370,6 +408,8 @@ export function calculateAverageHits(hitChances: number[]): number {
 }
 
 function popNextActiveState(dict: CombatStateDictionary): CombatStateProbability | undefined {
+    const p0 = performance.now();
+    let next: CombatStateProbability | undefined = undefined;
     for (let key of Object.keys(dict)) {
         const idx: number = dict[key].findIndex((sp: CombatStateProbability) => !combatStateIsFinished(sp.state));
         if (idx !== -1) {
@@ -379,10 +419,12 @@ function popNextActiveState(dict: CombatStateDictionary): CombatStateProbability
             } else {
                 dict[key].splice(idx, 1);
             }
-            return stateProbability;
+            next = stateProbability;
+            break;
         }
     }
-    return undefined;
+    performanceObj.popNextActiveState += performance.now() - p0;
+    return next;
 }
 
 function combatStateIsFinished(state: CombatState): boolean {
@@ -412,19 +454,20 @@ function determineVictor(state: CombatStateOutput): CombatVictor | undefined {
 }
 
 function appendCombatStateProbabilities(dict: CombatStateDictionary, stateProbabilities: CombatStateProbability[]) {
+    const p0 = performance.now();
     for (let stateProbability of stateProbabilities) {
         appendCombatStateProbability(dict, stateProbability);
     }
-    logStatistics(dict);
+    performanceObj.appendCombatStateProbability += performance.now() - p0;
+    // logStatistics(dict);
 }
 
 function appendCombatStateProbability(dict: CombatStateDictionary, stateProbability: CombatStateProbability) {
-    const p0 = performance.now();
     const hash: number = stateProbability.state.hash;
     const list: CombatStateProbability[] | undefined = dict[hash];
     if (list) {
         if (list.length === 0) {
-            console.warn(`Empty list found at hash ${hash}`);
+            console.warn(`appendCombatStateProbability: Empty list found at hash ${hash}`);
             list.push(stateProbability);
         } else {
             // console.log(`Multiple (${list.length}) states found for hash ${hash}. Using equality comparer.`);
@@ -457,7 +500,40 @@ function appendCombatStateProbability(dict: CombatStateDictionary, stateProbabil
     } else {
         dict[hash] = [stateProbability];
     }
-    performanceObj.appendCombatStateProbability += performance.now() - p0;
+}
+
+function getMemoizedResolutions(state: CombatState, dict: CombatStateResolutionDictionary): CombatStateProbability[] | undefined {
+    const p0 = performance.now();
+    const hash: number = state.hash;
+    const list: CombatStateResolution[] | undefined = dict[hash];
+    let nextStates: CombatStateProbability[] | undefined = undefined;
+
+    if (list) {
+        for (let resolution of list) {
+            if (CombatState.compare(resolution.input, state) === 0) {
+                nextStates = resolution.nextStates;
+                break;
+            }
+        }
+    }
+    performanceObj.getMemoizedResolutions += performance.now() - p0;
+    return nextStates;
+}
+
+function addMemoizedResolutions(state: CombatState, nextStates: CombatStateProbability[], dict: CombatStateResolutionDictionary) {
+    const p0 = performance.now();
+    const hash: number = state.hash;
+    const list: CombatStateResolution[] | undefined = dict[hash];
+    const resolution: CombatStateResolution = {
+        input: state,
+        nextStates: nextStates,
+    };
+    if (list) {
+        list.push(resolution);
+    } else {
+        dict[hash] = [resolution];
+    }
+    performanceObj.addMemoizedResolutions += performance.now() - p0;
 }
 
 // Next steps: reduce footprint of comparer/hash functions:

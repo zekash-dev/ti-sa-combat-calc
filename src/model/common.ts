@@ -71,6 +71,17 @@ export enum CombatStage {
  */
 export type CombatStateDictionary = Dictionary<CombatStateProbability[]>;
 
+/**
+ * Key = hash of CombatState
+ * Value = known resolutions for an input state
+ */
+export type CombatStateResolutionDictionary = Dictionary<CombatStateResolution[]>;
+
+export interface CombatStateResolution {
+    input: CombatState;
+    nextStates: CombatStateProbability[];
+}
+
 export interface CombatStateProbability {
     state: CombatState;
     probability: number;
@@ -176,8 +187,12 @@ export interface CountProbability {
 
 export interface PerformanceTracker {
     calculateCombatOutcome: number;
+    getInitialState: number;
+    resolveState: number;
     resolveCombatRound: number;
     appendCombatStateProbability: number;
+    popNextActiveState: number;
+    addMemoizedResolutions: number;
     assignHit: number;
     getUnitSnapshot: number;
     sortUnitsByPriorityOrder: number;
@@ -190,5 +205,9 @@ export interface PerformanceTracker {
     hashParticipantState: number;
     unitStateComparer: number;
     hashUnitState: number;
+    getMemoizedResolutions: number;
+    computeNextStates: number;
     hashCollissions: number;
+    memoizedResolutions: number;
+    calculatedResolutions: number;
 }
