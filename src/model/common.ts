@@ -28,15 +28,15 @@ export interface UnitDefinition {
      */
     combatValue: number;
     /**
-     * Number of combat rolls. Undefined = 1.
+     * Number of combat rolls in normal combat rounds.
      */
-    combatRolls?: number;
-    sustainDamage?: number;
-    preCombatShots?: number;
+    combatRolls: number;
+    sustainDamage: number;
+    preCombatShots: number;
     /**
-     * Number of AFB shots. Undefined = 0.
+     * Number of AFB shots.
      */
-    antiFigherBarrage?: number;
+    antiFigherBarrage: number;
 }
 
 export enum Faction {
@@ -119,8 +119,13 @@ export interface CombatStateTags {
 /**
  * Computed snapshot that takes has applied the bonus effect of all tags to the unit state.
  */
-export interface ComputedUnitSnapshot extends UnitDefinition, UnitStatePrototype {
+export interface ComputedUnitSnapshot {
     base: UnitState;
+    type: UnitType;
+    combatValue: number;
+    rolls: number;
+    sustainDamage: number;
+    sustainedHits: number;
 }
 
 // Simulation
@@ -183,31 +188,4 @@ export interface AggregatedCombatResult {
 export interface CountProbability {
     count: number;
     probability: number;
-}
-
-export interface PerformanceTracker {
-    calculateCombatOutcome: number;
-    getInitialState: number;
-    resolveState: number;
-    resolveCombatRound: number;
-    appendCombatStateProbability: number;
-    popNextActiveState: number;
-    addMemoizedResolutions: number;
-    assignHit: number;
-    getUnitSnapshot: number;
-    sortUnitsByPriorityOrder: number;
-    resolveHit: number;
-    calculateHits: number;
-    mergeIdenticalStates: number;
-    combatStateComparer: number;
-    hashCombatState: number;
-    participantStateComparer: number;
-    hashParticipantState: number;
-    unitStateComparer: number;
-    hashUnitState: number;
-    getMemoizedResolutions: number;
-    computeNextStates: number;
-    hashCollissions: number;
-    memoizedResolutions: number;
-    calculatedResolutions: number;
 }

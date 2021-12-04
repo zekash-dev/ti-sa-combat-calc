@@ -1,4 +1,4 @@
-import { CombatStage, PerformanceTracker, UnitType } from "./common";
+import { CombatStage, UnitType } from "./common";
 
 export interface CombatStatePrototype {
     stage: CombatStage;
@@ -20,23 +20,19 @@ export class CombatState {
     stage: CombatStage;
     attacker: ParticipantState;
     defender: ParticipantState;
-    performanceTracker: PerformanceTracker;
     hash: number;
 
-    constructor({ stage, attacker, defender }: CombatStatePrototype, performanceTracker: PerformanceTracker) {
+    constructor({ stage, attacker, defender }: CombatStatePrototype) {
         this.stage = stage;
         this.attacker = attacker;
         this.defender = defender;
-        this.performanceTracker = performanceTracker;
         this.hash = this.calculateHash();
     }
 
     private calculateHash(): number {
-        const p0 = performance.now();
         let hash: number = this.stage;
         hash = (hash << 5) - hash + this.attacker.hash;
         hash = (hash << 5) - hash + this.defender.hash * 2;
-        this.performanceTracker.hashCombatState += performance.now() - p0;
         return hash;
     }
 
@@ -49,17 +45,12 @@ export class CombatState {
     }
 
     public static compare(a: CombatState, b: CombatState): number {
-        const p0 = performance.now();
-        const ret = (() => {
-            if (a.hash !== b.hash) return a.hash - b.hash;
-            const attackerComparison: number = ParticipantState.compare(a.attacker, b.attacker);
-            if (attackerComparison !== 0) return attackerComparison;
-            const defenderComparison: number = ParticipantState.compare(a.defender, b.defender);
-            if (defenderComparison !== 0) return defenderComparison;
-            return 0;
-        })();
-        a.performanceTracker.combatStateComparer += performance.now() - p0;
-        return ret;
+        if (a.hash !== b.hash) return a.hash - b.hash;
+        const attackerComparison: number = ParticipantState.compare(a.attacker, b.attacker);
+        if (attackerComparison !== 0) return attackerComparison;
+        const defenderComparison: number = ParticipantState.compare(a.defender, b.defender);
+        if (defenderComparison !== 0) return defenderComparison;
+        return 0;
     }
 }
 
@@ -76,24 +67,20 @@ export interface ParticipantStateOutput {
 export class ParticipantState {
     units: UnitState[];
     tags: CombatStateTags;
-    performanceTracker: PerformanceTracker;
     hash: number;
 
-    constructor({ units, tags }: ParticipantStatePrototype, performanceTracker: PerformanceTracker) {
-        this.units = [...units].sort(UnitState.compare);
+    constructor({ units, tags }: ParticipantStatePrototype) {
+        this.units = [...units].sort();
         this.tags = tags;
-        this.performanceTracker = performanceTracker;
         this.hash = this.calculateHash();
     }
 
     private calculateHash(): number {
-        const p0 = performance.now();
         let hash: number = 0;
         for (let unit of this.units) {
             hash = (hash << 5) - hash + unit.hash;
         }
         hash = (hash << 5) - hash + hashCombatStateTags(this.tags);
-        this.performanceTracker.hashParticipantState += performance.now() - p0;
         return hash;
     }
 
@@ -105,53 +92,40 @@ export class ParticipantState {
     }
 
     public static compare(a: ParticipantState, b: ParticipantState): number {
-        const p0 = performance.now();
-        const ret = (() => {
-            if (a.hash !== b.hash) return a.hash - b.hash;
-            if (a.units.length !== b.units.length) return a.units.length - b.units.length;
-            for (let i = 0; i < a.units.length; i++) {
-                const comparison: number = UnitState.compare(a.units[i], b.units[i]);
-                if (comparison !== 0) return comparison;
-            }
-            return compareCombatStateTags(a.tags, b.tags);
-        })();
-        a.performanceTracker.participantStateComparer += performance.now() - p0;
-        return ret;
+        if (a.hash !== b.hash) return a.hash - b.hash;
+        if (a.units.length !== b.units.length) return a.units.length - b.units.length;
+        for (let i = 0; i < a.units.length; i++) {
+            const comparison: number = UnitState.compare(a.units[i], b.units[i]);
+            if (comparison !== 0) return comparison;
+        }
+        return compareCombatStateTags(a.tags, b.tags);
     }
 }
 
 export interface UnitStatePrototype {
     type: UnitType;
-    sustainedHits?: number;
+    sustainedHits: number;
     tags?: CombatStateTags;
 }
 
 export class UnitState {
     type: UnitType;
-    sustainedHits?: number;
+    sustainedHits: number;
     tags?: CombatStateTags;
-    performanceTracker: PerformanceTracker;
     hash: number;
 
-    constructor({ type, sustainedHits, tags }: UnitStatePrototype, performanceTracker: PerformanceTracker) {
+    constructor({ type, sustainedHits, tags }: UnitStatePrototype) {
         this.type = type;
         this.sustainedHits = sustainedHits;
         this.tags = tags;
-        this.performanceTracker = performanceTracker ?? {};
         this.hash = this.calculateHash();
     }
 
     private calculateHash(): number {
-        const p0 = performance.now();
         let hash: number = this.type;
-        hash = (hash << 5) - hash + (this.sustainedHits ?? 0);
+        hash = (hash << 5) - hash + this.sustainedHits;
         hash = (hash << 5) - hash + hashCombatStateTags(this.tags);
-        this.performanceTracker.hashUnitState += performance.now() - p0;
         return hash;
-    }
-
-    public sustainHit(): UnitState {
-        return new UnitState({ type: this.type, sustainedHits: (this.sustainedHits ?? 0) + 1 }, this.performanceTracker);
     }
 
     public toOutput(): UnitStatePrototype {
@@ -163,15 +137,10 @@ export class UnitState {
     }
 
     public static compare(a: UnitState, b: UnitState): number {
-        const p0 = performance.now();
-        const ret = (() => {
-            if (a.hash !== b.hash) return a.hash - b.hash;
-            if (a.type !== b.type) return a.type - b.type;
-            if (a.sustainedHits !== b.sustainedHits) return (a.sustainedHits ?? 0) - (b.sustainedHits ?? 0);
-            return compareCombatStateTags(a.tags, b.tags);
-        })();
-        a.performanceTracker.unitStateComparer += performance.now() - p0;
-        return ret;
+        if (a.hash !== b.hash) return a.hash - b.hash;
+        if (a.type !== b.type) return a.type - b.type;
+        if (a.sustainedHits !== b.sustainedHits) return a.sustainedHits - b.sustainedHits;
+        return compareCombatStateTags(a.tags, b.tags);
     }
 }
 

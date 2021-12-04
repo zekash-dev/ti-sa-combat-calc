@@ -77,7 +77,7 @@ export function getUnitCount(participant: ParticipantInput, unitType: UnitType):
 
 function addUnits(participant: ParticipantInput, unitType: UnitType, count: number) {
     for (let i = 0; i < count; i++) {
-        participant.units.push({ type: unitType });
+        participant.units.push({ type: unitType, sustainedHits: 0 });
     }
 }
 
