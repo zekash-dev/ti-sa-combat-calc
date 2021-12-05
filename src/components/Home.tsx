@@ -29,7 +29,7 @@ export function Home() {
                     </Grid>
                 </Grid>
                 <Grid container>
-                    <Grid item>
+                    <Grid item xs={12}>
                         <ResultView />
                     </Grid>
                 </Grid>

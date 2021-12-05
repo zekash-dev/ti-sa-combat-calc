@@ -13,6 +13,6 @@ export const runCalculation = (): AppThunk => async (dispatch, getState) => {
     dispatch(setCalculating({ calculationKey }));
     const input: CalculationInput = selectCalculationInput(getState());
 
-    const output: CalculationOutput = await worker.runCalculationWorker(input);
+    const output: CalculationOutput | null = await worker.runCalculationWorker(input);
     dispatch(setOutput({ calculationKey, output }));
 };

@@ -23,17 +23,8 @@ import {
 } from "model/calculation";
 import { UnitDefinition, unitDefinitions } from "model/unit";
 
-const emptyOutput: CalculationOutput = {
-    victorProbabilites: {
-        attacker: 0,
-        defender: 0,
-        draw: 0,
-    },
-    resultStates: [],
-};
-
-export function calculateCombatOutcome(input: CalculationInput): CalculationOutput {
-    if (input.attacker.units.length === 0 && input.defender.units.length === 0) return emptyOutput;
+export function calculateCombatOutcome(input: CalculationInput): CalculationOutput | null {
+    if (input.attacker.units.length === 0 && input.defender.units.length === 0) return null;
     if (process.env.NODE_ENV === "development") {
         console.profile();
     }

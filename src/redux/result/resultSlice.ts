@@ -21,7 +21,7 @@ interface StartCalculationPayload {
 
 interface SetResultPayload {
     calculationKey: string;
-    output: CalculationOutput;
+    output: CalculationOutput | null;
 }
 
 const resultSlice = createSlice({

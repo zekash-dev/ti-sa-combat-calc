@@ -130,6 +130,8 @@ export const {
 } = participantSlice.actions;
 
 export const selectparticipantState = (rootState: RootState) => rootState.participant;
+export const selectparticipants = (rootState: RootState): KeyedDictionary<ParticipantRole, ParticipantInput> =>
+    rootState.participant.participants;
 export const selectParticipant = (role: ParticipantRole) => (rootState: RootState) => rootState.participant.participants[role];
 
 export const selectCalculationInput = createSelector([selectparticipantState], (participantState): CalculationInput => {
