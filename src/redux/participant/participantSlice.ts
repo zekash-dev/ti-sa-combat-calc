@@ -1,7 +1,9 @@
 import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
 
-import { Faction, KeyedDictionary } from "model/common";
+import { grantDefaultFactionAbilities } from "logic/participant";
 import { CalculationInput, ParticipantInput, ParticipantRole } from "model/calculation";
+import { Faction, ParticipantTag } from "model/combatTags";
+import { KeyedDictionary } from "model/common";
 import { UnitType } from "model/unit";
 import { RootState } from "redux/store";
 
@@ -12,12 +14,14 @@ export interface ParticipantState {
 export const initialState: ParticipantState = {
     participants: {
         attacker: {
+            faction: Faction.EMIRATES_OF_HACAN,
             units: [],
-            tags: {},
+            tags: grantDefaultFactionAbilities({}, Faction.EMIRATES_OF_HACAN),
         },
         defender: {
+            faction: Faction.UNIVERSITIES_OF_JOLNAR,
             units: [],
-            tags: {},
+            tags: grantDefaultFactionAbilities({}, Faction.UNIVERSITIES_OF_JOLNAR),
         },
     },
 };
@@ -25,6 +29,17 @@ export const initialState: ParticipantState = {
 interface SetFactionPayload {
     role: ParticipantRole;
     faction: Faction;
+}
+
+interface SetTagPayload {
+    role: ParticipantRole;
+    key: ParticipantTag;
+    value: any;
+}
+
+interface UnsetTagPayload {
+    role: ParticipantRole;
+    key: ParticipantTag;
 }
 
 interface ModifyUnitCountPayload {
@@ -41,8 +56,19 @@ const participantSlice = createSlice({
     initialState: initialState,
     reducers: {
         setFaction: (state: ParticipantState, action: PayloadAction<SetFactionPayload>) => {
-            // const { faction, role } = action.payload;
-            // state.participants[role].faction = faction;
+            const { role, faction } = action.payload;
+            state.participants[role].faction = faction;
+            state.participants[role].tags = grantDefaultFactionAbilities(state.participants[role].tags, faction);
+        },
+        setParticipantTag: (state: ParticipantState, action: PayloadAction<SetTagPayload>) => {
+            const { role, key, value } = action.payload;
+            if (typeof key === "number") {
+                state.participants[role].tags[key as ParticipantTag] = value;
+            }
+        },
+        unsetParticipantTag: (state: ParticipantState, action: PayloadAction<UnsetTagPayload>) => {
+            const { role, key } = action.payload;
+            delete state.participants[role].tags[key];
         },
         clearParticipantUnits: (state: ParticipantState, action: PayloadAction<ParticipantRole>) => {
             state.participants[action.payload].units = [];
@@ -92,8 +118,16 @@ function removeUnits(participant: ParticipantInput, unitType: UnitType, count: n
     }
 }
 
-export const { setFaction, clearParticipantUnits, clearParticipantUnitsOfType, incrementUnitCount, decrementUnitCount, setUnitCount } =
-    participantSlice.actions;
+export const {
+    setFaction,
+    setParticipantTag,
+    unsetParticipantTag,
+    clearParticipantUnits,
+    clearParticipantUnitsOfType,
+    incrementUnitCount,
+    decrementUnitCount,
+    setUnitCount,
+} = participantSlice.actions;
 
 export const selectparticipantState = (rootState: RootState) => rootState.participant;
 export const selectParticipant = (role: ParticipantRole) => (rootState: RootState) => rootState.participant.participants[role];

@@ -15,11 +15,11 @@ import {
     CalculationInput,
     CalculationOutput,
     CombatStage,
-    CombatStateOutput,
     CombatStateProbabilityOutput,
     CombatVictor,
     ParticipantInput,
     ParticipantRole,
+    UnitInput,
 } from "model/calculation";
 import { UnitDefinition, unitDefinitions } from "model/unit";
 
@@ -48,7 +48,7 @@ export function calculateCombatOutcome(input: CalculationInput): CalculationOutp
         appendCombatStateProbabilities(stateDictionary, nextStates);
         activeState = popNextActiveState(stateDictionary);
     }
-    const output = createCalculationOutput(stateDictionary);
+    const output = createCalculationOutput(stateDictionary, input);
     if (process.env.NODE_ENV === "development") {
         console.profileEnd();
     }
@@ -88,11 +88,11 @@ function getNextStage(stage: CombatStage): CombatStage {
     }
 }
 
-function createCalculationOutput(stateDictionary: CombatStateDictionary): CalculationOutput {
+function createCalculationOutput(stateDictionary: CombatStateDictionary, input: CalculationInput): CalculationOutput {
     const resultStates: CombatStateProbability[] = Object.values(stateDictionary).flat();
     const resultStatesOutput: CombatStateProbabilityOutput[] = resultStates.map((resultProbability) => ({
         probability: resultProbability.probability,
-        state: resultProbability.state.toOutput(),
+        state: resultProbability.state.toOutput(input),
     }));
     const victorProbabilites: KeyedDictionary<CombatVictor, number> = {
         attacker: 0,
@@ -396,25 +396,17 @@ function combatStateIsFinished(state: CombatState): boolean {
     return determineVictor(state) !== undefined;
 }
 
-function determineVictor(state: CombatStateOutput): CombatVictor | undefined {
-    if (state.defender.units.length === 0) {
-        if (state.attacker.units.length === 0) {
+type CombatStateLike = { [key in ParticipantRole]: { units: UnitInput[] } };
+function determineVictor(state: CombatStateLike): CombatVictor | undefined {
+    if (state.attacker.units.length === 0) {
+        if (state.defender.units.length === 0) {
             return "draw";
         }
-        return ParticipantRole.Attacker;
-    }
-    if (state.attacker.units.length === 0) {
         return ParticipantRole.Defender;
     }
-    // if (state.attacker.units.length === 0) {
-    //     if (state.defender.units.length === 0) {
-    //         return "draw";
-    //     }
-    //     return ParticipantRole.Defender;
-    // }
-    // if (state.defender.units.length === 0) {
-    //     return ParticipantRole.Attacker;
-    // }
+    if (state.defender.units.length === 0) {
+        return ParticipantRole.Attacker;
+    }
     return undefined;
 }
 

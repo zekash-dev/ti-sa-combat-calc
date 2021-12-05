@@ -38,7 +38,7 @@ export function ParticipantUnitEditor({ role }: Props) {
 
     return (
         <Box sx={{ width: 400, p: 4 }}>
-            <Typography variant="h2">{role.toUpperCase()}</Typography>
+            <Typography variant="h3">{role.toUpperCase()}</Typography>
             <TableContainer component={Paper}>
                 <Table size="small">
                     <TableHead>

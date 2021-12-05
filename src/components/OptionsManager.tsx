@@ -1,4 +1,5 @@
-import { Box, Button, CircularProgress, Grid, Typography } from "@mui/material";
+import { PlayArrow } from "@mui/icons-material";
+import { Button, CircularProgress } from "@mui/material";
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -14,18 +15,8 @@ export function OptionsManager() {
     };
 
     return (
-        <Box sx={{ width: 400, p: 4 }}>
-            <Typography variant="h2">OPTIONS</Typography>
-            <Grid>
-                <Button variant="contained" onClick={onClickCalculate} disabled={calculating}>
-                    Run calculation
-                </Button>
-            </Grid>
-            {calculating && (
-                <Grid sx={{ p: 1 }}>
-                    <CircularProgress />
-                </Grid>
-            )}
-        </Box>
+        <Button variant="contained" onClick={onClickCalculate} disabled={calculating} sx={{ height: 40, width: 80 }}>
+            {calculating ? <CircularProgress size={20} color="primary" /> : <PlayArrow />}
+        </Button>
     );
 }

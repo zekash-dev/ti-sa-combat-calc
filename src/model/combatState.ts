@@ -1,6 +1,6 @@
 import { Dictionary } from "lodash";
 
-import { CombatStage, CombatStateOutput, CombatStateTags, ParticipantInput, UnitInput } from "./calculation";
+import { CalculationInput, CombatStage, CombatStateOutput, ParticipantInput, UnitInput } from "./calculation";
 import { UnitType } from "./unit";
 
 /**
@@ -49,11 +49,11 @@ export class CombatState {
         return hash;
     }
 
-    public toOutput(): CombatStateOutput {
+    public toOutput(input: CalculationInput): CombatStateOutput {
         return {
             stage: this.stage,
-            attacker: this.attacker.toOutput(),
-            defender: this.defender.toOutput(),
+            attacker: this.attacker.toOutput(input.attacker),
+            defender: this.defender.toOutput(input.defender),
         };
     }
 
@@ -87,8 +87,9 @@ export class ParticipantState {
         return hash;
     }
 
-    public toOutput(): ParticipantInput {
+    public toOutput(input: ParticipantInput): ParticipantInput {
         return {
+            faction: input.faction,
             units: this.units.map((u) => u.toOutput()),
             tags: this.tags,
         };
@@ -148,6 +149,14 @@ export interface ComputedUnitSnapshot {
     rolls: number;
     sustainDamage: number;
     sustainedHits: number;
+}
+
+/**
+ * All tags in CombatState need to be easy to hash and equate.
+ * Implement as number keys and number values.
+ */
+export interface CombatStateTags {
+    [key: number]: number;
 }
 
 function hashCombatStateTags(tags: CombatStateTags | undefined): number {

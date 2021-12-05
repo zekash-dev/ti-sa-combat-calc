@@ -1,4 +1,5 @@
-import { KeyedDictionary } from "./common";
+import { Faction, ParticipantTag, UnitTag } from "./combatTags";
+import { KeyedDictionary, SparseDictionary } from "./common";
 import { UnitType } from "./unit";
 
 export enum CombatStage {
@@ -41,20 +42,16 @@ export interface CombatStateOutput {
 }
 
 export interface ParticipantInput {
+    faction: Faction;
     units: UnitInput[];
-    tags: CombatStateTags; // techs, upgrades, AC's, PC's, ...
+    tags: ParticipantInputTags; // techs, upgrades, AC's, PC's, ...
 }
+
+export type ParticipantInputTags = SparseDictionary<ParticipantTag, any>;
 
 export interface UnitInput {
     type: UnitType;
     sustainedHits: number;
-    tags?: CombatStateTags;
+    tags?: UnitInputTags; // Leaders present on ships/PDS, AC's affecting a specific unit
 }
-
-/**
- * All tags in CombatState need to be easy to hash and equate.
- * Implement as number keys and number values.
- */
-export interface CombatStateTags {
-    [key: number]: number;
-}
+export type UnitInputTags = SparseDictionary<UnitTag, any>;
