@@ -19,6 +19,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { ParticipantInput, ParticipantRole } from "model/calculation";
 import { UnitType } from "model/unit";
 import { clearParticipantUnitsOfType, getUnitCount, selectParticipant, setUnitCount } from "redux/participant/participantSlice";
+import { UnitImage } from "./graphics/UnitImage";
 
 interface Props {
     role: ParticipantRole;
@@ -84,6 +85,13 @@ export function ParticipantUnitEditor({ role }: Props) {
                     </TableBody>
                 </Table>
             </TableContainer>
+            <UnitImage unitType={UnitType.Flagship} faction={participant.faction} role={role} />
+            <UnitImage unitType={UnitType.WarSun} faction={participant.faction} role={role} />
+            <UnitImage unitType={UnitType.Dreadnought} faction={participant.faction} role={role} />
+            <UnitImage unitType={UnitType.Cruiser} faction={participant.faction} role={role} />
+            <UnitImage unitType={UnitType.Destroyer} faction={participant.faction} role={role} />
+            <UnitImage unitType={UnitType.Carrier} faction={participant.faction} role={role} />
+            <UnitImage unitType={UnitType.Fighter} faction={participant.faction} role={role} />
         </Box>
     );
 }

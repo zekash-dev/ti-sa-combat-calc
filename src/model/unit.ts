@@ -7,6 +7,7 @@ export enum UnitType {
     Destroyer = 104,
     Carrier = 105,
     Fighter = 106,
+    Flagship = 107,
 }
 
 export interface UnitDefinition {
@@ -74,6 +75,14 @@ export const unitDefinitions: KeyedDictionary<UnitType, UnitDefinition> = {
         type: UnitType.Fighter,
         combatValue: 9,
         combatRolls: 1,
+        sustainDamage: 0,
+        preCombatShots: 0,
+        antiFigherBarrage: 0,
+    },
+    [UnitType.Flagship]: {
+        type: UnitType.Flagship,
+        combatValue: 0,
+        combatRolls: 0,
         sustainDamage: 0,
         preCombatShots: 0,
         antiFigherBarrage: 0,
