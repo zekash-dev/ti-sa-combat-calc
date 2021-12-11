@@ -1,16 +1,5 @@
-import { clamp, round } from "lodash";
+import { clamp, max, round } from "lodash";
 
-import {
-    CombatState,
-    CombatStateDictionary,
-    CombatStateProbability,
-    CombatStateResolution,
-    CombatStateResolutionDictionary,
-    ComputedUnitSnapshot,
-    ParticipantState,
-    UnitState,
-} from "model/combatState";
-import { KeyedDictionary } from "model/common";
 import {
     CalculationInput,
     CalculationOutput,
@@ -21,7 +10,21 @@ import {
     ParticipantRole,
     UnitInput,
 } from "model/calculation";
+import {
+    CombatState,
+    CombatStateDictionary,
+    CombatStateProbability,
+    CombatStateResolution,
+    CombatStateResolutionDictionary,
+    ComputedUnitSnapshot,
+    ParticipantState,
+    UnitState,
+} from "model/combatState";
+import { ParticipantTag } from "model/combatTags";
+import { KeyedDictionary } from "model/common";
+import { ParticipantOnComputeSnapshotInput, ParticipantTagImplementation } from "model/effects";
 import { UnitDefinition, unitDefinitions } from "model/unit";
+import { participantTagResources } from "./participant";
 
 export function calculateCombatOutcome(input: CalculationInput): CalculationOutput | null {
     if (input.attacker.units.length === 0 && input.defender.units.length === 0) return null;
@@ -228,16 +231,56 @@ function getUnitSnapshots(
     const unitSnapshots: ComputedUnitSnapshot[] = [];
     for (let unit of participant.units) {
         const def: UnitDefinition = unitDefinitions[unit.type];
+        const baseRolls: number = getCombatRollsForStage(def, stage);
+        const rolls: number = max([baseRolls - unit.sustainedHits, 1])!;
         unitSnapshots.push({
             base: unit,
             type: unit.type,
             combatValue: def.combatValue,
-            rolls: getCombatRollsForStage(def, stage),
+            rolls: rolls,
             sustainDamage: def.sustainDamage,
             sustainedHits: unit.sustainedHits,
+            tagEffects: [],
         });
     }
+    applyUnitSnapshotParticipantTags(participant, input, role, stage, unitSnapshots);
     return unitSnapshots;
+}
+
+function applyUnitSnapshotParticipantTags(
+    participant: ParticipantState,
+    input: CalculationInput,
+    role: ParticipantRole,
+    stage: CombatStage,
+    unitSnapshots: ComputedUnitSnapshot[]
+) {
+    const participantInput: ParticipantInput = input[role];
+    const tagValues: ParticipantTagValueAndState[] = getParticipantTagValues(participantInput, participant);
+    const effectInput: ParticipantOnComputeSnapshotInput = {
+        units: unitSnapshots,
+    };
+    for (let { tag } of tagValues) {
+        const impl: ParticipantTagImplementation | false = participantTagResources[tag].implementation;
+        if (!!impl && !!impl.onComputeUnitSnapshots) {
+            impl.onComputeUnitSnapshots(effectInput);
+        }
+    }
+}
+
+interface ParticipantTagValueAndState {
+    tag: ParticipantTag;
+    value: any;
+    state: number | undefined;
+}
+function getParticipantTagValues(input: ParticipantInput, state: ParticipantState): ParticipantTagValueAndState[] {
+    const values: ParticipantTagValueAndState[] = [];
+    for (let tagStr of Object.keys(input.tags)) {
+        const tag: ParticipantTag = Number(tagStr);
+        const tagInputValue: any = input.tags[tag];
+        const tagState = state.tags[tag];
+        values.push({ tag, value: tagInputValue, state: tagState });
+    }
+    return values;
 }
 
 function getCombatRollsForStage(def: UnitDefinition, stage: CombatStage): number {

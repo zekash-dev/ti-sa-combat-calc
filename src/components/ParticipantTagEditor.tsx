@@ -146,7 +146,7 @@ function ParticipantTagListItem(props: ParticipantTagListItemProps) {
 
     const tagResources: ParticipantTagResources = participantTagResources[tag];
 
-    if (!tagResources.implemented) {
+    if (!tagResources.implementation) {
         return (
             <ListItem>
                 <ListItemText>

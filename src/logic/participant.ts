@@ -6,15 +6,16 @@ import {
     FactionAbility,
     FactionResources,
     FactionUpgrade,
+    JolnarRerollStrategy,
     ParticipantTag,
     ParticipantTagResources,
-    ParticipantTagValue,
     Technology,
     TechnologyType,
 } from "model/combatTags";
 import { KeyedDictionary } from "model/common";
 import { allUnitTypes, unitDefinitions, UnitType } from "model/unit";
 import { getAllEnumValues } from "./common";
+import * as effects from "./effects";
 
 export function grantDefaultFactionAbilities(participantTags: ParticipantInputTags, faction: Faction): ParticipantInputTags {
     const newTags: ParticipantInputTags = {
@@ -92,7 +93,7 @@ export function getDefaultFactionAbilityValue<T extends ParticipantTag>(factionA
     }
 }
 
-const JOLNAR_REROLL_DEFAULT: ParticipantTagValue<FactionAbility.JOLNAR_REROLL> = {
+const JOLNAR_REROLL_DEFAULT: JolnarRerollStrategy = {
     maxRerolls: 0,
     combatValueBreakpoint: 7,
 };
@@ -129,140 +130,148 @@ export const participantTagResources: KeyedDictionary<ParticipantTag, Participan
     [FactionAbility.MENTAK_PRECOMBAT_SHOTS]: {
         name: "Pre-combat shots",
         color: factionResources[Faction.MENTAK_COALITION].color,
-        implemented: false,
+        implementation: false,
     },
     [FactionAbility.NAALU_FIGHTER_MOD]: {
         name: "Fighters +1",
         color: factionResources[Faction.NAALU_COLLECTIVE].color,
-        implemented: false,
+        implementation: false,
     },
     [FactionAbility.SARDAKK_UNIT_MOD]: {
         name: "All units +1",
         color: factionResources[Faction.HIVES_OF_SARDAKK_NORR].color,
-        implemented: false,
+        implementation: false,
     },
     [FactionAbility.JOLNAR_UNIT_MOD]: {
         name: "All units -1",
         color: factionResources[Faction.UNIVERSITIES_OF_JOLNAR].color,
-        implemented: false,
+        implementation: false,
     },
     [FactionAbility.JOLNAR_REROLL]: {
         name: "Reroll enemy rolls",
         color: factionResources[Faction.UNIVERSITIES_OF_JOLNAR].color,
-        implemented: false,
+        implementation: false,
     },
     [FactionAbility.XXCHA_ROUND1_MOD]: {
         name: "Round 1: Enemy units -1",
         color: factionResources[Faction.XXCHA_KINGDOM].color,
-        implemented: false,
+        implementation: false,
     },
     [FactionAbility.YIN_ROUND2_SACRIFICE]: {
         name: "Round 2: Sacrifice unit",
         color: factionResources[Faction.YIN_BROTHERHOOD].color,
-        implemented: false,
+        implementation: false,
     },
     [FactionAbility.YIN_INVASION_CONVERSION]: {
         name: "Convert ground force",
         color: factionResources[Faction.YIN_BROTHERHOOD].color,
-        implemented: false,
+        implementation: false,
     },
     [FactionAbility.LIZIX_DREADNOUGHT_MOD]: {
         name: "Dreadnoughts +1",
         color: factionResources[Faction.LIZIX_MINDNET].color,
-        implemented: false,
+        implementation: false,
     },
     [FactionAbility.LIZIX_GROUND_FORCE_MOD]: {
         name: "Ground forces +1 (+2 with MU)",
         color: factionResources[Faction.LIZIX_MINDNET].color,
-        implemented: false,
+        implementation: false,
     },
     [FactionAbility.ARBOREC_GROUND_FORCE_MOD]: {
         name: "Ground forces -1",
         color: factionResources[Faction.ARBOREC_ECOSYSTEM].color,
-        implemented: false,
+        implementation: false,
     },
     [FactionUpgrade.LETNEV_SAIMOC_INFUSED_HULLS]: {
         name: "Saimoc-infused hulls",
         color: factionResources[Faction.BARONY_OF_LETNEV].color,
-        implemented: false,
+        implementation: false,
     },
-    [FactionUpgrade.SAAR_CHAOS_MAPPING]: { name: "Chaos mapping", color: factionResources[Faction.CLAN_OF_SAAR].color, implemented: false },
+    [FactionUpgrade.SAAR_CHAOS_MAPPING]: {
+        name: "Chaos mapping",
+        color: factionResources[Faction.CLAN_OF_SAAR].color,
+        implementation: false,
+    },
     [FactionUpgrade.SOL_ADVANCED_FLEET_TACTICS]: {
         name: "Advanced fleet tactics",
         color: factionResources[Faction.FEDERATION_OF_SOL].color,
-        implemented: false,
+        implementation: false,
     },
     [FactionUpgrade.SOL_MARK2_ADVANCED_CARRIERS]: {
         name: "Mark II advanced carriers",
         color: factionResources[Faction.FEDERATION_OF_SOL].color,
-        implemented: false,
+        implementation: false,
     },
     [FactionUpgrade.SOL_VERSATILE_COMBAT_TACTICS]: {
         name: "Versatile combat tactics",
         color: factionResources[Faction.FEDERATION_OF_SOL].color,
-        implemented: false,
+        implementation: false,
     },
     [FactionUpgrade.MENTAK_ADAPTABLE_ORDNANCE_RIGS]: {
         name: "Adaptable ordnance rigs",
         color: factionResources[Faction.MENTAK_COALITION].color,
-        implemented: false,
+        implementation: false,
     },
     [FactionUpgrade.SARDAKK_BERZERKER_GENOME]: {
         name: "Berzerker genome",
         color: factionResources[Faction.HIVES_OF_SARDAKK_NORR].color,
-        implemented: false,
+        implementation: false,
     },
     [FactionUpgrade.XXCHA_ARCHON_ENERGY_SHELL]: {
         name: "Archon energy shells",
         color: factionResources[Faction.XXCHA_KINGDOM].color,
-        implemented: false,
+        implementation: false,
     },
     [FactionUpgrade.YIN_BLADE_OF_ZEAL]: {
         name: "Blade of zeal",
         color: factionResources[Faction.YIN_BROTHERHOOD].color,
-        implemented: false,
+        implementation: false,
     },
     [FactionUpgrade.YIN_SUBLIMINAL_COMMAND]: {
         name: "Subliminal command",
         color: factionResources[Faction.YIN_BROTHERHOOD].color,
-        implemented: false,
+        implementation: false,
     },
     [FactionUpgrade.MUAAT_MAGMUS_REACTOR]: {
         name: "Magmus reactor",
         color: factionResources[Faction.EMBERS_OF_MUAAT].color,
-        implemented: false,
+        implementation: false,
     },
     [FactionUpgrade.MUAAT_MAGMA_OBLITERATOR]: {
         name: "Magma obliterator",
         color: factionResources[Faction.EMBERS_OF_MUAAT].color,
-        implemented: false,
+        implementation: false,
     },
     [FactionUpgrade.CREUSS_DIMENSIONAL_SPLICER]: {
         name: "Dimensional splicer",
         color: factionResources[Faction.GHOSTS_OF_CREUSS].color,
-        implemented: false,
+        implementation: false,
     },
     [FactionUpgrade.ORDER_CHRONOS_FIELD]: {
         name: "Chronos field",
         color: factionResources[Faction.ORDER_OF_THE_LAST].color,
-        implemented: false,
+        implementation: false,
     },
-    [Technology.HYLAR_V_LASER]: { name: "Hylar V laser", color: technologyColors[TechnologyType.RED], implemented: false },
-    [Technology.IMPULSION_SHIELDS]: { name: "Impulsion shields", color: technologyColors[TechnologyType.RED], implemented: false },
-    [Technology.AUTOMATED_TURRETS]: { name: "Automated turrets", color: technologyColors[TechnologyType.RED], implemented: false },
-    [Technology.WAR_SUN]: { name: "War sun", color: technologyColors[TechnologyType.RED], implemented: false },
-    [Technology.GRAVITON_NETAGOR]: { name: "Graviton negator", color: technologyColors[TechnologyType.RED], implemented: false },
-    [Technology.MAGEN_DEFENSE_GRID]: { name: "Magen defense grid", color: technologyColors[TechnologyType.RED], implemented: false },
-    [Technology.ASSAULT_CANNONS]: { name: "Assault cannons", color: technologyColors[TechnologyType.RED], implemented: false },
+    [Technology.HYLAR_V_LASER]: { name: "Hylar V laser", color: technologyColors[TechnologyType.RED], implementation: effects.hylarVLaser },
+    [Technology.IMPULSION_SHIELDS]: { name: "Impulsion shields", color: technologyColors[TechnologyType.RED], implementation: false },
+    [Technology.AUTOMATED_TURRETS]: { name: "Automated turrets", color: technologyColors[TechnologyType.RED], implementation: false },
+    [Technology.WAR_SUN]: { name: "War sun", color: technologyColors[TechnologyType.RED], implementation: false },
+    [Technology.GRAVITON_NETAGOR]: { name: "Graviton negator", color: technologyColors[TechnologyType.RED], implementation: false },
+    [Technology.MAGEN_DEFENSE_GRID]: { name: "Magen defense grid", color: technologyColors[TechnologyType.RED], implementation: false },
+    [Technology.ASSAULT_CANNONS]: { name: "Assault cannons", color: technologyColors[TechnologyType.RED], implementation: false },
     [Technology.GRAVITON_LASER_SYSTEM]: {
         name: "Graviton laser system",
         color: technologyColors[TechnologyType.YELLOW],
-        implemented: false,
+        implementation: false,
     },
-    [Technology.CYBERNETICS]: { name: "Cybernetics", color: technologyColors[TechnologyType.GREEN], implemented: false },
-    [Technology.GEN_SYNTHESIS]: { name: "Gen synthesis", color: technologyColors[TechnologyType.GREEN], implemented: false },
-    [Technology.DACXIVE_ANIMATORS]: { name: "Dacxive animators", color: technologyColors[TechnologyType.GREEN], implemented: false },
-    [Technology.X89_BACTERIAL_WEAPON]: { name: "X-89 bacterial weapon", color: technologyColors[TechnologyType.GREEN], implemented: false },
-    [Technology.ADVANCED_FIGHTERS]: { name: "Advanced fighters", color: technologyColors[TechnologyType.BLUE], implemented: false },
-    [Technology.MANEUVERING_JETS]: { name: "Maneuvering jets", color: technologyColors[TechnologyType.BLUE], implemented: false },
+    [Technology.CYBERNETICS]: { name: "Cybernetics", color: technologyColors[TechnologyType.GREEN], implementation: false },
+    [Technology.GEN_SYNTHESIS]: { name: "Gen synthesis", color: technologyColors[TechnologyType.GREEN], implementation: false },
+    [Technology.DACXIVE_ANIMATORS]: { name: "Dacxive animators", color: technologyColors[TechnologyType.GREEN], implementation: false },
+    [Technology.X89_BACTERIAL_WEAPON]: {
+        name: "X-89 bacterial weapon",
+        color: technologyColors[TechnologyType.GREEN],
+        implementation: false,
+    },
+    [Technology.ADVANCED_FIGHTERS]: { name: "Advanced fighters", color: technologyColors[TechnologyType.BLUE], implementation: false },
+    [Technology.MANEUVERING_JETS]: { name: "Maneuvering jets", color: technologyColors[TechnologyType.BLUE], implementation: false },
 };

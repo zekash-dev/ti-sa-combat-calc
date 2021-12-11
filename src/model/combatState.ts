@@ -1,6 +1,7 @@
 import { Dictionary } from "lodash";
 
 import { CalculationInput, CombatStage, CombatStateOutput, ParticipantInput, UnitInput } from "./calculation";
+import { ParticipantTag, UnitTag } from "./combatTags";
 import { UnitType } from "./unit";
 
 /**
@@ -142,6 +143,10 @@ export class UnitState {
     }
 }
 
+/**
+ * Snapshot of a unit in combat, calculated for a combat stage.
+ * All effects from tags have been applied.
+ */
 export interface ComputedUnitSnapshot {
     base: UnitState;
     type: UnitType;
@@ -149,7 +154,10 @@ export interface ComputedUnitSnapshot {
     rolls: number;
     sustainDamage: number;
     sustainedHits: number;
+    tagEffects: UnitSnapshotTag[];
 }
+
+export type UnitSnapshotTag = ParticipantTag | UnitTag;
 
 /**
  * All tags in CombatState need to be easy to hash and equate.

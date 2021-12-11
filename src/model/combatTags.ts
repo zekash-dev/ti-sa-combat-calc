@@ -1,4 +1,5 @@
 import { getAllEnumValues } from "logic/common";
+import { ComputedUnitSnapshot } from "./combatState";
 
 export enum Faction {
     BARONY_OF_LETNEV = 101,
@@ -80,14 +81,6 @@ export const technologies: Technology[] = getAllEnumValues<Technology>(Technolog
 
 export type ParticipantTag = FactionAbility | FactionUpgrade | Technology;
 
-export type ParticipantTagValue<T extends ParticipantTag | unknown> = T extends FactionAbility.JOLNAR_REROLL
-    ? JolnarRerollStrategy
-    : T extends Technology.IMPULSION_SHIELDS
-    ? 1 | 0
-    : T extends Technology.X89_BACTERIAL_WEAPON
-    ? 1 | 0
-    : true;
-
 export interface JolnarRerollStrategy {
     maxRerolls: number;
     combatValueBreakpoint: number;
@@ -109,5 +102,13 @@ export interface ParticipantTagResources {
     name: string;
     icon?: JSX.Element;
     color: string;
-    implemented: boolean;
+    implementation: false | ParticipantTagImplementation;
+}
+
+export interface ParticipantOnComputeSnapshotInput {
+    units: ComputedUnitSnapshot[];
+}
+
+export interface ParticipantTagImplementation {
+    onComputeUnitSnapshots?: (input: ParticipantOnComputeSnapshotInput) => void;
 }
