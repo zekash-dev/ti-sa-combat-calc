@@ -1,3 +1,4 @@
+import { getAllEnumValues } from "logic/common";
 import { KeyedDictionary } from "./common";
 
 export enum UnitType {
@@ -9,6 +10,8 @@ export enum UnitType {
     Fighter = 106,
     Flagship = 107,
 }
+
+export const allUnitTypes: UnitType[] = getAllEnumValues<UnitType>(UnitType);
 
 export interface UnitDefinition {
     type: UnitType;
@@ -28,6 +31,10 @@ export interface UnitDefinition {
      * Number of AFB shots.
      */
     antiFigherBarrage: number;
+
+    name: string;
+    imageWidth: number;
+    imageHeight: number;
 }
 
 export const unitDefinitions: KeyedDictionary<UnitType, UnitDefinition> = {
@@ -38,6 +45,9 @@ export const unitDefinitions: KeyedDictionary<UnitType, UnitDefinition> = {
         sustainDamage: 2,
         preCombatShots: 0,
         antiFigherBarrage: 0,
+        name: "War sun",
+        imageWidth: 80,
+        imageHeight: 80,
     },
     [UnitType.Dreadnought]: {
         type: UnitType.Dreadnought,
@@ -46,6 +56,9 @@ export const unitDefinitions: KeyedDictionary<UnitType, UnitDefinition> = {
         sustainDamage: 1,
         preCombatShots: 0,
         antiFigherBarrage: 0,
+        name: "Dreadnought",
+        imageWidth: 100,
+        imageHeight: 50,
     },
     [UnitType.Cruiser]: {
         type: UnitType.Cruiser,
@@ -54,6 +67,9 @@ export const unitDefinitions: KeyedDictionary<UnitType, UnitDefinition> = {
         sustainDamage: 0,
         preCombatShots: 0,
         antiFigherBarrage: 0,
+        name: "Cruiser",
+        imageWidth: 50,
+        imageHeight: 25,
     },
     [UnitType.Destroyer]: {
         type: UnitType.Destroyer,
@@ -62,6 +78,9 @@ export const unitDefinitions: KeyedDictionary<UnitType, UnitDefinition> = {
         sustainDamage: 0,
         preCombatShots: 0,
         antiFigherBarrage: 2,
+        name: "Destroyer",
+        imageWidth: 40,
+        imageHeight: 26,
     },
     [UnitType.Carrier]: {
         type: UnitType.Carrier,
@@ -70,6 +89,9 @@ export const unitDefinitions: KeyedDictionary<UnitType, UnitDefinition> = {
         sustainDamage: 0,
         preCombatShots: 0,
         antiFigherBarrage: 0,
+        name: "Carrier",
+        imageWidth: 60,
+        imageHeight: 21,
     },
     [UnitType.Fighter]: {
         type: UnitType.Fighter,
@@ -78,13 +100,19 @@ export const unitDefinitions: KeyedDictionary<UnitType, UnitDefinition> = {
         sustainDamage: 0,
         preCombatShots: 0,
         antiFigherBarrage: 0,
+        name: "Fighter",
+        imageWidth: 20,
+        imageHeight: 20,
     },
     [UnitType.Flagship]: {
         type: UnitType.Flagship,
-        combatValue: 0,
-        combatRolls: 0,
+        combatValue: 9,
+        combatRolls: 1,
         sustainDamage: 0,
         preCombatShots: 0,
         antiFigherBarrage: 0,
+        name: "Flagship",
+        imageWidth: 100,
+        imageHeight: 33,
     },
 };

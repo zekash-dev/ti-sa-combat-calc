@@ -46,7 +46,7 @@ function ResultVictorLabels({ output }: ResultVictorLabelsProps) {
             <div
                 style={{
                     position: "absolute",
-                    left: `clamp(220px, calc(${attackerPercent + drawPercent / 2}% - 10px), calc(100% - 420px))`,
+                    left: `clamp(250px, calc(${attackerPercent + drawPercent / 2}% - 10px), calc(100% - 450px))`,
                     whiteSpace: "nowrap",
                 }}
             >

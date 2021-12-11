@@ -25,26 +25,32 @@ export const theme: Theme = createTheme({
         h1: {
             fontFamily: "Orbitron,sans-serif",
             color: headerColor,
+            textTransform: "uppercase",
         },
         h2: {
             fontFamily: "Orbitron,sans-serif",
             color: headerColor,
+            textTransform: "uppercase",
         },
         h3: {
             fontFamily: "Orbitron,sans-serif",
             color: headerColor,
+            textTransform: "uppercase",
         },
         h4: {
             fontFamily: "Orbitron,sans-serif",
             color: headerColor,
+            textTransform: "uppercase",
         },
         h5: {
             fontFamily: "Orbitron,sans-serif",
             color: headerColor,
+            textTransform: "uppercase",
         },
         h6: {
             fontFamily: "Orbitron,sans-serif",
             color: headerColor,
+            textTransform: "uppercase",
         },
     },
 });

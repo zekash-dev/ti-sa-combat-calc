@@ -1,20 +1,6 @@
-import {
-    blue,
-    brown,
-    cyan,
-    deepPurple,
-    green,
-    grey,
-    indigo,
-    lightBlue,
-    lightGreen,
-    orange,
-    purple,
-    red,
-    yellow,
-} from "@mui/material/colors";
+import { blue, green, red, yellow } from "@mui/material/colors";
 
-import { ParticipantInputTags } from "model/calculation";
+import { ParticipantInputTags, UnitInput } from "model/calculation";
 import {
     Faction,
     FactionAbility,
@@ -27,6 +13,7 @@ import {
     TechnologyType,
 } from "model/combatTags";
 import { KeyedDictionary } from "model/common";
+import { allUnitTypes, unitDefinitions, UnitType } from "model/unit";
 import { getAllEnumValues } from "./common";
 
 export function grantDefaultFactionAbilities(participantTags: ParticipantInputTags, faction: Faction): ParticipantInputTags {
@@ -40,6 +27,14 @@ export function grantDefaultFactionAbilities(participantTags: ParticipantInputTa
         newTags[newAbility] = getDefaultFactionAbilityValue(newAbility);
     }
     return newTags;
+}
+
+export const unitSizes: KeyedDictionary<UnitType, number> = Object.fromEntries(
+    allUnitTypes.map((type: UnitType) => [type, unitDefinitions[type].imageWidth * unitDefinitions[type].imageHeight])
+) as KeyedDictionary<UnitType, number>;
+
+export function unitSizeComparer(a: UnitInput, b: UnitInput): number {
+    return unitSizes[b.type] - unitSizes[a.type];
 }
 
 export const defaultFactionAbilities: KeyedDictionary<Faction, FactionAbility[]> = {

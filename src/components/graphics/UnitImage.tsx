@@ -1,34 +1,50 @@
 import React from "react";
 import { SvgLoader, SvgProxy } from "react-svgmt";
 
-import { Faction } from "model/combatTags";
-import { UnitType } from "model/unit";
 import { factionResources } from "logic/participant";
 import { toBrighterHue, toDarkerHue } from "logic/styling";
 import { ParticipantRole } from "model/calculation";
+import { Faction } from "model/combatTags";
+import { UnitType } from "model/unit";
 
 interface Props {
     unitType: UnitType;
     faction: Faction;
     role: ParticipantRole;
+    width: number;
+    height: number;
 }
 
-export function UnitImage({ unitType, faction, role }: Props) {
+export const UnitImage = React.memo(({ unitType, faction, role, width, height }: Props) => {
+    const [loaded, setLoaded] = React.useState(false);
+    const handleLoaded = () => setLoaded(true);
     const path = getSvgPath(unitType);
-    console.log(path);
     const baseColor: string = factionResources[faction].color;
     const darkColor: string = toDarkerHue(baseColor, 0.3);
     const brightColor: string = toBrighterHue(baseColor, 0.05);
+
+    // Let the image load before showing it, to prevent flickers while the SvgProxys are being handled
     return (
-        <SvgLoader path={path}>
-            <SvgProxy selector="svg" width="200px" />
-            {role === ParticipantRole.Defender && <SvgProxy selector="g" transform="scale(-1, 1) translate(-100, 0)" />}
-            <SvgProxy selector="#color-primary" fill={baseColor} />
-            <SvgProxy selector="#color-darker" fill={darkColor} />
-            <SvgProxy selector="#color-brighter" fill={brightColor} />
-        </SvgLoader>
+        <div
+            style={{
+                display: "inline-block",
+                padding: 1,
+                height,
+                width,
+                visibility: loaded ? "visible" : "hidden",
+                float: role === ParticipantRole.Attacker ? "right" : "left",
+            }}
+        >
+            <SvgLoader path={path} onSVGReady={handleLoaded}>
+                <SvgProxy selector="svg" width="100%" height="100%" />
+                {role === ParticipantRole.Defender && <SvgProxy selector="g" transform="scale(-1, 1) translate(-100, 0)" />}
+                <SvgProxy selector="#color-primary" fill={baseColor} />
+                <SvgProxy selector="#color-darker" fill={darkColor} />
+                <SvgProxy selector="#color-brighter" fill={brightColor} />
+            </SvgLoader>
+        </div>
     );
-}
+});
 
 function getSvgPath(unitType: UnitType): string {
     const base = window.location.href;
