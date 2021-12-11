@@ -1,6 +1,6 @@
 import { Dictionary } from "lodash";
 
-import { CalculationInput, CombatStage, CombatStateOutput, ParticipantInput, UnitInput } from "./calculation";
+import { CalculationInput, CombatStage, CombatStateOutput, HitType, ParticipantInput, UnitInput } from "./calculation";
 import { ParticipantTag, UnitTag } from "./combatTags";
 import { UnitType } from "./unit";
 
@@ -152,6 +152,7 @@ export interface ComputedUnitSnapshot {
     type: UnitType;
     combatValue: number;
     rolls: number;
+    hitType: HitType;
     sustainDamage: number;
     sustainedHits: number;
     tagEffects: UnitSnapshotTag[];

@@ -80,15 +80,15 @@ function ResultVictorBars({ output, participants }: ResultVictorBarsProps) {
     let bars: JSX.Element[];
     if (attackerPercent > 1 && defenderPercent > 1) {
         bars = [
-            <SlantedResultVictorBar sx={{ width: attackerPercent + "%", backgroundColor: attackerResources.color }} />,
-            <SlantedResultVictorBar sx={{ width: drawPercent + "%", backgroundColor: grey[900] }} />,
-            <SlantedResultVictorBar sx={{ width: defenderPercent + "%", backgroundColor: defenderResources.color }} />,
+            <SlantedResultVictorBar key="att" sx={{ width: attackerPercent + "%", backgroundColor: attackerResources.color }} />,
+            <SlantedResultVictorBar key="drw" sx={{ width: drawPercent + "%", backgroundColor: grey[900] }} />,
+            <SlantedResultVictorBar key="dfn" sx={{ width: defenderPercent + "%", backgroundColor: defenderResources.color }} />,
         ];
     } else {
         bars = [
-            <StandardResultVictorBar sx={{ width: attackerPercent + "%", backgroundColor: attackerResources.color }} />,
-            <StandardResultVictorBar sx={{ width: drawPercent + "%", backgroundColor: grey[900] }} />,
-            <StandardResultVictorBar sx={{ width: defenderPercent + "%", backgroundColor: defenderResources.color }} />,
+            <StandardResultVictorBar key="att" sx={{ width: attackerPercent + "%", backgroundColor: attackerResources.color }} />,
+            <StandardResultVictorBar key="drw" sx={{ width: drawPercent + "%", backgroundColor: grey[900] }} />,
+            <StandardResultVictorBar key="dfn" sx={{ width: defenderPercent + "%", backgroundColor: defenderResources.color }} />,
         ];
     }
 

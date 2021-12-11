@@ -1,16 +1,12 @@
 import { Add, Remove } from "@mui/icons-material";
-import { Box, Button, IconButton, Paper, Table, TableBody, TableCell, TableContainer, TableRow } from "@mui/material";
+import { Box, Button, IconButton, Paper, Table, TableBody, TableCell, TableContainer, TableRow, TextField } from "@mui/material";
+import { isInteger, round } from "lodash";
+import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 import { ParticipantInput, ParticipantRole } from "model/calculation";
 import { allUnitTypes, unitDefinitions, UnitType } from "model/unit";
-import {
-    clearParticipantUnits,
-    decrementUnitCount,
-    getUnitCount,
-    incrementUnitCount,
-    selectParticipant,
-} from "redux/participant/participantSlice";
+import { clearParticipantUnits, getUnitCount, selectParticipant, setUnitCount } from "redux/participant/participantSlice";
 
 interface Props {
     role: ParticipantRole;
@@ -19,9 +15,7 @@ interface Props {
 export function ParticipantUnitEditor({ role }: Props) {
     const dispatch = useDispatch();
     const participant: ParticipantInput = useSelector(selectParticipant(role));
-
-    const handleDecrementUnitCount = (unit: UnitType) => dispatch(decrementUnitCount({ role, unit }));
-    const handleIncrementUnitCount = (unit: UnitType) => dispatch(incrementUnitCount({ role, unit }));
+    const handleSetUnitCount = (unit: UnitType, count: number) => dispatch(setUnitCount({ role, unit, count }));
     const handleClearAllunits = () => dispatch(clearParticipantUnits(role));
 
     return (
@@ -29,23 +23,14 @@ export function ParticipantUnitEditor({ role }: Props) {
             <TableContainer component={Paper}>
                 <Table size="small">
                     <TableBody>
-                        {allUnitTypes.map((unitType: UnitType) => {
-                            const count: number = getUnitCount(participant, unitType);
-                            return (
-                                <TableRow key={unitType}>
-                                    <TableCell>{unitDefinitions[unitType].name}</TableCell>
-                                    <TableCell>
-                                        <IconButton size="small" disabled={count === 0} onClick={() => handleDecrementUnitCount(unitType)}>
-                                            <Remove />
-                                        </IconButton>
-                                        {count}
-                                        <IconButton size="small" onClick={() => handleIncrementUnitCount(unitType)}>
-                                            <Add />
-                                        </IconButton>
-                                    </TableCell>
-                                </TableRow>
-                            );
-                        })}
+                        {allUnitTypes.map((unitType: UnitType) => (
+                            <UnitCountEditor
+                                key={unitType}
+                                type={unitType}
+                                count={getUnitCount(participant, unitType)}
+                                onChange={handleSetUnitCount}
+                            />
+                        ))}
                     </TableBody>
                 </Table>
             </TableContainer>
@@ -55,5 +40,83 @@ export function ParticipantUnitEditor({ role }: Props) {
                 </Button>
             </Box>
         </Box>
+    );
+}
+
+interface UnitCountEditorProps {
+    type: UnitType;
+    count: number;
+    onChange(type: UnitType, count: number): void;
+}
+
+function UnitCountEditor({ type, count, onChange }: UnitCountEditorProps) {
+    const [tempValue, setTempValue] = useState<string | undefined>(undefined);
+    const handleDecrementUnitCount = () => onChange(type, count - 1);
+    const handleIncrementUnitCount = () => onChange(type, count + 1);
+
+    const onButtonClick = () => setTempValue(String(count));
+
+    const onInputKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+        if (e.key === "Enter") {
+            submitNewValue();
+        } else if (e.key === "Escape") {
+            setTempValue(undefined);
+        }
+    };
+
+    const onInputBlur = () => submitNewValue();
+
+    const submitNewValue = () => {
+        let numberVal: number = Number(tempValue);
+        if (!isNaN(numberVal)) {
+            if (!isInteger(numberVal)) {
+                numberVal = round(numberVal);
+            }
+            onChange(type, numberVal);
+        }
+        setTempValue(undefined);
+    };
+
+    return (
+        <TableRow key={type} sx={{ height: 50 }}>
+            <TableCell>{unitDefinitions[type].name}</TableCell>
+            <TableCell>
+                {tempValue !== undefined ? (
+                    <TextField
+                        autoFocus
+                        onFocus={(e) => {
+                            e.target.select();
+                        }}
+                        size="small"
+                        sx={{ width: 40, marginLeft: "34px" }}
+                        value={tempValue}
+                        onChange={(e) => setTempValue(e.target.value)}
+                        onKeyDown={onInputKeyDown}
+                        inputProps={{
+                            style: { paddingTop: 4, paddingRight: 8, paddingBottom: 4, paddingLeft: 8, textAlign: "center" },
+                        }}
+                        onBlur={onInputBlur}
+                    />
+                ) : (
+                    <>
+                        <IconButton size="small" disabled={count === 0} onClick={handleDecrementUnitCount}>
+                            <Remove />
+                        </IconButton>
+                        <Button
+                            variant="text"
+                            color="secondary"
+                            sx={{ paddingLeft: 1, paddingRight: 1, minWidth: 35, lineHeight: "unset" }}
+                            onClick={onButtonClick}
+                        >
+                            {count}
+                        </Button>
+                        {/* {count} */}
+                        <IconButton size="small" onClick={handleIncrementUnitCount}>
+                            <Add />
+                        </IconButton>
+                    </>
+                )}
+            </TableCell>
+        </TableRow>
     );
 }

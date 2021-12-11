@@ -6,8 +6,8 @@ export enum CombatStage {
     SpaceMines = 1,
     PDS = 2,
     StartOfBattle = 3,
-    PreCombat = 4,
-    AntiFighterBarrage = 5,
+    AntiFighterBarrage = 4,
+    PreCombat = 5,
     Round1 = 6,
     Round2 = 7,
     RoundN = 8,
@@ -55,3 +55,20 @@ export interface UnitInput {
     tags?: UnitInputTags; // Leaders present on ships/PDS, AC's affecting a specific unit
 }
 export type UnitInputTags = SparseDictionary<UnitTag, any>;
+
+export enum HitType {
+    /**
+     * Normal hit that can be assigned to any unit.
+     */
+    Normal = 1,
+
+    /**
+     * Hit that can only be assigned to a fighter, for example from AFB.
+     */
+    AssignToFighter = 2,
+}
+
+export interface HitsProbabilityOutcome {
+    hits: SparseDictionary<HitType, number>;
+    probability: number;
+}

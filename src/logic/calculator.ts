@@ -6,6 +6,8 @@ import {
     CombatStage,
     CombatStateProbabilityOutput,
     CombatVictor,
+    HitsProbabilityOutcome,
+    HitType,
     ParticipantInput,
     ParticipantRole,
     UnitInput,
@@ -21,9 +23,9 @@ import {
     UnitState,
 } from "model/combatState";
 import { ParticipantTag } from "model/combatTags";
-import { KeyedDictionary } from "model/common";
+import { KeyedDictionary, SparseDictionary } from "model/common";
 import { ParticipantOnComputeSnapshotInput, ParticipantTagImplementation } from "model/effects";
-import { UnitDefinition, unitDefinitions } from "model/unit";
+import { UnitDefinition, unitDefinitions, UnitType } from "model/unit";
 import { participantTagResources } from "./participant";
 
 export function calculateCombatOutcome(input: CalculationInput): CalculationOutput | null {
@@ -50,7 +52,7 @@ export function calculateCombatOutcome(input: CalculationInput): CalculationOutp
 }
 
 function getInitialState(input: CalculationInput): CombatState {
-    return new CombatState(CombatStage.RoundN, getInitialParticipantState(input.attacker), getInitialParticipantState(input.defender));
+    return new CombatState(CombatStage.SpaceMines, getInitialParticipantState(input.attacker), getInitialParticipantState(input.defender));
 }
 
 function getInitialParticipantState(participant: ParticipantInput): ParticipantState {
@@ -93,7 +95,6 @@ function createCalculationOutput(stateDictionary: CombatStateDictionary, input: 
         defender: 0,
         draw: 0,
     };
-    // console.log(JSON.stringify(resultStatesOutput));
     for (let resultState of resultStatesOutput) {
         const victor: CombatVictor | undefined = determineVictor(resultState.state);
         if (victor) {
@@ -127,34 +128,8 @@ function resolveState(
 }
 
 function computeNextStates(currentState: CombatStateProbability, input: CalculationInput): CombatStateProbability[] {
-    let nextStates: CombatStateProbability[];
-    switch (currentState.state.stage) {
-        case CombatStage.SpaceMines:
-            nextStates = resolveSpaceMines(currentState.state, input);
-            break;
-        case CombatStage.PDS:
-            nextStates = resolvePds(currentState.state, input);
-            break;
-        case CombatStage.StartOfBattle:
-            nextStates = resolveStartOfBattle(currentState.state, input);
-            break;
-        case CombatStage.AntiFighterBarrage:
-            nextStates = resolveAntiFighterBarrage(currentState.state, input);
-            break;
-        case CombatStage.PreCombat:
-            nextStates = resolvePreCombat(currentState.state, input);
-            break;
-        case CombatStage.Round1:
-            nextStates = resolveCombatRound(currentState.state, input, CombatStage.Round1);
-            break;
-        case CombatStage.Round2:
-            nextStates = resolveCombatRound(currentState.state, input, CombatStage.Round1);
-            break;
-        case CombatStage.RoundN:
-            nextStates = resolveCombatRound(currentState.state, input, CombatStage.RoundN);
-            break;
-    }
-    // mergeIdenticalStates(nextStates);
+    let nextStates: CombatStateProbability[] = resolveCombatStage(currentState.state, input);
+
     const identicalStateIdx: number = nextStates.findIndex((sp) => CombatState.compare(sp.state, currentState.state) === 0);
     if (identicalStateIdx !== -1) {
         // Remove path that lead to the current state (neither side scores a hit in round N)
@@ -169,57 +144,45 @@ function computeNextStates(currentState: CombatStateProbability, input: Calculat
     return nextStates;
 }
 
-function resolveSpaceMines(state: CombatState, input: CalculationInput): CombatStateProbability[] {
-    return resolveStageNyi(state);
-}
-
-function resolvePds(state: CombatState, input: CalculationInput): CombatStateProbability[] {
-    return resolveStageNyi(state);
-}
-
-function resolveStartOfBattle(state: CombatState, input: CalculationInput): CombatStateProbability[] {
-    return resolveStageNyi(state);
-}
-
-function resolveAntiFighterBarrage(state: CombatState, input: CalculationInput): CombatStateProbability[] {
-    return resolveStageNyi(state);
-}
-
-function resolvePreCombat(state: CombatState, input: CalculationInput): CombatStateProbability[] {
-    return resolveStageNyi(state);
-}
-
-function resolveStageNyi(state: CombatState): CombatStateProbability[] {
-    return [
-        {
-            probability: 1.0,
-            state: new CombatState(getNextStage(state.stage), state.attacker, state.defender),
-        },
-    ];
-}
-
-function resolveCombatRound(state: CombatState, input: CalculationInput, stage: CombatStage): CombatStateProbability[] {
+function resolveCombatStage(state: CombatState, input: CalculationInput): CombatStateProbability[] {
     const nextStates: CombatStateProbability[] = [];
 
-    const attackerUnits: ComputedUnitSnapshot[] = getUnitSnapshots(state.attacker, input, ParticipantRole.Attacker, stage);
-    const defenderUnits: ComputedUnitSnapshot[] = getUnitSnapshots(state.defender, input, ParticipantRole.Defender, stage);
+    const attackerUnits: ComputedUnitSnapshot[] = getUnitSnapshots(state.attacker, input, ParticipantRole.Attacker, state.stage);
+    const defenderUnits: ComputedUnitSnapshot[] = getUnitSnapshots(state.defender, input, ParticipantRole.Defender, state.stage);
 
-    const attackerHits: number[] = calculateHits(attackerUnits);
-    const defenderHits: number[] = calculateHits(defenderUnits);
+    const attackerHitOutcomes: HitsProbabilityOutcome[] = calculateHits(attackerUnits);
+    const defenderHitOutcomes: HitsProbabilityOutcome[] = calculateHits(defenderUnits);
 
-    for (let att = 0; att < attackerHits.length; att++) {
-        for (let def = 0; def < defenderHits.length; def++) {
-            const probability: number = attackerHits[att] * defenderHits[def];
+    for (let att = 0; att < attackerHitOutcomes.length; att++) {
+        for (let def = 0; def < defenderHitOutcomes.length; def++) {
+            const attackerHits: HitsProbabilityOutcome = attackerHitOutcomes[att];
+            const defenderHits: HitsProbabilityOutcome = defenderHitOutcomes[def];
+            const probability: number = attackerHits.probability * defenderHits.probability;
 
-            const nextAttacker: ParticipantState = assignHits(state.attacker, attackerUnits, def);
-            const nextDefender: ParticipantState = assignHits(state.defender, defenderUnits, att);
-            nextStates.push({
-                probability,
-                state: new CombatState(getNextStage(state.stage), nextAttacker, nextDefender),
-            });
+            const nextAttacker: ParticipantState = assignHits(state.attacker, attackerUnits, defenderHits);
+            const nextDefender: ParticipantState = assignHits(state.defender, defenderUnits, attackerHits);
+            const nextState: CombatState = new CombatState(getNextStage(state.stage), nextAttacker, nextDefender);
+            const identicalState: CombatStateProbability | undefined = findIdenticalCombatState(nextStates, nextState);
+            if (identicalState) {
+                identicalState.probability += probability;
+            } else {
+                nextStates.push({
+                    probability,
+                    state: nextState,
+                });
+            }
         }
     }
     return nextStates;
+}
+
+function findIdenticalCombatState(stateProbabilities: CombatStateProbability[], state: CombatState): CombatStateProbability | undefined {
+    for (let stateProbability of stateProbabilities) {
+        if (CombatState.compare(stateProbability.state, state) === 0) {
+            return stateProbability;
+        }
+    }
+    return undefined;
 }
 
 function getUnitSnapshots(
@@ -232,12 +195,13 @@ function getUnitSnapshots(
     for (let unit of participant.units) {
         const def: UnitDefinition = unitDefinitions[unit.type];
         const baseRolls: number = getCombatRollsForStage(def, stage);
-        const rolls: number = max([baseRolls - unit.sustainedHits, 1])!;
+        const rolls: number = max([baseRolls - unit.sustainedHits, baseRolls])!;
         unitSnapshots.push({
             base: unit,
             type: unit.type,
             combatValue: def.combatValue,
             rolls: rolls,
+            hitType: getHitTypeForStage(def, stage),
             sustainDamage: def.sustainDamage,
             sustainedHits: unit.sustainedHits,
             tagEffects: [],
@@ -302,16 +266,46 @@ function getCombatRollsForStage(def: UnitDefinition, stage: CombatStage): number
     }
 }
 
-function calculateHits(units: ComputedUnitSnapshot[]): number[] {
-    let hitChances: number[] = [1.0]; // Initial probability: 100% chance for 0 hits.
+function getHitTypeForStage(def: UnitDefinition, stage: CombatStage): HitType {
+    switch (stage) {
+        case CombatStage.AntiFighterBarrage:
+            return HitType.AssignToFighter;
+    }
+    return HitType.Normal;
+}
+
+function calculateHits(units: ComputedUnitSnapshot[]): HitsProbabilityOutcome[] {
+    const hits: SparseDictionary<HitType, number[]> = {};
+    // let hitChances: number[] = [1.0]; // Initial probability: 100% chance for 0 hits.
     for (let unit of units) {
         const hitProbability: number = clamp((11 - unit.combatValue) / 10, 0.0, 1.0);
         const rolls: number = unit.rolls;
         for (let i = 0; i < rolls; i++) {
-            hitChances = addHitChance(hitChances, hitProbability);
+            // Initial probability: 100% chance for 0 hits.
+            hits[unit.hitType] = addHitChance(hits[unit.hitType] ?? [1.0], hitProbability);
         }
     }
-    return hitChances;
+
+    let outcomes: HitsProbabilityOutcome[] = [{ hits: {}, probability: 1.0 }];
+    for (let hitTypeStr of Object.keys(hits)) {
+        const hitType: HitType = Number(hitTypeStr);
+        const probabilities: number[] = hits[hitType]!;
+        outcomes = outcomes
+            .map((prev: HitsProbabilityOutcome) =>
+                probabilities.map(
+                    (p: number, idx): HitsProbabilityOutcome => ({
+                        hits: {
+                            ...prev.hits,
+                            [hitType]: idx,
+                        },
+                        probability: prev.probability * p,
+                    })
+                )
+            )
+            .flatMap((arr) => arr);
+    }
+
+    return outcomes;
 }
 
 function addHitChance(hitChances: number[], hitProbability: number): number[] {
@@ -326,10 +320,14 @@ function addHitChance(hitChances: number[], hitProbability: number): number[] {
     return nextHitChances;
 }
 
-function assignHits(participant: ParticipantState, units: ComputedUnitSnapshot[], hits: number): ParticipantState {
+function assignHits(participant: ParticipantState, units: ComputedUnitSnapshot[], hitOutcomes: HitsProbabilityOutcome): ParticipantState {
     const newUnits: ComputedUnitSnapshot[] = [...units];
-    for (let i = 0; i < hits; i++) {
-        assignHit(newUnits);
+    for (let hitTypeStr of Object.keys(hitOutcomes.hits)) {
+        const hitType: HitType = Number(hitTypeStr);
+        const numberOfHits: number = hitOutcomes.hits[hitType]!;
+        for (let i = 0; i < numberOfHits; i++) {
+            assignHit(newUnits, hitType);
+        }
     }
     return new ParticipantState(
         newUnits.map((u) => u.base),
@@ -337,8 +335,8 @@ function assignHits(participant: ParticipantState, units: ComputedUnitSnapshot[]
     );
 }
 
-function assignHit(units: ComputedUnitSnapshot[]) {
-    const hitIndex: number = determineHitTarget(units);
+function assignHit(units: ComputedUnitSnapshot[], hitType: HitType) {
+    const hitIndex: number = determineHitTarget(units, hitType);
     if (hitIndex !== -1) {
         // account for "can't assign fighter hits" etc.? Loop list until we find a unit that it can be assigned to?
         const selectedUnit: ComputedUnitSnapshot | undefined = units[hitIndex];
@@ -364,10 +362,11 @@ function assignHit(units: ComputedUnitSnapshot[]) {
  * Returns the index of the unit that should suffer the hit.
  * @param units
  */
-function determineHitTarget(units: ComputedUnitSnapshot[]): number {
+function determineHitTarget(units: ComputedUnitSnapshot[], hitType: HitType): number {
     let maxPrioIndex: number = -1;
     let maxPrioValue: number = -1;
     for (let i = 0; i < units.length; i++) {
+        if (!canAssignHitToUnit(units[i], hitType)) continue;
         const prio = calculateHitPriority(units[i]);
         if (prio > maxPrioValue) {
             maxPrioIndex = i;
@@ -375,6 +374,15 @@ function determineHitTarget(units: ComputedUnitSnapshot[]): number {
         }
     }
     return maxPrioIndex;
+}
+
+function canAssignHitToUnit(unit: ComputedUnitSnapshot, hitType: HitType): boolean {
+    switch (hitType) {
+        case HitType.AssignToFighter:
+            return unit.type === UnitType.Fighter;
+        case HitType.Normal:
+            return true;
+    }
 }
 
 function calculateHitPriority(unit: ComputedUnitSnapshot): number {
@@ -459,30 +467,14 @@ function appendCombatStateProbability(dict: CombatStateDictionary, stateProbabil
             console.warn(`appendCombatStateProbability: Empty list found at hash ${hash}`);
             list.push(stateProbability);
         } else {
-            // console.log(`Multiple (${list.length}) states found for hash ${hash}. Using equality comparer.`);
             const equalState: CombatStateProbability | undefined = list.find(
                 (sp: CombatStateProbability) => CombatState.compare(stateProbability.state, sp.state) === 0
             );
             if (equalState) {
-                // console.log(`Equal state found.`);
                 equalState.probability += stateProbability.probability;
             } else {
-                // console.log(`Equal state not found.`);
                 list.push(stateProbability);
             }
-            // const equalStateIdx: number = list.findIndex(
-            //     (sp: CombatStateProbability) => CombatState.compare(stateProbability.state, sp.state) === 0
-            // );
-            // if (equalStateIdx !== -1) {
-            //     console.log(`Equal state found.`);
-            //     list[equalStateIdx] = {
-            //         state: list[equalStateIdx].state,
-            //         probability: list[equalStateIdx].probability + stateProbability.probability,
-            //     };
-            // } else {
-            //     console.log(`Equal state not found.`);
-            //     list.push(stateProbability);
-            // }
         }
     } else {
         dict[hash] = [stateProbability];
@@ -518,9 +510,3 @@ function addMemoizedResolutions(state: CombatState, nextStates: CombatStateProba
         dict[hash] = [resolution];
     }
 }
-
-// function logStatistics(dict: CombatStateDictionary) {
-//     const states: CombatStateProbability[] = Object.values(dict).flat();
-//     const finished: CombatStateProbability[] = states.filter((sp: CombatStateProbability) => combatStateIsFinished(sp.state));
-//     console.log(`State count: ${states.length} (finished: ${finished.length})`);
-// }

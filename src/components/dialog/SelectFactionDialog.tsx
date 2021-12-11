@@ -1,4 +1,4 @@
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Grid, Typography } from "@mui/material";
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Grid } from "@mui/material";
 
 import { getAllEnumValues } from "logic/common";
 import { factionResources } from "logic/participant";
@@ -18,15 +18,11 @@ export function SelectFactionDialog({ open, currentValue, onClose, onSelect }: P
     };
     return (
         <Dialog fullWidth={true} maxWidth="lg" open={open} onClose={onClose}>
-            <DialogTitle>
-                <Typography variant="h4" sx={{ textAlign: "center" }}>
-                    Select faction
-                </Typography>
-            </DialogTitle>
+            <DialogTitle sx={{ textAlign: "center" }}>Select faction</DialogTitle>
             <DialogContent>
                 <Grid container spacing={1}>
                     {getAllEnumValues<Faction>(Faction).map((faction: Faction) => (
-                        <Grid item xs={4}>
+                        <Grid key={faction} item xs={4}>
                             <Button
                                 variant="contained"
                                 // color={faction === currentValue ? "secondary" : "primary"}

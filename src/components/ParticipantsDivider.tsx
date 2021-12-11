@@ -34,7 +34,6 @@ export function ParticipantsDivider() {
                     height: 60,
                     top: "calc(50% - 30px)",
                     left: "-29px",
-                    zIndex: 100000,
                     "&.Mui-disabled": { backgroundColor: "#303030" },
                 }}
             >

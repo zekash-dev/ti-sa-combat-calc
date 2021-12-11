@@ -31,8 +31,9 @@ export function ParticipantBattlefieldRepresentation({ role }: Props) {
 
     return (
         <Box ref={containerRef} sx={{ width: "100%", p: 1 }}>
-            {sortedUnits.map((unit: UnitInput) => (
+            {sortedUnits.map((unit: UnitInput, idx: number) => (
                 <UnitImage
+                    key={`${unit.type}-${idx}`}
                     unitType={unit.type}
                     faction={participant.faction}
                     role={role}
