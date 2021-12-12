@@ -1,5 +1,5 @@
 import { getAllEnumValues } from "logic/common";
-import { ComputedUnitSnapshot } from "./combatState";
+import { ParticipantTagImplementation } from "./effects";
 
 export enum Faction {
     BARONY_OF_LETNEV = 101,
@@ -103,12 +103,4 @@ export interface ParticipantTagResources {
     icon?: JSX.Element;
     color: string;
     implementation: false | ParticipantTagImplementation;
-}
-
-export interface ParticipantOnComputeSnapshotInput {
-    units: ComputedUnitSnapshot[];
-}
-
-export interface ParticipantTagImplementation {
-    onComputeUnitSnapshots?: (input: ParticipantOnComputeSnapshotInput) => void;
 }

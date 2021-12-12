@@ -1,3 +1,4 @@
+import { getAllEnumValues } from "logic/common";
 import { Faction, ParticipantTag, UnitTag } from "./combatTags";
 import { KeyedDictionary, SparseDictionary } from "./common";
 import { UnitType } from "./unit";
@@ -13,6 +14,14 @@ export enum CombatStage {
     RoundN = 8,
 }
 
+export const allCombatStages: CombatStage[] = getAllEnumValues<CombatStage>(CombatStage);
+
+export interface CombatStageResources {
+    name: string;
+}
+
+export type IntermediateCombatStage = Omit<CombatStage, CombatStage.RoundN>;
+
 export enum ParticipantRole {
     Attacker = "attacker",
     Defender = "defender",
@@ -26,8 +35,10 @@ export interface CalculationInput {
 }
 
 export interface CalculationOutput {
-    victorProbabilites: KeyedDictionary<CombatVictor, number>;
-    resultStates: CombatStateProbabilityOutput[];
+    victorProbabilities: KeyedDictionary<CombatVictor, number>;
+    finalStates: CombatStateProbabilityOutput[];
+    stages: SparseDictionary<CombatStage, CombatStageOutput>;
+    // statesByStage: SparseDictionary<CombatStage, CombatStateProbabilityOutput[]>;
 }
 
 export interface CombatStateProbabilityOutput {
@@ -39,6 +50,29 @@ export interface CombatStateOutput {
     stage: CombatStage;
     attacker: ParticipantInput;
     defender: ParticipantInput;
+}
+
+export interface CombatStageOutput {
+    victorProbabilities: KeyedDictionary<CombatVictor, number>;
+    beforeStates: CombatStateProbabilityOutput[];
+    afterStates: CombatStateProbabilityOutput[];
+    statistics: KeyedDictionary<ParticipantRole, CombatStageParticipantStatistics>;
+}
+
+/**
+ * Statistics for a participant in a single combat stage.
+ */
+export interface CombatStageParticipantStatistics {
+    /**
+     * Expected hits based on the participant's units.
+     */
+    expectedHits: number;
+    /**
+     * Average hits (weighted by probability) that were actually assigned to opponent units.
+     *
+     * This can differ from _expectedHits_ if all hits can't be assigned, or if the opponent uses abilities to cancel hits.
+     */
+    assignedHits: number;
 }
 
 export interface ParticipantInput {

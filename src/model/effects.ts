@@ -1,3 +1,4 @@
+import { CombatStage } from "./calculation";
 import { ComputedUnitSnapshot } from "./combatState";
 
 export interface UnitTagImplementation {
@@ -5,6 +6,7 @@ export interface UnitTagImplementation {
 }
 
 export interface ParticipantOnComputeSnapshotInput {
+    stage: CombatStage;
     units: ComputedUnitSnapshot[];
 }
 
