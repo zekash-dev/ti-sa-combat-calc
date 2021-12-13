@@ -474,16 +474,15 @@ function addStatesByStage(
 ) {
     // Gather intermediate statistics for all stages up until RoundN
     for (let stateProbability of stateProbabilities.filter((sp) => sp.state.stage !== CombatStage.RoundN)) {
-        // const adjustedStateProbability: CombatStateProbability = {
-        //     probability: stateProbability.probability / initialProbability,
-        //     state: stateProbability.state,
-        // };
-        const adjustedStateProbability = stateProbability;
-        const statesByStageList: CombatStateProbability[] | undefined = statesByStage[adjustedStateProbability.state.stage];
+        // Clone to prevent mutation issues
+        const clone: CombatStateProbability = {
+            ...stateProbability,
+        };
+        const statesByStageList: CombatStateProbability[] | undefined = statesByStage[clone.state.stage];
         if (statesByStageList) {
-            statesByStageList.push(adjustedStateProbability);
+            statesByStageList.push(clone);
         } else {
-            statesByStage[adjustedStateProbability.state.stage] = [adjustedStateProbability];
+            statesByStage[clone.state.stage] = [clone];
         }
     }
 }
@@ -607,7 +606,6 @@ function calculateCombatStageParticipantStatistics(
     stage: CombatStage
 ): CombatStageParticipantStatistics {
     const totalProbabilityBefore = sum(beforeStates.map((sp) => sp.probability));
-    const totalProbabilityAfter = sum(afterStates.map((sp) => sp.probability));
     let expectedHits: number = 0;
     let opponentHealthBefore: number = 0;
     let opponentHealthAfter: number = 0;
@@ -616,17 +614,21 @@ function calculateCombatStageParticipantStatistics(
         const expHits: number = sum(units.map(getUnitExpectedHits));
         expectedHits += expHits * stateProbability.probability;
 
-        const opponentUnits: ComputedUnitSnapshot[] = getUnitSnapshots(stateProbability.state[getOpponentRole(role)], input, role, stage);
-        opponentHealthBefore += (sum(opponentUnits.map(getUnitHealth)) * stateProbability.probability) / totalProbabilityBefore;
+        const opponent: ParticipantRole = getOpponentRole(role);
+        const opponentUnits: ComputedUnitSnapshot[] = getUnitSnapshots(stateProbability.state[opponent], input, role, stage);
+        const health: number = sum(opponentUnits.map(getUnitHealth)) * stateProbability.probability;
+        opponentHealthBefore += health;
+        if (determineVictor(stateProbability.state) === opponent) {
+            opponentHealthAfter += health;
+        }
     }
     for (let stateProbability of afterStates) {
         const opponentUnits: ComputedUnitSnapshot[] = getUnitSnapshots(stateProbability.state[getOpponentRole(role)], input, role, stage);
-        opponentHealthAfter += (sum(opponentUnits.map(getUnitHealth)) * stateProbability.probability) / totalProbabilityAfter;
+        opponentHealthAfter += sum(opponentUnits.map(getUnitHealth)) * stateProbability.probability;
     }
-    // todo: I need to rethink for assignedHits is calculated...
     return {
         expectedHits,
-        assignedHits: (opponentHealthBefore - opponentHealthAfter) * totalProbabilityAfter,
+        assignedHits: (opponentHealthBefore - opponentHealthAfter) * totalProbabilityBefore,
     };
 }
 

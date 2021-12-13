@@ -71,18 +71,18 @@ interface ParticipantHitsDisplayProps {
 }
 
 function ParticipantHitsDisplay({ label, participant }: ParticipantHitsDisplayProps) {
-    let expected: number = round(participant.expectedHits, 1);
-    let assigned: number = round(participant.assignedHits, 1);
-    let expectedEqualsAssigned: boolean = expected === assigned;
-    if (expectedEqualsAssigned) {
-        let expectedPrecise: number = round(participant.expectedHits, 2);
-        let assignedPrecise: number = round(participant.assignedHits, 2);
-        expectedEqualsAssigned = expectedPrecise === assignedPrecise;
-        if (!expectedEqualsAssigned) {
-            expected = expectedPrecise;
-            assigned = assignedPrecise;
-        }
+    let precision: number = 1;
+    if (
+        participant.expectedHits < 1 ||
+        participant.assignedHits < 1 ||
+        (round(participant.expectedHits, 1) === round(participant.assignedHits, 1) &&
+            round(participant.expectedHits, 2) !== round(participant.assignedHits, 2))
+    ) {
+        precision = 2;
     }
+    let expected: number = round(participant.expectedHits, precision);
+    let assigned: number = round(participant.assignedHits, precision);
+    let expectedEqualsAssigned: boolean = expected === assigned;
 
     return (
         <Typography sx={{ width: "33%", color: "text.secondary" }}>
