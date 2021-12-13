@@ -23,7 +23,7 @@ export function ResultView() {
             <CombatStageResultView output={output} participants={participants} />
             <Accordion expanded={expanded} disableGutters onChange={() => setExpanded((prev) => !prev)}>
                 <AccordionSummary expandIcon={<ExpandMore />}>
-                    <Typography variant="h5" color="text.primary">
+                    <Typography variant="h6" color="text.primary">
                         Final results
                     </Typography>
                 </AccordionSummary>

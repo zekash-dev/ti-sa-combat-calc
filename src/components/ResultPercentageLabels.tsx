@@ -17,7 +17,7 @@ export function ResultPercentageLabels({ victorProbabilities, small }: ResultPer
     const showDraw = draw > 0.1;
     const showUndetermined = undetermined > 0.1;
     return (
-        <div style={{ width: "100%", height: small ? "22px" : "30px", position: "relative" }}>
+        <div style={{ width: "100%", height: small ? "20px" : "24px", position: "relative" }}>
             <div
                 style={{
                     position: "absolute",
@@ -74,7 +74,7 @@ interface PercentageLabelProps {
 
 function PercentageLabel({ label, percentage, small }: PercentageLabelProps) {
     return (
-        <Typography variant="h6" color="text.secondary" style={{ fontSize: small ? "0.9em" : undefined }}>
+        <Typography variant="body1" color="text.secondary" style={{ fontSize: small ? "0.9em" : undefined }}>
             {label}: {formatPercent(percentage)}
         </Typography>
     );
