@@ -558,6 +558,7 @@ function createCombatStageOutputs(
     const byStage: SparseDictionary<CombatStage, CombatStateProbability[]> = Object.fromEntries(
         Object.keys(statesByStage).map((key) => [key, statesByStage[Number(key) as CombatStage]!])
     );
+    let previousVictorProbabilities: KeyedDictionary<CombatVictor, number> | undefined = undefined;
 
     for (let stage of outputStages) {
         const beforeStates: CombatStateProbability[] | undefined = byStage[stage];
@@ -566,7 +567,6 @@ function createCombatStageOutputs(
 
         const beforeStatesOutput: CombatStateProbabilityOutput[] = toCombatStateProbabilityOutputs(beforeStates, input);
         const afterStatesOutput: CombatStateProbabilityOutput[] = toCombatStateProbabilityOutputs(afterStates, input);
-        const victorProbabilities: KeyedDictionary<CombatVictor, number> = getVictorProbabilities(afterStatesOutput);
 
         const statistics: KeyedDictionary<ParticipantRole, CombatStageParticipantStatistics> = {
             [ParticipantRole.Attacker]: calculateCombatStageParticipantStatistics(
@@ -584,8 +584,13 @@ function createCombatStageOutputs(
                 stage
             ),
         };
-
         if (Object.values(statistics).every((stat) => stat.expectedHits === 0)) continue;
+
+        let victorProbabilities: KeyedDictionary<CombatVictor, number> = getVictorProbabilities(afterStatesOutput);
+        if (previousVictorProbabilities) {
+            victorProbabilities = mergeVictorProbabilities(previousVictorProbabilities, victorProbabilities);
+        }
+        previousVictorProbabilities = victorProbabilities;
 
         outputs[stage] = {
             beforeStates: beforeStatesOutput,
@@ -653,4 +658,15 @@ export function getVictorProbabilities(combatStates: CombatStateProbabilityOutpu
         }
     }
     return victorProbabilities;
+}
+
+export function mergeVictorProbabilities(
+    first: KeyedDictionary<CombatVictor, number>,
+    second: KeyedDictionary<CombatVictor, number>
+): KeyedDictionary<CombatVictor, number> {
+    return {
+        attacker: first.attacker + second.attacker,
+        defender: first.defender + second.defender,
+        draw: first.draw + second.draw,
+    };
 }

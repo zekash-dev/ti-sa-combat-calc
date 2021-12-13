@@ -12,9 +12,10 @@ import { KeyedDictionary } from "model/common";
 interface ResultPercentageBarsProps {
     victorProbabilities: KeyedDictionary<CombatVictor, number>;
     participants: KeyedDictionary<ParticipantRole, ParticipantInput>;
+    small?: boolean;
 }
 
-export function ResultPercentageBars({ victorProbabilities, participants }: ResultPercentageBarsProps) {
+export function ResultPercentageBars({ victorProbabilities, participants, small }: ResultPercentageBarsProps) {
     const styles = useStyles();
     const { attacker, defender, draw } = victorProbabilities;
     const undetermined: number = 1.0 - sum(Object.values(victorProbabilities));
@@ -24,10 +25,10 @@ export function ResultPercentageBars({ victorProbabilities, participants }: Resu
 
     return (
         <div className={styles.bars}>
-            <VictorBar probability={attacker} color={attackerResources.color} slanted={slanted} />
-            <VictorBar probability={draw} color={grey[900]} slanted={slanted} />
-            <VictorBar probability={undetermined} color={grey[400]} slanted={slanted} />
-            <VictorBar probability={defender} color={defenderResources.color} slanted={slanted} />
+            <VictorBar probability={attacker} color={attackerResources.color} slanted={slanted} small={small} />
+            <VictorBar probability={draw} color={grey[900]} slanted={slanted} small={small} />
+            <VictorBar probability={undetermined} color={grey[400]} slanted={slanted} small={small} />
+            <VictorBar probability={defender} color={defenderResources.color} slanted={slanted} small={small} />
         </div>
     );
 }
@@ -35,14 +36,16 @@ interface VictorBarProps {
     probability: number;
     color: string;
     slanted: boolean;
+    small?: boolean;
 }
-function VictorBar({ probability, color, slanted }: VictorBarProps) {
+
+function VictorBar({ probability, color, slanted, small }: VictorBarProps) {
     const styles = useStyles();
     if (probability < 0.001) return null;
 
     return (
         <div
-            className={classNames(styles.victorBar, { [styles.slantedBar]: slanted })}
+            className={classNames(styles.victorBar, { [styles.slantedBar]: slanted, [styles.smallVictorBar]: small })}
             style={{
                 width: `${probability * 100}%`,
                 backgroundColor: color,
@@ -57,10 +60,13 @@ const useStyles = makeStyles((theme: Theme) => ({
         overflow: "hidden",
     },
     victorBar: {
-        height: 120,
+        height: 80,
         display: "inline-block",
         position: "relative",
         transition: "width 0.5s",
+    },
+    smallVictorBar: {
+        height: 40,
     },
     slantedBar: {
         "&:after": {

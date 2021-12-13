@@ -1,3 +1,6 @@
+import { ExpandMore } from "@mui/icons-material";
+import { Accordion, AccordionDetails, AccordionSummary, Typography } from "@mui/material";
+import { useState } from "react";
 import { useSelector } from "react-redux";
 
 import { CalculationOutput, ParticipantInput, ParticipantRole } from "model/calculation";
@@ -9,6 +12,7 @@ import { ResultPercentageBars } from "./ResultPercentageBars";
 import { ResultPercentageLabels } from "./ResultPercentageLabels";
 
 export function ResultView() {
+    const [expanded, setExpanded] = useState(true);
     const output: CalculationOutput | null = useSelector(selectOutput);
     const participants: KeyedDictionary<ParticipantRole, ParticipantInput> = useSelector(selectparticipants);
 
@@ -16,9 +20,18 @@ export function ResultView() {
 
     return (
         <>
-            <ResultPercentageLabels victorProbabilities={output.victorProbabilities} />
-            <ResultPercentageBars victorProbabilities={output.victorProbabilities} participants={participants} />
             <CombatStageResultView output={output} participants={participants} />
+            <Accordion expanded={expanded} disableGutters onChange={() => setExpanded((prev) => !prev)}>
+                <AccordionSummary expandIcon={<ExpandMore />}>
+                    <Typography variant="h5" color="primary">
+                        Final results
+                    </Typography>
+                </AccordionSummary>
+                <AccordionDetails sx={{ padding: 0 }}>
+                    <ResultPercentageLabels victorProbabilities={output.victorProbabilities} />
+                    <ResultPercentageBars victorProbabilities={output.victorProbabilities} participants={participants} />
+                </AccordionDetails>
+            </Accordion>
         </>
     );
 }
