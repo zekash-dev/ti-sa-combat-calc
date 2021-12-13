@@ -1,5 +1,6 @@
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Grid } from "@mui/material";
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Grid, Typography } from "@mui/material";
 
+import { FactionImage } from "components/graphics/FactionImage";
 import { getAllEnumValues } from "logic/common";
 import { factionResources } from "logic/participant";
 import { Faction } from "model/combatTags";
@@ -24,18 +25,25 @@ export function SelectFactionDialog({ open, currentValue, onClose, onSelect }: P
                     {getAllEnumValues<Faction>(Faction).map((faction: Faction) => (
                         <Grid key={faction} item xs={4}>
                             <Button
-                                variant="contained"
-                                // color={faction === currentValue ? "secondary" : "primary"}
+                                variant="outlined"
                                 sx={{
+                                    justifyContent: "left",
                                     width: "100%",
-                                    height: "100%",
-                                    backgroundColor: factionResources[faction].color,
-                                    border: faction === currentValue ? "5px solid white" : "5px solid transparent",
+                                    height: "80px",
+                                    color: factionResources[faction].color,
+                                    backgroundColor: faction === currentValue ? "rgba(255, 255, 255, 0.2)" : undefined,
+                                    border: `5px solid ${factionResources[faction].color}`,
                                     fontSize: "1.1em",
+                                    "&:hover": {
+                                        borderWidth: "5px",
+                                    },
                                 }}
                                 onClick={handleSelectFaction(faction)}
                             >
-                                {factionResources[faction].name}
+                                <FactionImage faction={faction} style={{ width: "50px" }} />
+                                <Typography variant="body1" color="text.primary" sx={{ m: 2 }}>
+                                    {factionResources[faction].name}
+                                </Typography>
                             </Button>
                         </Grid>
                     ))}

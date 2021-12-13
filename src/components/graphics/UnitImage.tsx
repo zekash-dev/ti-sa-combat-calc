@@ -48,7 +48,7 @@ export const UnitImage = React.memo(({ unitType, faction, role, width, height }:
 
 function getSvgPath(unitType: UnitType): string {
     const base = window.location.href;
-    const subfolder = "images";
+    const subfolder = "images/units";
     let imageName: string;
     switch (unitType) {
         case UnitType.WarSun:

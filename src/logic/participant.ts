@@ -10,6 +10,7 @@ import {
     ParticipantTag,
     ParticipantTagResources,
     Technology,
+    TechnologyResources,
     TechnologyType,
 } from "model/combatTags";
 import { KeyedDictionary } from "model/common";
@@ -128,6 +129,88 @@ export const technologyColors: KeyedDictionary<TechnologyType, string> = {
     [TechnologyType.GREEN]: green[500],
     [TechnologyType.RED]: red[500],
     [TechnologyType.YELLOW]: yellow[600],
+};
+
+export const technologyResources: KeyedDictionary<Technology, TechnologyResources> = {
+    [Technology.HYLAR_V_LASER]: {
+        name: "Hylar V laser",
+        color: technologyColors[TechnologyType.RED],
+        type: TechnologyType.RED,
+        implementation: effects.hylarVLaser,
+    },
+    [Technology.IMPULSION_SHIELDS]: {
+        name: "Impulsion shields",
+        color: technologyColors[TechnologyType.RED],
+        type: TechnologyType.RED,
+        implementation: false,
+    },
+    [Technology.AUTOMATED_TURRETS]: {
+        name: "Automated turrets",
+        color: technologyColors[TechnologyType.RED],
+        type: TechnologyType.RED,
+        implementation: false,
+    },
+    [Technology.WAR_SUN]: { name: "War sun", color: technologyColors[TechnologyType.RED], type: TechnologyType.RED, implementation: false },
+    [Technology.GRAVITON_NETAGOR]: {
+        name: "Graviton negator",
+        color: technologyColors[TechnologyType.RED],
+        type: TechnologyType.RED,
+        implementation: false,
+    },
+    [Technology.MAGEN_DEFENSE_GRID]: {
+        name: "Magen defense grid",
+        color: technologyColors[TechnologyType.RED],
+        type: TechnologyType.RED,
+        implementation: false,
+    },
+    [Technology.ASSAULT_CANNONS]: {
+        name: "Assault cannons",
+        color: technologyColors[TechnologyType.RED],
+        type: TechnologyType.RED,
+        implementation: false,
+    },
+    [Technology.GRAVITON_LASER_SYSTEM]: {
+        name: "Graviton laser system",
+        color: technologyColors[TechnologyType.YELLOW],
+        type: TechnologyType.YELLOW,
+        implementation: false,
+    },
+    [Technology.CYBERNETICS]: {
+        name: "Cybernetics",
+        color: technologyColors[TechnologyType.GREEN],
+        type: TechnologyType.GREEN,
+        implementation: false,
+    },
+    [Technology.GEN_SYNTHESIS]: {
+        name: "Gen synthesis",
+        color: technologyColors[TechnologyType.GREEN],
+        type: TechnologyType.GREEN,
+        implementation: false,
+    },
+    [Technology.DACXIVE_ANIMATORS]: {
+        name: "Dacxive animators",
+        color: technologyColors[TechnologyType.GREEN],
+        type: TechnologyType.GREEN,
+        implementation: false,
+    },
+    [Technology.X89_BACTERIAL_WEAPON]: {
+        name: "X-89 bacterial weapon",
+        color: technologyColors[TechnologyType.GREEN],
+        type: TechnologyType.GREEN,
+        implementation: false,
+    },
+    [Technology.ADVANCED_FIGHTERS]: {
+        name: "Advanced fighters",
+        color: technologyColors[TechnologyType.BLUE],
+        type: TechnologyType.BLUE,
+        implementation: false,
+    },
+    [Technology.MANEUVERING_JETS]: {
+        name: "Maneuvering jets",
+        color: technologyColors[TechnologyType.BLUE],
+        type: TechnologyType.BLUE,
+        implementation: false,
+    },
 };
 
 export const participantTagResources: KeyedDictionary<ParticipantTag, ParticipantTagResources> = {
@@ -256,28 +339,7 @@ export const participantTagResources: KeyedDictionary<ParticipantTag, Participan
         color: factionResources[Faction.ORDER_OF_THE_LAST].color,
         implementation: false,
     },
-    [Technology.HYLAR_V_LASER]: { name: "Hylar V laser", color: technologyColors[TechnologyType.RED], implementation: effects.hylarVLaser },
-    [Technology.IMPULSION_SHIELDS]: { name: "Impulsion shields", color: technologyColors[TechnologyType.RED], implementation: false },
-    [Technology.AUTOMATED_TURRETS]: { name: "Automated turrets", color: technologyColors[TechnologyType.RED], implementation: false },
-    [Technology.WAR_SUN]: { name: "War sun", color: technologyColors[TechnologyType.RED], implementation: false },
-    [Technology.GRAVITON_NETAGOR]: { name: "Graviton negator", color: technologyColors[TechnologyType.RED], implementation: false },
-    [Technology.MAGEN_DEFENSE_GRID]: { name: "Magen defense grid", color: technologyColors[TechnologyType.RED], implementation: false },
-    [Technology.ASSAULT_CANNONS]: { name: "Assault cannons", color: technologyColors[TechnologyType.RED], implementation: false },
-    [Technology.GRAVITON_LASER_SYSTEM]: {
-        name: "Graviton laser system",
-        color: technologyColors[TechnologyType.YELLOW],
-        implementation: false,
-    },
-    [Technology.CYBERNETICS]: { name: "Cybernetics", color: technologyColors[TechnologyType.GREEN], implementation: false },
-    [Technology.GEN_SYNTHESIS]: { name: "Gen synthesis", color: technologyColors[TechnologyType.GREEN], implementation: false },
-    [Technology.DACXIVE_ANIMATORS]: { name: "Dacxive animators", color: technologyColors[TechnologyType.GREEN], implementation: false },
-    [Technology.X89_BACTERIAL_WEAPON]: {
-        name: "X-89 bacterial weapon",
-        color: technologyColors[TechnologyType.GREEN],
-        implementation: false,
-    },
-    [Technology.ADVANCED_FIGHTERS]: { name: "Advanced fighters", color: technologyColors[TechnologyType.BLUE], implementation: false },
-    [Technology.MANEUVERING_JETS]: { name: "Maneuvering jets", color: technologyColors[TechnologyType.BLUE], implementation: false },
+    ...technologyResources,
 };
 
 export const combatStageResources: KeyedDictionary<CombatStage, CombatStageResources> = {

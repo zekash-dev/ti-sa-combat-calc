@@ -104,3 +104,7 @@ export interface ParticipantTagResources {
     color: string;
     implementation: false | ParticipantTagImplementation;
 }
+
+export interface TechnologyResources extends ParticipantTagResources {
+    type: TechnologyType;
+}

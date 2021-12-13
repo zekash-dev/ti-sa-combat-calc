@@ -48,7 +48,7 @@ function CombatStageView(props: CombatStageViewProps) {
     return (
         <Accordion expanded={expanded} disableGutters onChange={() => setExpanded((prev) => !prev)}>
             <AccordionSummary expandIcon={<ExpandMore />}>
-                <Typography variant="h5" color="primary" sx={{ minWidth: "400px" }}>
+                <Typography variant="h5" color="text.primary" sx={{ minWidth: "400px" }}>
                     {combatStageResources[stage].name}
                 </Typography>
                 <ParticipantHitsDisplay label="Attacker" participant={stageOutput.statistics.attacker} />

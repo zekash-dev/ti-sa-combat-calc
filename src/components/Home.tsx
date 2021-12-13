@@ -19,10 +19,14 @@ export function Home() {
                 <Box sx={{ position: "relative" }}>
                     <Grid container>
                         <Grid item xs={6} sx={{ textAlign: "center" }}>
-                            <Typography variant="h3">{ParticipantRole.Attacker}</Typography>
+                            <Typography variant="h3" color="text.primary">
+                                {ParticipantRole.Attacker}
+                            </Typography>
                         </Grid>
                         <Grid item xs={6} sx={{ textAlign: "center" }}>
-                            <Typography variant="h3">{ParticipantRole.Defender}</Typography>
+                            <Typography variant="h3" color="text.primary">
+                                {ParticipantRole.Defender}
+                            </Typography>
                         </Grid>
                     </Grid>
                     <Grid container justifyContent="center">

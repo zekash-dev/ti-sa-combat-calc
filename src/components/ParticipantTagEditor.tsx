@@ -1,14 +1,14 @@
-import { CheckBox, CheckBoxOutlineBlank, ChevronLeft, ChevronRight, Person } from "@mui/icons-material";
+import { CheckBox, CheckBoxOutlineBlank, ChevronLeft, ChevronRight, Stars } from "@mui/icons-material";
 import {
     Divider,
     Drawer as MuiDrawer,
-    IconButton,
     List,
     ListItem,
     ListItemIcon,
     ListItemText,
     styled,
     Theme,
+    Tooltip,
     Typography,
 } from "@mui/material";
 import React, { useState } from "react";
@@ -20,6 +20,7 @@ import {
     factionResources,
     getDefaultFactionAbilityValue,
     participantTagResources,
+    technologyResources,
 } from "logic/participant";
 import { ParticipantInput, ParticipantRole } from "model/calculation";
 import {
@@ -34,6 +35,8 @@ import {
 } from "model/combatTags";
 import { selectParticipant, setFaction, setParticipantTag, unsetParticipantTag } from "redux/participant/participantSlice";
 import { SelectFactionDialog } from "./dialog/SelectFactionDialog";
+import { FactionImage } from "./graphics/FactionImage";
+import { TechnologyTypeImage } from "./graphics/TechnologyTypeImage";
 
 interface Props {
     location: "left" | "right";
@@ -45,16 +48,20 @@ export function ParticipantTagEditor(props: Props) {
     const toggleDrawer = () => setOpen(!open);
     return (
         <Drawer variant="permanent" open={open} anchor={props.location}>
-            <DrawerHeader sx={{ flexDirection: props.location === "right" ? "row-reverse" : "row" }}>
-                <IconButton onClick={toggleDrawer}>{(props.location === "right") !== open ? <ChevronLeft /> : <ChevronRight />}</IconButton>
-            </DrawerHeader>
+            <ListItem button onClick={toggleDrawer} sx={{ justifyContent: props.location === "right" ? "left" : "right" }}>
+                {(props.location === "right") !== open ? <ChevronLeft fontSize="large" /> : <ChevronRight fontSize="large" />}
+            </ListItem>
             <Divider />
-            {open ? <DrawerOpenContent {...props} /> : <DrawerClosedContent {...props} />}
+            <DrawerContent {...props} open={open} />
         </Drawer>
     );
 }
 
-function DrawerOpenContent({ location, role }: Props) {
+interface DrawerContentProps extends Props {
+    open: boolean;
+}
+
+function DrawerContent({ location, role, open }: DrawerContentProps) {
     const dispatch = useDispatch();
     const [factionDialogOpen, setFactionDialogOpen] = useState(false);
     const openFactionDialog = () => setFactionDialogOpen(true);
@@ -76,15 +83,15 @@ function DrawerOpenContent({ location, role }: Props) {
     return (
         <>
             <List dense>
-                <ListItem>
+                <ListItem sx={{ visibility: open ? "visible" : "hidden" }}>
                     <ListItemText>Faction</ListItemText>
                 </ListItem>
                 <ListItem button disableRipple onClick={openFactionDialog}>
                     <ListItemIcon>
-                        <Person />
+                        <FactionImage faction={participant.faction} style={{ width: "30px", marginLeft: "auto", marginRight: "auto" }} />
                     </ListItemIcon>
                     <ListItemText>
-                        <Typography variant="body1" sx={{ overflow: "hidden", textOverflow: "ellipsis", color: faction.color }}>
+                        <Typography variant="body1" sx={{ overflow: "hidden", textOverflow: "ellipsis" }}>
                             {faction.name}
                         </Typography>
                     </ListItemText>
@@ -93,37 +100,42 @@ function DrawerOpenContent({ location, role }: Props) {
                     <ParticipantTagListItem
                         key={tag}
                         tag={tag}
-                        onToggle={toggleParticipantTag(tag)}
+                        icon={<TagStarIcon tag={tag} selected={participant.tags[tag] !== undefined} />}
                         selected={participant.tags[tag] !== undefined}
+                        tooltip={!open}
+                        onToggle={toggleParticipantTag(tag)}
                     />
                 ))}
                 {factionUpgrades.length > 0 && (
                     <>
-                        <ListItem>
+                        <ListItem sx={{ visibility: open ? "visible" : "hidden" }}>
                             <ListItemText>Faction upgrades</ListItemText>
                         </ListItem>
                         {factionUpgrades.map((tag: FactionUpgrade) => (
                             <ParticipantTagListItem
                                 key={tag}
                                 tag={tag}
-                                onToggle={toggleParticipantTag(tag)}
+                                icon={<TagStarIcon tag={tag} selected={participant.tags[tag] !== undefined} />}
+                                tooltip={!open}
                                 selected={participant.tags[tag] !== undefined}
+                                onToggle={toggleParticipantTag(tag)}
                             />
                         ))}
                     </>
                 )}
-                <ListItem>
+                <ListItem sx={{ visibility: open ? "visible" : "hidden" }}>
                     <ListItemText>Technologies</ListItemText>
                 </ListItem>
                 {technologies.map((tag: Technology) => (
                     <ParticipantTagListItem
                         key={tag}
                         tag={tag}
-                        onToggle={toggleParticipantTag(tag)}
+                        icon={<TechnologyIcon tag={tag} selected={participant.tags[tag] !== undefined} />}
+                        tooltip={!open}
                         selected={participant.tags[tag] !== undefined}
+                        onToggle={toggleParticipantTag(tag)}
                     />
                 ))}
-                <Divider />
             </List>
             <SelectFactionDialog
                 open={factionDialogOpen}
@@ -137,47 +149,59 @@ function DrawerOpenContent({ location, role }: Props) {
 
 interface ParticipantTagListItemProps {
     tag: ParticipantTag;
+    icon?: JSX.Element;
     selected: boolean;
+    tooltip?: boolean;
     onToggle: (key: ParticipantTag) => void;
 }
 
-function ParticipantTagListItem(props: ParticipantTagListItemProps) {
-    const { tag, selected, onToggle } = props;
-
+function ParticipantTagListItem({ tag, icon, selected, tooltip, onToggle }: ParticipantTagListItemProps) {
     const tagResources: ParticipantTagResources = participantTagResources[tag];
 
-    if (!tagResources.implementation) {
-        return (
-            <ListItem>
-                <ListItemText>
-                    <Typography
-                        variant="body1"
-                        sx={{ overflow: "hidden", textOverflow: "ellipsis", color: participantTagResources[tag].color }}
-                    >
-                        {"[NYI] " + participantTagResources[tag].name}
-                    </Typography>
-                </ListItemText>
-            </ListItem>
-        );
-    }
-
-    return (
-        <ListItem button disableRipple onClick={() => onToggle(tag)}>
+    const listItem: JSX.Element = (
+        <ListItem button disabled={!tagResources.implementation} disableRipple onClick={() => onToggle(tag)}>
+            {!!icon && <ListItemIcon>{icon}</ListItemIcon>}
             <ListItemText>
-                <Typography
-                    variant="body1"
-                    sx={{ overflow: "hidden", textOverflow: "ellipsis", color: participantTagResources[tag].color }}
-                >
-                    {participantTagResources[tag].name}
+                <Typography variant="body1" sx={{ overflow: "hidden", textOverflow: "ellipsis" }}>
+                    {(tagResources.implementation ? "" : "[NYI] ") + participantTagResources[tag].name}
                 </Typography>
             </ListItemText>
-            <ListItemIcon>{selected ? <CheckBox /> : <CheckBoxOutlineBlank />}</ListItemIcon>
+            {!!tagResources.implementation && <ListItemIcon>{selected ? <CheckBox /> : <CheckBoxOutlineBlank />}</ListItemIcon>}
         </ListItem>
+    );
+
+    if (tooltip) {
+        return (
+            <Tooltip title={tagResources.name} placement="right">
+                {listItem}
+            </Tooltip>
+        );
+    } else {
+        return listItem;
+    }
+}
+
+function TagStarIcon({ tag, selected }: { tag: ParticipantTag; selected: boolean }) {
+    return (
+        <Stars
+            sx={{
+                fontSize: 32,
+                color: participantTagResources[tag].color,
+                marginLeft: "auto",
+                marginRight: "auto",
+                filter: selected ? undefined : "grayscale(0.8)",
+            }}
+        />
     );
 }
 
-function DrawerClosedContent({ location, role }: Props) {
-    return <List></List>;
+function TechnologyIcon({ tag, selected }: { tag: Technology; selected: boolean }) {
+    return (
+        <TechnologyTypeImage
+            technologyType={technologyResources[tag].type}
+            style={{ width: 30, marginLeft: "auto", marginRight: "auto", filter: selected ? undefined : "grayscale(0.8)" }}
+        />
+    );
 }
 
 const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== "open" })(({ theme, open }) => ({
@@ -193,13 +217,6 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== "open" 
         ...closedMixin(theme),
         "& .MuiDrawer-paper": closedMixin(theme),
     }),
-}));
-
-const DrawerHeader = styled("div")(({ theme }) => ({
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "flex-end",
-    padding: theme.spacing(1, 2),
 }));
 
 const drawerWidth = 340;

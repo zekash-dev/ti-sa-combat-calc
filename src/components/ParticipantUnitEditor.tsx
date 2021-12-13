@@ -104,8 +104,7 @@ function UnitCountEditor({ type, count, onChange }: UnitCountEditorProps) {
                         </IconButton>
                         <Button
                             variant="text"
-                            color="secondary"
-                            sx={{ paddingLeft: 1, paddingRight: 1, minWidth: 35, lineHeight: "unset" }}
+                            sx={{ paddingLeft: 1, paddingRight: 1, minWidth: 35, lineHeight: "unset", color: "text.primary" }}
                             onClick={onButtonClick}
                         >
                             {count}
