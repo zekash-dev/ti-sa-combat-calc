@@ -179,7 +179,7 @@ export const technologyResources: KeyedDictionary<Technology, TechnologyResource
         name: "Cybernetics",
         color: technologyColors[TechnologyType.GREEN],
         type: TechnologyType.GREEN,
-        implementation: false,
+        implementation: effects.cybernetics,
     },
     [Technology.GEN_SYNTHESIS]: {
         name: "Gen synthesis",
@@ -203,7 +203,7 @@ export const technologyResources: KeyedDictionary<Technology, TechnologyResource
         name: "Advanced fighters",
         color: technologyColors[TechnologyType.BLUE],
         type: TechnologyType.BLUE,
-        implementation: false,
+        implementation: effects.advancedFighters,
     },
     [Technology.MANEUVERING_JETS]: {
         name: "Maneuvering jets",
@@ -222,17 +222,17 @@ export const participantTagResources: KeyedDictionary<ParticipantTag, Participan
     [FactionAbility.NAALU_FIGHTER_MOD]: {
         name: "Fighters +1",
         color: factionResources[Faction.NAALU_COLLECTIVE].color,
-        implementation: false,
+        implementation: effects.naaluFighterMod,
     },
     [FactionAbility.SARDAKK_UNIT_MOD]: {
         name: "All units +1",
         color: factionResources[Faction.HIVES_OF_SARDAKK_NORR].color,
-        implementation: false,
+        implementation: effects.sardakkUnitMod,
     },
     [FactionAbility.JOLNAR_UNIT_MOD]: {
         name: "All units -1",
         color: factionResources[Faction.UNIVERSITIES_OF_JOLNAR].color,
-        implementation: false,
+        implementation: effects.jolnarUnitMod,
     },
     [FactionAbility.JOLNAR_REROLL]: {
         name: "Reroll enemy rolls",
@@ -257,7 +257,7 @@ export const participantTagResources: KeyedDictionary<ParticipantTag, Participan
     [FactionAbility.LIZIX_DREADNOUGHT_MOD]: {
         name: "Dreadnoughts +1",
         color: factionResources[Faction.LIZIX_MINDNET].color,
-        implementation: false,
+        implementation: effects.lizixDreadnoughtMod,
     },
     [FactionAbility.LIZIX_GROUND_FORCE_MOD]: {
         name: "Ground forces +1 (+2 with MU)",
