@@ -27,12 +27,7 @@ export const UnitImage = React.memo(({ unitType, faction, role, width, height }:
     return (
         <div
             style={{
-                display: "inline-block",
-                padding: 1,
-                height,
-                width,
                 visibility: loaded ? "visible" : "hidden",
-                float: role === ParticipantRole.Attacker ? "right" : "left",
             }}
         >
             <SvgLoader path={path} onSVGReady={handleLoaded}>

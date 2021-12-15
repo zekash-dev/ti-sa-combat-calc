@@ -5,9 +5,8 @@ import { useSelector } from "react-redux";
 
 import { unitSizeComparer, unitSizes } from "logic/participant";
 import { ParticipantInput, ParticipantRole, UnitInput } from "model/calculation";
-import { unitDefinitions } from "model/unit";
 import { selectParticipant } from "redux/participant/participantSlice";
-import { UnitImage } from "./graphics/UnitImage";
+import { UnitBattlefieldRepresentation } from "./UnitBattlefieldRepresentation";
 
 interface Props {
     role: ParticipantRole;
@@ -32,13 +31,12 @@ export function ParticipantBattlefieldRepresentation({ role }: Props) {
     return (
         <Box ref={containerRef} sx={{ width: "100%", p: 1 }}>
             {sortedUnits.map((unit: UnitInput, idx: number) => (
-                <UnitImage
+                <UnitBattlefieldRepresentation
                     key={`${unit.type}-${idx}`}
-                    unitType={unit.type}
+                    unit={unit}
                     faction={participant.faction}
                     role={role}
-                    width={unitDefinitions[unit.type].imageWidth * scale}
-                    height={unitDefinitions[unit.type].imageHeight * scale}
+                    scale={scale}
                 />
             ))}
         </Box>
