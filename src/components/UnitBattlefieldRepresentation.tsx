@@ -32,7 +32,6 @@ export function UnitBattlefieldRepresentation({ unit, faction, role, scale }: Pr
         <>
             <div
                 onClick={openPopover}
-                // onMouseOut={closePopover}
                 style={{
                     display: "inline-block",
                     cursor: "pointer",

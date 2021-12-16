@@ -34,8 +34,8 @@ export function ParticipantUnitEditor({ role }: Props) {
                     </TableBody>
                 </Table>
             </TableContainer>
-            <Box sx={{ m: 1 }}>
-                <Button variant="contained" color="primary" onClick={handleClearAllunits}>
+            <Box sx={{ m: 1 }} textAlign="center">
+                <Button variant="contained" color="primary" onClick={handleClearAllunits} sx={{ width: 200 }}>
                     Clear units
                 </Button>
             </Box>

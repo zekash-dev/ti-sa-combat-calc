@@ -21,7 +21,7 @@ export function ResultPercentageBars({ victorProbabilities, participants, small 
     const undetermined: number = 1.0 - sum(Object.values(victorProbabilities));
     const attackerResources: FactionResources = factionResources[participants.attacker.faction];
     const defenderResources: FactionResources = factionResources[participants.defender.faction];
-    const slanted = attacker > 0.01 && defender > 0.01;
+    const slanted = attacker > 0.01 && defender > 0.01 && false; // Disabled slant for now; I need to center it to make it more accurate.
 
     return (
         <div className={styles.bars}>

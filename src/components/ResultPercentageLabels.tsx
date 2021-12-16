@@ -16,12 +16,20 @@ export function ResultPercentageLabels({ victorProbabilities, small }: ResultPer
     const undetermined: number = (1.0 - sum(Object.values(victorProbabilities))) * 100;
     const showDraw = draw > 0.1;
     const showUndetermined = undetermined > 0.1;
+
+    const attackerWidth: number = small ? 110 : 130;
+    const defenderWidth: number = small ? 120 : 140;
+    const drawWidth: number = showDraw ? (small ? 95 : 110) : 0;
+    const undeterminedWidth: number = showUndetermined ? (small ? 150 : 170) : 0;
+
     return (
-        <div style={{ width: "100%", height: small ? "20px" : "24px", position: "relative" }}>
+        <div style={{ width: "calc(100% - 20px)", height: small ? "24px" : "28px", position: "relative", marginLeft: 10 }}>
             <div
                 style={{
                     position: "absolute",
-                    left: `max(10px, calc(${attacker / 2}% - 100px))`,
+                    width: attackerWidth,
+                    left: `max(0px, calc(${attacker / 2}% - ${attackerWidth / 2}px))`,
+                    textAlign: "center",
                     whiteSpace: "nowrap",
                     transition: "left 0.5s",
                 }}
@@ -32,7 +40,13 @@ export function ResultPercentageLabels({ victorProbabilities, small }: ResultPer
                 <div
                     style={{
                         position: "absolute",
-                        left: `clamp(280px, calc(${attacker + draw / 2}% - 20px), calc(100% - ${showUndetermined ? 750 : 550}px))`,
+                        width: drawWidth,
+                        left: `clamp(${attackerWidth}px, calc(${attacker + draw / 2}% - ${drawWidth / 2}px), min(calc(${
+                            showUndetermined
+                                ? `${100 - defender - undetermined / 2}% - ${drawWidth + undeterminedWidth / 2}px`
+                                : `${100 - defender / 2}% - ${drawWidth + defenderWidth / 2}px`
+                        }), calc(100% - ${defenderWidth + undeterminedWidth + drawWidth}px)))`,
+                        textAlign: "center",
                         whiteSpace: "nowrap",
                         transition: "left 0.5s",
                     }}
@@ -44,7 +58,13 @@ export function ResultPercentageLabels({ victorProbabilities, small }: ResultPer
                 <div
                     style={{
                         position: "absolute",
-                        right: `clamp(250px, calc(${defender + undetermined / 2}% - 80px), calc(100% - ${showDraw ? 750 : 550}px))`,
+                        width: undeterminedWidth,
+                        right: `clamp(${defenderWidth}px, calc(${defender + undetermined / 2}% - ${undeterminedWidth / 2}px), min(calc(${
+                            showDraw
+                                ? `${100 - attacker - draw / 2}% - ${undeterminedWidth + drawWidth / 2}px`
+                                : `${100 - attacker / 2}% - ${undeterminedWidth + attackerWidth / 2}px`
+                        }), calc(100% - ${attackerWidth + undeterminedWidth + drawWidth}px)))`,
+                        textAlign: "center",
                         whiteSpace: "nowrap",
                         transition: "right 0.5s",
                     }}
@@ -55,7 +75,9 @@ export function ResultPercentageLabels({ victorProbabilities, small }: ResultPer
             <div
                 style={{
                     position: "absolute",
-                    right: `max(10px, calc(${defender / 2}% - 100px))`,
+                    width: defenderWidth,
+                    right: `max(0px, calc(${defender / 2}% - ${defenderWidth / 2}px))`,
+                    textAlign: "center",
                     whiteSpace: "nowrap",
                     transition: "right 0.5s",
                 }}
@@ -74,7 +96,7 @@ interface PercentageLabelProps {
 
 function PercentageLabel({ label, percentage, small }: PercentageLabelProps) {
     return (
-        <Typography variant="body1" color="text.secondary" style={{ fontSize: small ? "0.9em" : undefined }}>
+        <Typography variant="body1" color="text.primary" style={{ fontSize: small ? "1em" : "1.1em" }}>
             {label}: {formatPercent(percentage)}
         </Typography>
     );

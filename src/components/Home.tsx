@@ -22,34 +22,28 @@ export function Home() {
             <div style={{ margin: "0 72px" }}>
                 <Box sx={{ position: "relative" }}>
                     <Grid container>
-                        <Grid item xs={6} sx={{ textAlign: "center" }}>
-                            <Typography variant="h3" color="text.primary">
+                        <Grid item sx={{ width: 290 }}>
+                            <Typography variant="h4" color="text.primary" sx={{ textAlign: "center" }}>
                                 {ParticipantRole.Attacker}
                             </Typography>
-                        </Grid>
-                        <Grid item xs={6} sx={{ textAlign: "center" }}>
-                            <Typography variant="h3" color="text.primary">
-                                {ParticipantRole.Defender}
-                            </Typography>
-                        </Grid>
-                    </Grid>
-                    <Grid container justifyContent="center">
-                        <Grid item xs={3}>
                             <ParticipantUnitEditor role={ParticipantRole.Attacker} />
                         </Grid>
-                        <Grid item xs={3}>
+                        <Grid item sx={{ width: "calc(50% - 290px)" }}>
                             <ParticipantBattlefieldRepresentation
                                 role={ParticipantRole.Attacker}
                                 participant={richParticipants[ParticipantRole.Attacker]}
                             />
                         </Grid>
-                        <Grid item xs={3}>
+                        <Grid item sx={{ width: "calc(50% - 290px)" }}>
                             <ParticipantBattlefieldRepresentation
                                 role={ParticipantRole.Defender}
                                 participant={richParticipants[ParticipantRole.Defender]}
                             />
                         </Grid>
-                        <Grid item xs={3}>
+                        <Grid item sx={{ width: 290 }}>
+                            <Typography variant="h4" color="text.primary" sx={{ textAlign: "center" }}>
+                                {ParticipantRole.Defender}
+                            </Typography>
                             <ParticipantUnitEditor role={ParticipantRole.Defender} />
                         </Grid>
                     </Grid>
