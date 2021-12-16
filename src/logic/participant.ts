@@ -1,6 +1,6 @@
 import { blue, green, red, yellow } from "@mui/material/colors";
 
-import { CombatStage, CombatStageResources, ParticipantInputTags, ParticipantRole, UnitInput } from "model/calculation";
+import { CombatStage, CombatStageResources, ParticipantInputTags, ParticipantRole, RichUnit } from "model/calculation";
 import {
     Faction,
     FactionAbility,
@@ -35,8 +35,8 @@ export const unitSizes: KeyedDictionary<UnitType, number> = Object.fromEntries(
     allUnitTypes.map((type: UnitType) => [type, unitDefinitions[type].imageWidth * unitDefinitions[type].imageHeight])
 ) as KeyedDictionary<UnitType, number>;
 
-export function unitSizeComparer(a: UnitInput, b: UnitInput): number {
-    return unitSizes[b.type] - unitSizes[a.type];
+export function unitSizeComparer(a: RichUnit, b: RichUnit): number {
+    return unitSizes[b.input.type] - unitSizes[a.input.type];
 }
 
 export function getOpponentRole(role: ParticipantRole): ParticipantRole {
@@ -343,12 +343,12 @@ export const participantTagResources: KeyedDictionary<ParticipantTag, Participan
 };
 
 export const combatStageResources: KeyedDictionary<CombatStage, CombatStageResources> = {
-    [CombatStage.SpaceMines]: { name: "Space mines" },
-    [CombatStage.PDS]: { name: "PDS fire" },
-    [CombatStage.StartOfBattle]: { name: "Spart of battle" },
-    [CombatStage.AntiFighterBarrage]: { name: "Anti-fighter barrage" },
-    [CombatStage.PreCombat]: { name: "Pre-combat abilities" },
-    [CombatStage.Round1]: { name: "Round 1" },
-    [CombatStage.Round2]: { name: "Round 2" },
-    [CombatStage.RoundN]: { name: "Round N" },
+    [CombatStage.SpaceMines]: { name: "Space mines", shortName: "Mines" },
+    [CombatStage.PDS]: { name: "PDS fire", shortName: "PDS" },
+    [CombatStage.StartOfBattle]: { name: "Start of battle", shortName: "Start" },
+    [CombatStage.AntiFighterBarrage]: { name: "Anti-fighter barrage", shortName: "AFB" },
+    [CombatStage.PreCombat]: { name: "Pre-combat abilities", shortName: "Pre-combat" },
+    [CombatStage.Round1]: { name: "Round 1", shortName: "Round 1" },
+    [CombatStage.Round2]: { name: "Round 2", shortName: "Round 2" },
+    [CombatStage.RoundN]: { name: "Round N", shortName: "Combat" },
 };

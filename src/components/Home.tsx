@@ -1,15 +1,19 @@
 import { Box, Grid, Typography } from "@mui/material";
 import React from "react";
+import { useSelector } from "react-redux";
 
-import { ParticipantRole } from "model/calculation";
+import { ParticipantRole, RichParticipantsInput } from "model/calculation";
+import { selectRichParticipantsInput } from "redux/participant/participantSlice";
 import { CalculationTrigger } from "./CalculationTrigger";
+import { ParticipantBattlefieldRepresentation } from "./ParticipantBattlefieldRepresentation";
+import { ParticipantsDivider } from "./ParticipantsDivider";
 import { ParticipantTagEditor } from "./ParticipantTagEditor";
 import { ParticipantUnitEditor } from "./ParticipantUnitEditor";
 import { ResultView } from "./ResultView";
-import { ParticipantsDivider } from "./ParticipantsDivider";
-import { ParticipantBattlefieldRepresentation } from "./ParticipantBattlefieldRepresentation";
 
 export function Home() {
+    const richParticipants: RichParticipantsInput = useSelector(selectRichParticipantsInput);
+
     return (
         <div>
             <CalculationTrigger />
@@ -34,10 +38,16 @@ export function Home() {
                             <ParticipantUnitEditor role={ParticipantRole.Attacker} />
                         </Grid>
                         <Grid item xs={3}>
-                            <ParticipantBattlefieldRepresentation role={ParticipantRole.Attacker} />
+                            <ParticipantBattlefieldRepresentation
+                                role={ParticipantRole.Attacker}
+                                participant={richParticipants[ParticipantRole.Attacker]}
+                            />
                         </Grid>
                         <Grid item xs={3}>
-                            <ParticipantBattlefieldRepresentation role={ParticipantRole.Defender} />
+                            <ParticipantBattlefieldRepresentation
+                                role={ParticipantRole.Defender}
+                                participant={richParticipants[ParticipantRole.Defender]}
+                            />
                         </Grid>
                         <Grid item xs={3}>
                             <ParticipantUnitEditor role={ParticipantRole.Defender} />

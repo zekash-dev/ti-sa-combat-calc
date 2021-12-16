@@ -1,4 +1,5 @@
 import { getAllEnumValues } from "logic/common";
+import { UnitSnapshotTag } from "./combatState";
 import { Faction, ParticipantTag, UnitTag } from "./combatTags";
 import { KeyedDictionary, SparseDictionary } from "./common";
 import { UnitType } from "./unit";
@@ -18,6 +19,7 @@ export const allCombatStages: CombatStage[] = getAllEnumValues<CombatStage>(Comb
 
 export interface CombatStageResources {
     name: string;
+    shortName: string;
 }
 
 export type IntermediateCombatStage = Omit<CombatStage, CombatStage.RoundN>;
@@ -105,4 +107,42 @@ export enum HitType {
 export interface HitsProbabilityOutcome {
     hits: SparseDictionary<HitType, number>;
     probability: number;
+}
+
+export interface RichParticipantsInput {
+    [ParticipantRole.Attacker]: RichParticipant;
+    [ParticipantRole.Defender]: RichParticipant;
+}
+
+export interface RichParticipant {
+    faction: Faction;
+    units: RichUnit[];
+    tags: ParticipantInputTags; // techs, upgrades, AC's, PC's, ...
+}
+
+export interface RichUnit {
+    /**
+     * Base input.
+     */
+    input: UnitInput;
+    /**
+     * Baseline for the unit in normal combat rounds.
+     * Undefined indicates the unit does nothing in normal combat rounds (for example a PDS).
+     */
+    baseline: UnitStageStats | undefined;
+    /**
+     * Describes additional stages when the unit acts (AFB, Pre-combat).
+     * For Round1 and Round2, only describes if the unit differs from the baseline for these stages.
+     */
+    byStage: SparseDictionary<CombatStage, UnitStageStats>;
+    /**
+     * All tag effects that affect the unit's snapshot calculations.
+     */
+    tagEffects: UnitSnapshotTag[];
+}
+
+export interface UnitStageStats {
+    combatValue: number;
+    rolls: number;
+    hitType: HitType;
 }

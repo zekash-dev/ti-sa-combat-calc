@@ -5,11 +5,10 @@ import { KeyedDictionary } from "model/common";
 
 interface Props {
     combatValue: number;
-    width: number;
-    height: number;
+    style?: React.CSSProperties | undefined;
 }
 
-export const CombatRollImage = React.memo(({ combatValue, width, height }: Props) => {
+export const CombatRollImage = React.memo(({ combatValue, style }: Props) => {
     const [loaded, setLoaded] = React.useState(false);
     const handleLoaded = () => setLoaded(true);
     const path: string = getSvgPath(combatValue);
@@ -21,10 +20,8 @@ export const CombatRollImage = React.memo(({ combatValue, width, height }: Props
         <div
             style={{
                 display: "inline-block",
-                padding: 1,
-                height,
-                width,
                 visibility: loaded ? "visible" : "hidden",
+                ...style,
             }}
         >
             <SvgLoader path={path} onSVGReady={handleLoaded}>

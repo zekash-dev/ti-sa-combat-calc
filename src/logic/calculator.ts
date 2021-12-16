@@ -60,7 +60,7 @@ function getInitialState(input: CalculationInput): CombatState {
     return new CombatState(CombatStage.SpaceMines, getInitialParticipantState(input.attacker), getInitialParticipantState(input.defender));
 }
 
-function getInitialParticipantState(participant: ParticipantInput): ParticipantState {
+export function getInitialParticipantState(participant: ParticipantInput): ParticipantState {
     // todo: add role as input here; might affect some tags?
     // todo: convert to inital tag values (only need to track tags with a state that can change during combat)
     return new ParticipantState(
@@ -167,7 +167,7 @@ function findIdenticalCombatState(stateProbabilities: CombatStateProbability[], 
     return undefined;
 }
 
-function getUnitSnapshots(
+export function getUnitSnapshots(
     participant: ParticipantState,
     input: CalculationInput,
     role: ParticipantRole,
