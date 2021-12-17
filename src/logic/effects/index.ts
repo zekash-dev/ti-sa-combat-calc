@@ -1,4 +1,6 @@
 import { advancedFighters } from "./advancedFighters";
+import { assaultCannons } from "./assaultCannons";
+import { automatedTurrets } from "./automatedTurrets";
 import { cybernetics } from "./cybernetics";
 import { hylarVLaser } from "./hylarVLaser";
 import { jolnarUnitMod } from "./jolnarUnitMod";
@@ -9,6 +11,8 @@ import { sardakkUnitMod } from "./sardakkUnitMod";
 
 export {
     advancedFighters,
+    assaultCannons,
+    automatedTurrets,
     cybernetics,
     hylarVLaser,
     jolnarUnitMod,

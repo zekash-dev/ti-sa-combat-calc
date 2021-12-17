@@ -148,7 +148,7 @@ export const technologyResources: KeyedDictionary<Technology, TechnologyResource
         name: "Automated turrets",
         color: technologyColors[TechnologyType.RED],
         type: TechnologyType.RED,
-        implementation: false,
+        implementation: effects.automatedTurrets,
     },
     [Technology.WAR_SUN]: { name: "War sun", color: technologyColors[TechnologyType.RED], type: TechnologyType.RED, implementation: false },
     [Technology.GRAVITON_NETAGOR]: {
@@ -167,7 +167,7 @@ export const technologyResources: KeyedDictionary<Technology, TechnologyResource
         name: "Assault cannons",
         color: technologyColors[TechnologyType.RED],
         type: TechnologyType.RED,
-        implementation: false,
+        implementation: effects.assaultCannons,
     },
     [Technology.GRAVITON_LASER_SYSTEM]: {
         name: "Graviton laser system",

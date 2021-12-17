@@ -9,6 +9,7 @@ export function mockUnit(partial: Partial<ComputedUnitSnapshot> & Pick<ComputedU
         combatValue: partial.combatValue ?? unitDefinitions[partial.type].combatValue,
         rolls: partial.rolls ?? unitDefinitions[partial.type].combatRolls,
         hitType: partial.hitType ?? HitType.Normal,
+        nonStandardRolls: partial.nonStandardRolls ?? [],
         sustainDamage: partial.sustainDamage ?? unitDefinitions[partial.type].sustainDamage,
         sustainedHits: partial.sustainedHits ?? 0,
         tagEffects: partial.tagEffects ?? [],

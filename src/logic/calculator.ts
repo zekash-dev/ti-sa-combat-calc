@@ -56,11 +56,11 @@ export function calculateCombatOutcome(input: CalculationInput): CalculationOutp
     return output;
 }
 
-function getInitialState(input: CalculationInput): CombatState {
+export function getInitialState(input: CalculationInput): CombatState {
     return new CombatState(CombatStage.SpaceMines, getInitialParticipantState(input.attacker), getInitialParticipantState(input.defender));
 }
 
-export function getInitialParticipantState(participant: ParticipantInput): ParticipantState {
+function getInitialParticipantState(participant: ParticipantInput): ParticipantState {
     // todo: add role as input here; might affect some tags?
     // todo: convert to inital tag values (only need to track tags with a state that can change during combat)
     return new ParticipantState(
@@ -129,8 +129,8 @@ function computeNextStates(currentState: CombatStateProbability, input: Calculat
 function resolveCombatStage(state: CombatState, input: CalculationInput): CombatStateProbability[] {
     const nextStates: CombatStateProbability[] = [];
 
-    const attackerUnits: ComputedUnitSnapshot[] = getUnitSnapshots(state.attacker, input, ParticipantRole.Attacker, state.stage);
-    const defenderUnits: ComputedUnitSnapshot[] = getUnitSnapshots(state.defender, input, ParticipantRole.Defender, state.stage);
+    const attackerUnits: ComputedUnitSnapshot[] = getUnitSnapshots(state, input, ParticipantRole.Attacker, state.stage);
+    const defenderUnits: ComputedUnitSnapshot[] = getUnitSnapshots(state, input, ParticipantRole.Defender, state.stage);
 
     const attackerHitOutcomes: HitsProbabilityOutcome[] = calculateHits(attackerUnits);
     const defenderHitOutcomes: HitsProbabilityOutcome[] = calculateHits(defenderUnits);
@@ -168,12 +168,13 @@ function findIdenticalCombatState(stateProbabilities: CombatStateProbability[], 
 }
 
 export function getUnitSnapshots(
-    participant: ParticipantState,
+    combatState: CombatState,
     input: CalculationInput,
     role: ParticipantRole,
     stage: CombatStage
 ): ComputedUnitSnapshot[] {
     const unitSnapshots: ComputedUnitSnapshot[] = [];
+    const participant: ParticipantState = combatState[role];
     for (let unit of participant.units) {
         const def: UnitDefinition = unitDefinitions[unit.type];
         const baseRolls: number = getCombatRollsForStage(def, stage);
@@ -184,25 +185,30 @@ export function getUnitSnapshots(
             combatValue: def.combatValue,
             rolls: rolls,
             hitType: getHitTypeForStage(def, stage),
+            nonStandardRolls: [],
             sustainDamage: def.sustainDamage,
             sustainedHits: unit.sustainedHits,
             tagEffects: [],
         });
     }
-    applyUnitSnapshotParticipantTags(participant, input, role, stage, unitSnapshots);
+    applyUnitSnapshotParticipantTags(combatState, input, role, stage, unitSnapshots);
     return unitSnapshots;
 }
 
 function applyUnitSnapshotParticipantTags(
-    participant: ParticipantState,
-    input: CalculationInput,
+    combatState: CombatState,
+    calculationInput: CalculationInput,
     role: ParticipantRole,
     stage: CombatStage,
     unitSnapshots: ComputedUnitSnapshot[]
 ) {
-    const participantInput: ParticipantInput = input[role];
+    const participant: ParticipantState = combatState[role];
+    const participantInput: ParticipantInput = calculationInput[role];
     const tagValues: ParticipantTagValueAndState[] = getParticipantTagValues(participantInput, participant);
     const effectInput: ParticipantOnComputeSnapshotInput = {
+        calculationInput,
+        combatState,
+        role,
         stage,
         units: unitSnapshots,
     };
@@ -261,11 +267,15 @@ function calculateHits(units: ComputedUnitSnapshot[]): HitsProbabilityOutcome[] 
     const hits: SparseDictionary<HitType, number[]> = {};
     // let hitChances: number[] = [1.0]; // Initial probability: 100% chance for 0 hits.
     for (let unit of units) {
-        const hitProbability: number = getUnitHitProbability(unit);
+        const hitProbability: number = getUnitHitProbability(unit.combatValue);
         const rolls: number = unit.rolls;
         for (let i = 0; i < rolls; i++) {
             // Initial probability: 100% chance for 0 hits.
             hits[unit.hitType] = addHitChance(hits[unit.hitType] ?? [1.0], hitProbability);
+        }
+        for (let nonStandardRoll of unit.nonStandardRolls) {
+            const modifiedHitProbability: number = getUnitHitProbability(unit.combatValue + nonStandardRoll.valueMod);
+            hits[unit.hitType] = addHitChance(hits[unit.hitType] ?? [1.0], modifiedHitProbability);
         }
     }
 
@@ -291,8 +301,8 @@ function calculateHits(units: ComputedUnitSnapshot[]): HitsProbabilityOutcome[] 
     return outcomes;
 }
 
-function getUnitHitProbability(unit: ComputedUnitSnapshot): number {
-    return clamp((11 - unit.combatValue) / 10, 0.0, 1.0);
+function getUnitHitProbability(combatValue: number): number {
+    return clamp((11 - combatValue) / 10, 0.0, 1.0);
 }
 
 function addHitChance(hitChances: number[], hitProbability: number): number[] {
@@ -610,17 +620,17 @@ function calculateCombatStageParticipantStatistics(
     input: CalculationInput,
     stage: CombatStage
 ): CombatStageParticipantStatistics {
+    const opponent: ParticipantRole = getOpponentRole(role);
     const totalProbabilityBefore = sum(beforeStates.map((sp) => sp.probability));
     let expectedHits: number = 0;
     let opponentHealthBefore: number = 0;
     let opponentHealthAfter: number = 0;
     for (let stateProbability of beforeStates) {
-        const units: ComputedUnitSnapshot[] = getUnitSnapshots(stateProbability.state[role], input, role, stage);
+        const units: ComputedUnitSnapshot[] = getUnitSnapshots(stateProbability.state, input, role, stage);
         const expHits: number = sum(units.map(getUnitExpectedHits));
         expectedHits += expHits * stateProbability.probability;
 
-        const opponent: ParticipantRole = getOpponentRole(role);
-        const opponentUnits: ComputedUnitSnapshot[] = getUnitSnapshots(stateProbability.state[opponent], input, role, stage);
+        const opponentUnits: ComputedUnitSnapshot[] = getUnitSnapshots(stateProbability.state, input, opponent, stage);
         const health: number = sum(opponentUnits.map(getUnitHealth)) * stateProbability.probability;
         opponentHealthBefore += health;
         if (determineVictor(stateProbability.state) === opponent) {
@@ -628,7 +638,7 @@ function calculateCombatStageParticipantStatistics(
         }
     }
     for (let stateProbability of afterStates) {
-        const opponentUnits: ComputedUnitSnapshot[] = getUnitSnapshots(stateProbability.state[getOpponentRole(role)], input, role, stage);
+        const opponentUnits: ComputedUnitSnapshot[] = getUnitSnapshots(stateProbability.state, input, opponent, stage);
         opponentHealthAfter += sum(opponentUnits.map(getUnitHealth)) * stateProbability.probability;
     }
     return {
@@ -638,7 +648,10 @@ function calculateCombatStageParticipantStatistics(
 }
 
 function getUnitExpectedHits(unit: ComputedUnitSnapshot): number {
-    return getUnitHitProbability(unit) * unit.rolls;
+    return (
+        getUnitHitProbability(unit.combatValue) * unit.rolls +
+        sum(unit.nonStandardRolls.map((r) => getUnitHitProbability(unit.combatValue + r.valueMod)))
+    );
 }
 
 function getUnitHealth(unit: ComputedUnitSnapshot): number {

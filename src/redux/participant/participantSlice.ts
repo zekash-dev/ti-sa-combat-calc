@@ -1,6 +1,6 @@
 import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
 
-import { getInitialParticipantState, getUnitSnapshots } from "logic/calculator";
+import { getInitialState, getUnitSnapshots } from "logic/calculator";
 import { uniqueFilter } from "logic/common";
 import { grantDefaultFactionAbilities, unitSizeComparer } from "logic/participant";
 import {
@@ -15,7 +15,7 @@ import {
     UnitInput,
     UnitStageStats,
 } from "model/calculation";
-import { ComputedUnitSnapshot, ParticipantState, UnitSnapshotTag } from "model/combatState";
+import { CombatState, ComputedUnitSnapshot, UnitSnapshotTag } from "model/combatState";
 import { Faction, ParticipantTag } from "model/combatTags";
 import { KeyedDictionary, SparseDictionary } from "model/common";
 import { UnitType } from "model/unit";
@@ -174,13 +174,13 @@ function createRichParticipantInput(calculationInput: CalculationInput, role: Pa
 }
 
 function createRichUnits(calculationInput: CalculationInput, role: ParticipantRole): RichUnit[] {
+    const combatState: CombatState = getInitialState(calculationInput);
     const participant: ParticipantInput = calculationInput[role];
-    const participantState: ParticipantState = getInitialParticipantState(participant);
     const richUnits: RichUnit[] = [];
     const snapshotsByStage: SparseDictionary<CombatStage, ComputedUnitSnapshot>[] = Array.from(participant.units.map(() => ({})));
 
     for (let stage of allCombatStages) {
-        const snapshots: ComputedUnitSnapshot[] = getUnitSnapshots(participantState, calculationInput, role, stage);
+        const snapshots: ComputedUnitSnapshot[] = getUnitSnapshots(combatState, calculationInput, role, stage);
         for (let i = 0; i < participant.units.length; i++) {
             snapshotsByStage[i][stage] = snapshots[i];
         }
@@ -224,24 +224,33 @@ function createUnitStageStats(
     if (!snapshot) return undefined;
 
     const stageStats: UnitStageStats = {
-        combatValue: snapshot.combatValue,
-        rolls: snapshot.rolls,
+        rolls: [...Array(snapshot.rolls)]
+            .map(() => snapshot.combatValue)
+            .concat(snapshot.nonStandardRolls.map((r) => snapshot.combatValue + r.valueMod)),
         hitType: snapshot.hitType,
     };
 
-    if (stageStats.rolls === 0) return undefined;
+    if (stageStats.rolls.length === 0) return undefined;
 
     if (
         // If R1/R2 are the same as RoundN, no need to display them separately
         (stage === CombatStage.Round1 || stage === CombatStage.Round2) &&
-        stageStats.combatValue === baseline?.combatValue &&
-        stageStats.rolls === baseline?.rolls &&
-        stageStats.hitType === baseline?.hitType
+        baseline &&
+        unitStageStatsAreEqual(stageStats, baseline)
     ) {
         return undefined;
     }
 
     return stageStats;
+}
+
+function unitStageStatsAreEqual(a: UnitStageStats, b: UnitStageStats): boolean {
+    if (a.rolls.length !== b.rolls.length) return false;
+    if (a.hitType !== b.hitType) return false;
+    for (let i = 0; i < a.rolls.length; i++) {
+        if (a.rolls[i] !== b.rolls[i]) return false;
+    }
+    return true;
 }
 
 export default participantSlice.reducer;

@@ -99,8 +99,8 @@ function UnitStageStatsView({ label, stats }: UnitStageStatsViewProps) {
             <Typography variant="body2" sx={{ display: "inline", marginRight: 1 }}>
                 {label}
             </Typography>
-            {[...Array(stats.rolls)].map((x, i) => (
-                <CombatRollImage combatValue={stats.combatValue} style={{ width: 20, margin: 2, verticalAlign: "middle" }} />
+            {stats.rolls.map((combatValue) => (
+                <CombatRollImage combatValue={combatValue} style={{ width: 20, margin: 2, verticalAlign: "middle" }} />
             ))}
         </Box>
     );

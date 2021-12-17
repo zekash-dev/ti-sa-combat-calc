@@ -142,7 +142,9 @@ export interface RichUnit {
 }
 
 export interface UnitStageStats {
-    combatValue: number;
-    rolls: number;
+    /**
+     * Array with one entry for each roll, describing the combat value of the roll.
+     */
+    rolls: number[];
     hitType: HitType;
 }

@@ -153,9 +153,21 @@ export interface ComputedUnitSnapshot {
     combatValue: number;
     rolls: number;
     hitType: HitType;
+    nonStandardRolls: NonStandardRoll[];
     sustainDamage: number;
     sustainedHits: number;
     tagEffects: UnitSnapshotTag[];
+}
+
+/**
+ * Combat roll granted to a unit which doesn't follow the unit's combatValue.
+ * For example pre-combat shots granted by Assault Turrets which do not gain the bonus of Hylar V Laser.
+ */
+export interface NonStandardRoll {
+    /**
+     * Value mod. Positive values decrease the hit chance; negative values increase the hit chance.
+     */
+    valueMod: number;
 }
 
 export type UnitSnapshotTag = ParticipantTag | UnitTag;
