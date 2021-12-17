@@ -242,7 +242,7 @@ export const participantTagResources: KeyedDictionary<ParticipantTag, Participan
     [FactionAbility.XXCHA_ROUND1_MOD]: {
         name: "Round 1: Enemy units -1",
         color: factionResources[Faction.XXCHA_KINGDOM].color,
-        implementation: false,
+        implementation: effects.xxchaRound1Mod,
     },
     [FactionAbility.YIN_ROUND2_SACRIFICE]: {
         name: "Round 2: Sacrifice unit",
@@ -277,17 +277,17 @@ export const participantTagResources: KeyedDictionary<ParticipantTag, Participan
     [FactionUpgrade.SAAR_CHAOS_MAPPING]: {
         name: "Chaos mapping",
         color: factionResources[Faction.CLAN_OF_SAAR].color,
-        implementation: false,
+        implementation: effects.saarChaosMapping,
     },
     [FactionUpgrade.SOL_ADVANCED_FLEET_TACTICS]: {
         name: "Advanced fleet tactics",
         color: factionResources[Faction.FEDERATION_OF_SOL].color,
-        implementation: false,
+        implementation: effects.solAdvancedFleetTactics,
     },
     [FactionUpgrade.SOL_MARK2_ADVANCED_CARRIERS]: {
         name: "Mark II advanced carriers",
         color: factionResources[Faction.FEDERATION_OF_SOL].color,
-        implementation: false,
+        implementation: effects.solMark2AdvancedCarriers,
     },
     [FactionUpgrade.SOL_VERSATILE_COMBAT_TACTICS]: {
         name: "Versatile combat tactics",

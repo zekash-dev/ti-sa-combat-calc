@@ -192,6 +192,7 @@ export function getUnitSnapshots(
         });
     }
     applyUnitSnapshotParticipantTags(combatState, input, role, stage, unitSnapshots);
+    applyOpponentUnitSnapshotParticipantTags(combatState, input, getOpponentRole(role), stage, unitSnapshots);
     return unitSnapshots;
 }
 
@@ -216,6 +217,34 @@ function applyUnitSnapshotParticipantTags(
         const impl: ParticipantTagImplementation | false = participantTagResources[tag].implementation;
         if (!!impl && !!impl.onComputeUnitSnapshots) {
             impl.onComputeUnitSnapshots(effectInput);
+        }
+    }
+}
+
+/**
+ * Apply tag effects from your opponent to your own units.
+ */
+function applyOpponentUnitSnapshotParticipantTags(
+    combatState: CombatState,
+    calculationInput: CalculationInput,
+    opponentRole: ParticipantRole,
+    stage: CombatStage,
+    unitSnapshots: ComputedUnitSnapshot[]
+) {
+    const opponentState: ParticipantState = combatState[opponentRole];
+    const opponentInput: ParticipantInput = calculationInput[opponentRole];
+    const opponentTagValues: ParticipantTagValueAndState[] = getParticipantTagValues(opponentInput, opponentState);
+    const effectInput: ParticipantOnComputeSnapshotInput = {
+        calculationInput,
+        combatState,
+        role: opponentRole,
+        stage,
+        units: unitSnapshots,
+    };
+    for (let { tag } of opponentTagValues) {
+        const impl: ParticipantTagImplementation | false = participantTagResources[tag].implementation;
+        if (!!impl && !!impl.onComputeOpponentUnitSnapshots) {
+            impl.onComputeOpponentUnitSnapshots(effectInput);
         }
     }
 }
