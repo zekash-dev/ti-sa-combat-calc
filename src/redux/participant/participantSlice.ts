@@ -33,9 +33,9 @@ export const initialState: ParticipantSliceState = {
             tags: grantDefaultFactionAbilities({}, Faction.EMIRATES_OF_HACAN),
         },
         defender: {
-            faction: Faction.UNIVERSITIES_OF_JOLNAR,
+            faction: Faction.WINNU_SOVEREIGNTY,
             units: [],
-            tags: grantDefaultFactionAbilities({}, Faction.UNIVERSITIES_OF_JOLNAR),
+            tags: grantDefaultFactionAbilities({}, Faction.WINNU_SOVEREIGNTY),
         },
     },
 };

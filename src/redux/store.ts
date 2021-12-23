@@ -1,6 +1,6 @@
 import { Action, configureStore, ThunkAction } from "@reduxjs/toolkit";
 
-import optionsReducer, { initialState as initialOptionsState, OptionsState } from "./options/optionsSlice";
+import optionsReducer, { defaultState as initialOptionsState, OptionsState } from "./options/optionsSlice";
 import participantReducer, { initialState as initialParticipantState, ParticipantSliceState } from "./participant/participantSlice";
 import resultReducer, { initialState as initialResultState, ResultState } from "./result/resultSlice";
 

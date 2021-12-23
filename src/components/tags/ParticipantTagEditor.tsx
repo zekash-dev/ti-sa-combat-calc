@@ -4,6 +4,7 @@ import { OverlayScrollbarsComponent } from "overlayscrollbars-react";
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
+import { FactionImage, TechnologyTypeImage } from "components/graphics";
 import {
     availableFactionUpgrades,
     defaultFactionAbilities,
@@ -15,10 +16,8 @@ import {
 import { ParticipantInput, ParticipantRole } from "model/calculation";
 import { Faction, FactionAbility, FactionResources, FactionUpgrade, ParticipantTag, technologies, Technology } from "model/combatTags";
 import { selectParticipant, setFaction, setParticipantTag, unsetParticipantTag } from "redux/participant/participantSlice";
-import { SelectFactionDialog } from "./dialog/SelectFactionDialog";
-import { FactionImage } from "./graphics/FactionImage";
-import { TechnologyTypeImage } from "./graphics/TechnologyTypeImage";
 import { ParticipantTagListItem } from "./ParticipantTagListItem";
+import { SelectFactionDialog } from "./SelectFactionDialog";
 
 interface Props {
     location: "left" | "right";

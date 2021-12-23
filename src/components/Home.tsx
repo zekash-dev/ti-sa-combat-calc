@@ -4,13 +4,13 @@ import { useSelector } from "react-redux";
 
 import { ParticipantRole, RichParticipantsInput } from "model/calculation";
 import { selectRichParticipantsInput } from "redux/participant/participantSlice";
-import { AboutMenu } from "./AboutMenu";
 import { CalculationTrigger } from "./CalculationTrigger";
-import { ParticipantBattlefieldRepresentation } from "./ParticipantBattlefieldRepresentation";
+import { FloatingMenu } from "./menu/FloatingMenu";
 import { ParticipantsDivider } from "./ParticipantsDivider";
-import { ParticipantTagEditor } from "./ParticipantTagEditor";
-import { ParticipantUnitEditor } from "./ParticipantUnitEditor";
-import { ResultView } from "./ResultView";
+import { ResultView } from "./results/ResultView";
+import { ParticipantTagEditor } from "./tags/ParticipantTagEditor";
+import { ParticipantBattlefieldRepresentation } from "./units/ParticipantBattlefieldRepresentation";
+import { ParticipantUnitEditor } from "./units/ParticipantUnitEditor";
 
 export function Home() {
     const [attackerOpen, setAttackerOpen] = useState<boolean>(false);
@@ -58,7 +58,7 @@ export function Home() {
                     </Grid>
                 </Grid>
             </div>
-            <AboutMenu defenderOpen={defenderOpen} />
+            <FloatingMenu defenderOpen={defenderOpen} />
         </div>
     );
 }

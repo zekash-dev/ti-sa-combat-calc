@@ -671,8 +671,8 @@ function calculateCombatStageParticipantStatistics(
         opponentHealthAfter += sum(opponentUnits.map(getUnitHealth)) * stateProbability.probability;
     }
     return {
-        expectedHits,
-        assignedHits: (opponentHealthBefore - opponentHealthAfter) * totalProbabilityBefore,
+        expectedHits: expectedHits / totalProbabilityBefore,
+        assignedHits: (opponentHealthBefore - opponentHealthAfter) / totalProbabilityBefore,
     };
 }
 

@@ -1,6 +1,6 @@
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Grid, Typography } from "@mui/material";
 
-import { FactionImage } from "components/graphics/FactionImage";
+import { FactionImage } from "components/graphics";
 import { getAllEnumValues } from "logic/common";
 import { factionResources } from "logic/participant";
 import { Faction } from "model/combatTags";

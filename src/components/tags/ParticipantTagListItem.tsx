@@ -16,6 +16,7 @@ interface Props {
 
 export function ParticipantTagListItem({ tag, icon, iconBadge, selected, open, onToggle }: Props) {
     const tagResources: ParticipantTagResources = participantTagResources[tag];
+    const tagTitle: string = (tagResources.implementation ? "" : "[NYI] ") + tagResources.name;
 
     let iconElement: JSX.Element | undefined = undefined;
     if (icon) {
@@ -32,7 +33,7 @@ export function ParticipantTagListItem({ tag, icon, iconBadge, selected, open, o
                 <>
                     <ListItemText>
                         <Typography variant="body1" sx={{ overflow: "hidden", textOverflow: "ellipsis" }}>
-                            {(tagResources.implementation ? "" : "[NYI] ") + participantTagResources[tag].name}
+                            {tagTitle}
                         </Typography>
                     </ListItemText>
                     {!!tagResources.implementation && <ListItemIcon>{selected ? <CheckBox /> : <CheckBoxOutlineBlank />}</ListItemIcon>}
@@ -43,8 +44,8 @@ export function ParticipantTagListItem({ tag, icon, iconBadge, selected, open, o
 
     if (!open) {
         return (
-            <Tooltip title={tagResources.name} placement="right">
-                {listItem}
+            <Tooltip title={tagTitle} placement="right">
+                <span>{listItem}</span>
             </Tooltip>
         );
     } else {

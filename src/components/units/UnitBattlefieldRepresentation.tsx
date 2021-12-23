@@ -1,12 +1,11 @@
 import { Box, Popover, Typography } from "@mui/material";
 import React, { useState } from "react";
 
+import { CombatRollImage, UnitImage } from "components/graphics";
 import { combatStageResources } from "logic/participant";
 import { CombatStage, ParticipantRole, RichUnit, UnitStageStats } from "model/calculation";
 import { Faction } from "model/combatTags";
 import { unitDefinitions } from "model/unit";
-import { CombatRollImage } from "./graphics/CombatRollImage";
-import { UnitImage } from "./graphics/UnitImage";
 
 interface Props {
     unit: RichUnit;
@@ -103,7 +102,7 @@ function UnitStageStatsView({ label, stats }: UnitStageStatsViewProps) {
                 <CombatRollImage
                     key={`${combatValue}-${idx}`}
                     combatValue={combatValue}
-                    style={{ width: 20, margin: 2, verticalAlign: "middle" }}
+                    style={{ width: 20, height: 20, margin: 2, verticalAlign: "middle" }}
                 />
             ))}
         </Box>
