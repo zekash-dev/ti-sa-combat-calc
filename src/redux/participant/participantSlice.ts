@@ -16,7 +16,7 @@ import {
     UnitStageStats,
 } from "model/calculation";
 import { CombatState, ComputedUnitSnapshot, UnitSnapshotTag } from "model/combatState";
-import { Faction, ParticipantTag } from "model/combatTags";
+import { Faction, ParticipantTag, UnitTag } from "model/combatTags";
 import { KeyedDictionary, SparseDictionary } from "model/common";
 import { UnitType } from "model/unit";
 import { RootState } from "redux/store";
@@ -65,6 +65,19 @@ interface SetUnitCountPayload extends ModifyUnitCountPayload {
     count: number;
 }
 
+interface SetUnitTagPayload {
+    role: ParticipantRole;
+    unitIndex: number;
+    tag: UnitTag;
+    value: any;
+}
+
+interface UnsetUnitTagPayload {
+    role: ParticipantRole;
+    unitIndex: number;
+    tag: UnitTag;
+}
+
 const participantSlice = createSlice({
     name: "participant",
     initialState: initialState,
@@ -108,6 +121,25 @@ const participantSlice = createSlice({
                 removeUnits(state.participants[role], unit, currentCount - count);
             }
         },
+        setUnitTag: (state: ParticipantSliceState, action: PayloadAction<SetUnitTagPayload>) => {
+            const { role, unitIndex, tag, value } = action.payload;
+            const unit: UnitInput | undefined = state.participants[role].units[unitIndex];
+            if (unit) {
+                if (!unit.tags) {
+                    unit.tags = {};
+                }
+                unit.tags[tag] = value;
+            }
+        },
+        unsetUnitTag: (state: ParticipantSliceState, action: PayloadAction<UnsetUnitTagPayload>) => {
+            const { role, unitIndex, tag } = action.payload;
+            const unit: UnitInput | undefined = state.participants[role].units[unitIndex];
+            if (unit) {
+                if (unit.tags) {
+                    delete unit.tags[tag];
+                }
+            }
+        },
     },
 });
 
@@ -141,6 +173,8 @@ export const {
     incrementUnitCount,
     decrementUnitCount,
     setUnitCount,
+    setUnitTag,
+    unsetUnitTag,
 } = participantSlice.actions;
 
 export const selectparticipantState = (rootState: RootState) => rootState.participant;
@@ -206,6 +240,7 @@ function createRichUnits(calculationInput: CalculationInput, role: ParticipantRo
 
         richUnits.push({
             input: unit,
+            unitIndex: i,
             baseline,
             byStage,
             tagEffects,

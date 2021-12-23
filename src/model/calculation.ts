@@ -126,6 +126,10 @@ export interface RichUnit {
      */
     input: UnitInput;
     /**
+     * Index of the unit in the redux state.
+     */
+    unitIndex: number;
+    /**
      * Baseline for the unit in normal combat rounds.
      * Undefined indicates the unit does nothing in normal combat rounds (for example a PDS).
      */

@@ -25,11 +25,11 @@ import {
     ParticipantState,
     UnitState,
 } from "model/combatState";
-import { ParticipantTag } from "model/combatTags";
+import { ParticipantTag, UnitTag, UnitTagResources } from "model/combatTags";
 import { KeyedDictionary, SparseDictionary } from "model/common";
-import { ParticipantOnComputeSnapshotInput, ParticipantTagImplementation } from "model/effects";
+import { ParticipantOnComputeSnapshotInput, ParticipantTagImplementation, UnitOnComputeSnapshotInput } from "model/effects";
 import { UnitDefinition, unitDefinitions, UnitType } from "model/unit";
-import { getOpponentRole, participantTagResources } from "./participant";
+import { getOpponentRole, participantTagResources, unitTagResources } from "./participant";
 
 export function calculateCombatOutcome(input: CalculationInput): CalculationOutput | null {
     if (input.attacker.units.length === 0 && input.defender.units.length === 0) return null;
@@ -178,7 +178,7 @@ export function getUnitSnapshots(
     for (let unit of participant.units) {
         const def: UnitDefinition = unitDefinitions[unit.type];
         const baseRolls: number = getCombatRollsForStage(def, stage);
-        const rolls: number = max([baseRolls - unit.sustainedHits, baseRolls])!;
+        const rolls: number = baseRolls === 0 ? 0 : max([baseRolls - unit.sustainedHits, 1])!;
         unitSnapshots.push({
             base: unit,
             type: unit.type,
@@ -192,6 +192,7 @@ export function getUnitSnapshots(
         });
     }
     applyUnitSnapshotParticipantTags(combatState, input, role, stage, unitSnapshots);
+    applyUnitSnapshotUnitTags(combatState, input, role, stage, unitSnapshots);
     applyOpponentUnitSnapshotParticipantTags(combatState, input, getOpponentRole(role), stage, unitSnapshots);
     return unitSnapshots;
 }
@@ -245,6 +246,33 @@ function applyOpponentUnitSnapshotParticipantTags(
         const impl: ParticipantTagImplementation | false = participantTagResources[tag].implementation;
         if (!!impl && !!impl.onComputeOpponentUnitSnapshots) {
             impl.onComputeOpponentUnitSnapshots(effectInput);
+        }
+    }
+}
+
+function applyUnitSnapshotUnitTags(
+    combatState: CombatState,
+    calculationInput: CalculationInput,
+    role: ParticipantRole,
+    stage: CombatStage,
+    unitSnapshots: ComputedUnitSnapshot[]
+) {
+    for (let unit of unitSnapshots) {
+        if (unit.base.tags) {
+            const unitInput: UnitOnComputeSnapshotInput = {
+                calculationInput,
+                combatState,
+                role,
+                stage,
+                unit,
+            };
+            for (let tagStr of Object.keys(unit.base.tags)) {
+                const tag: UnitTag = Number(tagStr);
+                const resources: UnitTagResources = unitTagResources[tag];
+                if (resources?.implementation && resources.implementation.onComputeUnitSnapshot) {
+                    resources.implementation.onComputeUnitSnapshot(unitInput);
+                }
+            }
         }
     }
 }

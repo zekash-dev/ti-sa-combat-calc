@@ -12,6 +12,8 @@ import {
     Technology,
     TechnologyResources,
     TechnologyType,
+    UnitTag,
+    UnitTagResources,
 } from "model/combatTags";
 import { KeyedDictionary } from "model/common";
 import { allUnitTypes, unitDefinitions, UnitType } from "model/unit";
@@ -360,6 +362,21 @@ export const participantTagResources: KeyedDictionary<ParticipantTag, Participan
         implementation: false,
     },
     ...technologyResources,
+};
+
+export const unitTagResources: KeyedDictionary<UnitTag, UnitTagResources> = {
+    [UnitTag.ADMIRAL]: {
+        name: "Admiral",
+        implementation: effects.admiral,
+    },
+    [UnitTag.SCIENTIST]: {
+        name: "Scientist",
+        implementation: false,
+    },
+    [UnitTag.CERBERUS]: {
+        name: "The Cerberus",
+        implementation: false,
+    },
 };
 
 export const combatStageResources: KeyedDictionary<CombatStage, CombatStageResources> = {

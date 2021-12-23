@@ -1,10 +1,6 @@
 import { CalculationInput, CombatStage, ParticipantRole } from "./calculation";
 import { CombatState, ComputedUnitSnapshot } from "./combatState";
 
-export interface UnitTagImplementation {
-    onComputeSnapshot?: (unitSnapshot: ComputedUnitSnapshot) => void;
-}
-
 export interface ParticipantOnComputeSnapshotInput {
     calculationInput: CalculationInput;
     combatState: CombatState;
@@ -25,4 +21,19 @@ export interface ParticipantTagImplementation {
      * 'role' in the input describes the tag owner's role, not the opponent's role.
      */
     onComputeOpponentUnitSnapshots?: (input: ParticipantOnComputeSnapshotInput) => void;
+}
+
+export interface UnitOnComputeSnapshotInput {
+    calculationInput: CalculationInput;
+    combatState: CombatState;
+    role: ParticipantRole;
+    stage: CombatStage;
+    unit: ComputedUnitSnapshot;
+}
+
+export interface UnitTagImplementation {
+    /**
+     * Called when computing snapshots for the unit.
+     */
+    onComputeUnitSnapshot?: (input: UnitOnComputeSnapshotInput) => void;
 }

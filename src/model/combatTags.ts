@@ -1,5 +1,5 @@
 import { getAllEnumValues } from "logic/common";
-import { ParticipantTagImplementation } from "./effects";
+import { ParticipantTagImplementation, UnitTagImplementation } from "./effects";
 
 export enum Faction {
     BARONY_OF_LETNEV = 101,
@@ -90,6 +90,11 @@ export enum UnitTag {
     ADMIRAL = 901,
     SCIENTIST = 902,
     CERBERUS = 903,
+}
+
+export interface UnitTagResources {
+    name: string;
+    implementation: false | UnitTagImplementation;
 }
 
 export interface FactionResources {
