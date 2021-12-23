@@ -1,9 +1,10 @@
 import { Box, Grid, Typography } from "@mui/material";
-import React from "react";
+import { useState } from "react";
 import { useSelector } from "react-redux";
 
 import { ParticipantRole, RichParticipantsInput } from "model/calculation";
 import { selectRichParticipantsInput } from "redux/participant/participantSlice";
+import { AboutMenu } from "./AboutMenu";
 import { CalculationTrigger } from "./CalculationTrigger";
 import { ParticipantBattlefieldRepresentation } from "./ParticipantBattlefieldRepresentation";
 import { ParticipantsDivider } from "./ParticipantsDivider";
@@ -12,13 +13,15 @@ import { ParticipantUnitEditor } from "./ParticipantUnitEditor";
 import { ResultView } from "./ResultView";
 
 export function Home() {
+    const [attackerOpen, setAttackerOpen] = useState<boolean>(false);
+    const [defenderOpen, setDefenderOpen] = useState<boolean>(false);
     const richParticipants: RichParticipantsInput = useSelector(selectRichParticipantsInput);
 
     return (
         <div>
             <CalculationTrigger />
-            <ParticipantTagEditor location="left" role={ParticipantRole.Attacker} />
-            <ParticipantTagEditor location="right" role={ParticipantRole.Defender} />
+            <ParticipantTagEditor location="left" role={ParticipantRole.Attacker} open={attackerOpen} onOpenChange={setAttackerOpen} />
+            <ParticipantTagEditor location="right" role={ParticipantRole.Defender} open={defenderOpen} onOpenChange={setDefenderOpen} />
             <div style={{ margin: "0 72px" }}>
                 <Box sx={{ position: "relative" }}>
                     <Grid container>
@@ -55,6 +58,7 @@ export function Home() {
                     </Grid>
                 </Grid>
             </div>
+            <AboutMenu defenderOpen={defenderOpen} />
         </div>
     );
 }

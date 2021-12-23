@@ -9,13 +9,7 @@ export const theme: Theme = createTheme({
         primary: {
             main: yellow[800],
         },
-        // secondary: {
-        //     main: green[500],
-        // },
-        background: {
-            // default: "#000000",
-            // paper: "#000000",
-        },
+        background: {},
         text: {
             primary: "#ffffff",
             secondary: "#888",

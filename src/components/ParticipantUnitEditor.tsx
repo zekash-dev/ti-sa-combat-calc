@@ -23,14 +23,16 @@ export function ParticipantUnitEditor({ role }: Props) {
             <TableContainer component={Paper}>
                 <Table size="small">
                     <TableBody>
-                        {allUnitTypes.map((unitType: UnitType) => (
-                            <UnitCountEditor
-                                key={unitType}
-                                type={unitType}
-                                count={getUnitCount(participant, unitType)}
-                                onChange={handleSetUnitCount}
-                            />
-                        ))}
+                        {allUnitTypes
+                            .filter((u) => u !== UnitType.Flagship)
+                            .map((unitType: UnitType) => (
+                                <UnitCountEditor
+                                    key={unitType}
+                                    type={unitType}
+                                    count={getUnitCount(participant, unitType)}
+                                    onChange={handleSetUnitCount}
+                                />
+                            ))}
                     </TableBody>
                 </Table>
             </TableContainer>

@@ -107,4 +107,5 @@ export interface ParticipantTagResources {
 
 export interface TechnologyResources extends ParticipantTagResources {
     type: TechnologyType;
+    shortName: string;
 }

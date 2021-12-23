@@ -19,11 +19,15 @@ export function SelectFactionDialog({ open, currentValue, onClose, onSelect }: P
     };
     return (
         <Dialog fullWidth={true} maxWidth="lg" open={open} onClose={onClose}>
-            <DialogTitle sx={{ textAlign: "center" }}>Select faction</DialogTitle>
+            <DialogTitle sx={{ textAlign: "center" }}>
+                <Typography variant="h4" color="text.primary">
+                    Select faction
+                </Typography>
+            </DialogTitle>
             <DialogContent>
                 <Grid container spacing={1}>
                     {getAllEnumValues<Faction>(Faction).map((faction: Faction) => (
-                        <Grid key={faction} item xs={4}>
+                        <Grid key={faction} item xs={12} sm={6} md={4}>
                             <Button
                                 variant="outlined"
                                 sx={{
