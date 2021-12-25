@@ -324,7 +324,7 @@ export const participantTagResources: KeyedDictionary<ParticipantTag, Participan
     [FactionUpgrade.SARDAKK_BERZERKER_GENOME]: {
         name: "Berzerker genome",
         color: factionResources[Faction.HIVES_OF_SARDAKK_NORR].color,
-        implementation: false,
+        implementation: effects.sardakkBerzerkerGenome,
     },
     [FactionUpgrade.XXCHA_ARCHON_ENERGY_SHELL]: {
         name: "Archon energy shells",

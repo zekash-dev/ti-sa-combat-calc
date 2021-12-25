@@ -10,6 +10,7 @@ export * from "./lizixDreadnoughtMod";
 export * from "./mentakPreCombatShots";
 export * from "./naaluFighterMod";
 export * from "./saarChaosMapping";
+export * from "./sardakkBerzerkerGenome";
 export * from "./sardakkUnitMod";
 export * from "./solAdvancedFleetTactics";
 export * from "./solMark2AdvancedCarriers";

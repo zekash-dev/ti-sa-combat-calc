@@ -387,25 +387,26 @@ function assignHits(
     units: ComputedUnitSnapshot[],
     hits: SparseDictionary<HitType, number>
 ): CombatState {
-    const { modifiedCombatState, modifiedHits } = applyPreAssignHitTags(combatState, input, role, units, hits);
+    ({ combatState, hits } = applyPreAssignHitTags(combatState, input, role, units, hits));
+    ({ combatState, hits } = applyOpponentPreAssignHitTags(combatState, input, getOpponentRole(role), units, hits));
     const newUnits: ComputedUnitSnapshot[] = [...units];
-    for (let hitTypeStr of Object.keys(modifiedHits)) {
+    for (let hitTypeStr of Object.keys(hits)) {
         const hitType: HitType = Number(hitTypeStr);
-        const numberOfHits: number = modifiedHits[hitType]!;
+        const numberOfHits: number = hits[hitType]!;
         for (let i = 0; i < numberOfHits; i++) {
             assignHit(newUnits, hitType);
         }
     }
 
-    return modifiedCombatState.setParticipantUnits(
+    return combatState.setParticipantUnits(
         role,
         newUnits.map((u) => u.base)
     );
 }
 
 interface ApplyPreAssignHitTagsResponse {
-    modifiedCombatState: CombatState;
-    modifiedHits: SparseDictionary<HitType, number>;
+    combatState: CombatState;
+    hits: SparseDictionary<HitType, number>;
 }
 
 function applyPreAssignHitTags(
@@ -441,8 +442,46 @@ function applyPreAssignHitTags(
         }
     }
     return {
-        modifiedCombatState,
-        modifiedHits,
+        combatState: modifiedCombatState,
+        hits: modifiedHits,
+    };
+}
+
+function applyOpponentPreAssignHitTags(
+    combatState: CombatState,
+    calculationInput: CalculationInput,
+    opponentRole: ParticipantRole,
+    units: ComputedUnitSnapshot[],
+    hits: SparseDictionary<HitType, number>
+): ApplyPreAssignHitTagsResponse {
+    let modifiedCombatState: CombatState = combatState;
+    let modifiedHits: SparseDictionary<HitType, number> = hits;
+    const opponent: ParticipantState = combatState[opponentRole];
+    const opponentInput: ParticipantInput = calculationInput[opponentRole];
+    const opponentTagValues: ParticipantTagValueAndState[] = getParticipantTagValues(opponentInput, opponent);
+    for (let { tag, state } of opponentTagValues) {
+        const impl: ParticipantTagImplementation | false = participantTagResources[tag].implementation;
+        if (!!impl && !!impl.preAssignOpponentHits) {
+            const effectInput: PreAssignHitsInput = {
+                calculationInput,
+                combatState: modifiedCombatState,
+                role: opponentRole,
+                hits: modifiedHits,
+                units,
+                tagState: state,
+            };
+            const { newHits, newTagState } = impl.preAssignOpponentHits(effectInput);
+            if (newHits !== undefined) {
+                modifiedHits = newHits;
+            }
+            if (newTagState !== undefined) {
+                modifiedCombatState = modifiedCombatState.setParticipantTagValue(opponentRole, tag, newTagState);
+            }
+        }
+    }
+    return {
+        combatState: modifiedCombatState,
+        hits: modifiedHits,
     };
 }
 
