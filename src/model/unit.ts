@@ -33,8 +33,16 @@ export interface UnitDefinition {
     antiFigherBarrage: number;
 
     name: string;
-    imageWidth: number;
-    imageHeight: number;
+    imageSize: Dimensions;
+    /**
+     * Origin: bottom left
+     */
+    imageBadgeAnchor: Dimensions;
+}
+
+export interface Dimensions {
+    x: number;
+    y: number;
 }
 
 export const unitDefinitions: KeyedDictionary<UnitType, UnitDefinition> = {
@@ -46,8 +54,8 @@ export const unitDefinitions: KeyedDictionary<UnitType, UnitDefinition> = {
         preCombatShots: 0,
         antiFigherBarrage: 0,
         name: "War sun",
-        imageWidth: 80,
-        imageHeight: 80,
+        imageSize: { x: 80, y: 80 },
+        imageBadgeAnchor: { x: 10, y: 20 },
     },
     [UnitType.Dreadnought]: {
         type: UnitType.Dreadnought,
@@ -57,8 +65,8 @@ export const unitDefinitions: KeyedDictionary<UnitType, UnitDefinition> = {
         preCombatShots: 0,
         antiFigherBarrage: 0,
         name: "Dreadnought",
-        imageWidth: 100,
-        imageHeight: 50,
+        imageSize: { x: 100, y: 50 },
+        imageBadgeAnchor: { x: 5, y: 10 },
     },
     [UnitType.Cruiser]: {
         type: UnitType.Cruiser,
@@ -68,8 +76,8 @@ export const unitDefinitions: KeyedDictionary<UnitType, UnitDefinition> = {
         preCombatShots: 0,
         antiFigherBarrage: 0,
         name: "Cruiser",
-        imageWidth: 50,
-        imageHeight: 25,
+        imageSize: { x: 50, y: 25 },
+        imageBadgeAnchor: { x: 0, y: 5 },
     },
     [UnitType.Destroyer]: {
         type: UnitType.Destroyer,
@@ -79,8 +87,8 @@ export const unitDefinitions: KeyedDictionary<UnitType, UnitDefinition> = {
         preCombatShots: 0,
         antiFigherBarrage: 2,
         name: "Destroyer",
-        imageWidth: 40,
-        imageHeight: 26,
+        imageSize: { x: 40, y: 26 },
+        imageBadgeAnchor: { x: 0, y: 5 },
     },
     [UnitType.Carrier]: {
         type: UnitType.Carrier,
@@ -90,8 +98,8 @@ export const unitDefinitions: KeyedDictionary<UnitType, UnitDefinition> = {
         preCombatShots: 0,
         antiFigherBarrage: 0,
         name: "Carrier",
-        imageWidth: 60,
-        imageHeight: 21,
+        imageSize: { x: 60, y: 21 },
+        imageBadgeAnchor: { x: 0, y: 5 },
     },
     [UnitType.Fighter]: {
         type: UnitType.Fighter,
@@ -101,8 +109,8 @@ export const unitDefinitions: KeyedDictionary<UnitType, UnitDefinition> = {
         preCombatShots: 0,
         antiFigherBarrage: 0,
         name: "Fighter",
-        imageWidth: 20,
-        imageHeight: 20,
+        imageSize: { x: 20, y: 20 },
+        imageBadgeAnchor: { x: 0, y: 0 },
     },
     [UnitType.Flagship]: {
         type: UnitType.Flagship,
@@ -112,7 +120,7 @@ export const unitDefinitions: KeyedDictionary<UnitType, UnitDefinition> = {
         preCombatShots: 0,
         antiFigherBarrage: 0,
         name: "Flagship",
-        imageWidth: 100,
-        imageHeight: 33,
+        imageSize: { x: 100, y: 33 },
+        imageBadgeAnchor: { x: 10, y: 10 },
     },
 };

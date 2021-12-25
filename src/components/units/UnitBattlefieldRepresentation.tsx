@@ -18,6 +18,7 @@ interface Props {
 
 export function UnitBattlefieldRepresentation({ unit, faction, role, scale }: Props) {
     const [anchorEl, setAnchorEl] = useState<HTMLDivElement | null>(null);
+    const hasAdmiral: boolean = !!unit.input.tags && unit.input.tags[UnitTag.ADMIRAL] === true;
 
     const openPopover = (event: React.MouseEvent<HTMLDivElement>) => {
         setAnchorEl(event.currentTarget);
@@ -37,8 +38,8 @@ export function UnitBattlefieldRepresentation({ unit, faction, role, scale }: Pr
                     display: "inline-block",
                     cursor: "pointer",
                     margin: 1,
-                    height: unitDefinitions[unit.input.type].imageHeight * scale,
-                    width: unitDefinitions[unit.input.type].imageWidth * scale,
+                    height: unitDefinitions[unit.input.type].imageSize.y * scale,
+                    width: unitDefinitions[unit.input.type].imageSize.x * scale,
                     float: role === ParticipantRole.Attacker ? "right" : "left",
                 }}
             >
@@ -46,8 +47,8 @@ export function UnitBattlefieldRepresentation({ unit, faction, role, scale }: Pr
                     unitType={unit.input.type}
                     faction={faction}
                     role={role}
-                    width={unitDefinitions[unit.input.type].imageWidth * scale}
-                    height={unitDefinitions[unit.input.type].imageHeight * scale}
+                    scale={scale}
+                    badges={[hasAdmiral && <AdmiralImage key="admiral" />]}
                 />
             </div>
             <Popover

@@ -34,7 +34,7 @@ export function grantDefaultFactionAbilities(participantTags: ParticipantInputTa
 }
 
 export const unitSizes: KeyedDictionary<UnitType, number> = Object.fromEntries(
-    allUnitTypes.map((type: UnitType) => [type, unitDefinitions[type].imageWidth * unitDefinitions[type].imageHeight])
+    allUnitTypes.map((type: UnitType) => [type, unitDefinitions[type].imageSize.x * unitDefinitions[type].imageSize.y])
 ) as KeyedDictionary<UnitType, number>;
 
 export function unitSizeComparer(a: RichUnit, b: RichUnit): number {
