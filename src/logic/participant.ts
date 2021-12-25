@@ -214,7 +214,7 @@ export const technologyResources: KeyedDictionary<Technology, TechnologyResource
         shortName: "MAG",
         color: technologyColors[TechnologyType.RED],
         type: TechnologyType.RED,
-        implementation: false,
+        implementation: effects.magenDefenseGrid,
     },
     [Technology.ASSAULT_CANNONS]: {
         name: "Assault cannons",
@@ -228,7 +228,7 @@ export const technologyResources: KeyedDictionary<Technology, TechnologyResource
         shortName: "GLS",
         color: technologyColors[TechnologyType.YELLOW],
         type: TechnologyType.YELLOW,
-        implementation: false,
+        implementation: effects.gravitonLaserSystem,
     },
     [Technology.CYBERNETICS]: {
         name: "Cybernetics",
@@ -270,7 +270,7 @@ export const technologyResources: KeyedDictionary<Technology, TechnologyResource
         shortName: "MNJ",
         color: technologyColors[TechnologyType.BLUE],
         type: TechnologyType.BLUE,
-        implementation: false,
+        implementation: effects.maneuveringJets,
     },
 };
 

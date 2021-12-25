@@ -4,11 +4,11 @@ import { ParticipantTagImplementation, PreAssignHitsInput, PreAssignHitsOutput }
 
 export const impulsionShields: ParticipantTagImplementation = {
     preAssignHits: ({ calculationInput, role, units, hits, tagState }: PreAssignHitsInput): PreAssignHitsOutput => {
-        const canNegateHit: boolean = role === ParticipantRole.Attacker && tagState !== 1;
-        if (!canNegateHit) {
+        const canCancelHit: boolean = role === ParticipantRole.Attacker && tagState !== 1;
+        if (!canCancelHit) {
             return {};
         }
-        for (let hitType of negateHitPriorityOrder) {
+        for (let hitType of cancelHitPriorityOrder) {
             const hitsOfType: number | undefined = hits[hitType];
             if (hitsOfType === undefined || hitsOfType === 0) continue; // No hits of type
             if (determineHitTarget(units, hitType, calculationInput.combatType) === -1) continue; // Hit of type can't be assigned to any of your units
@@ -26,4 +26,4 @@ export const impulsionShields: ParticipantTagImplementation = {
     },
 };
 
-const negateHitPriorityOrder: HitType[] = [HitType.Normal, HitType.AssignToFighter];
+const cancelHitPriorityOrder: HitType[] = [HitType.Normal, HitType.AssignToFighter];
