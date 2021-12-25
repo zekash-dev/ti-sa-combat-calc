@@ -27,7 +27,12 @@ import {
 } from "model/combatState";
 import { ParticipantTag, UnitTag, UnitTagResources } from "model/combatTags";
 import { KeyedDictionary, SparseDictionary } from "model/common";
-import { ParticipantOnComputeSnapshotInput, ParticipantTagImplementation, UnitOnComputeSnapshotInput } from "model/effects";
+import {
+    ParticipantOnComputeSnapshotInput,
+    ParticipantTagImplementation,
+    PreAssignHitsInput,
+    UnitOnComputeSnapshotInput,
+} from "model/effects";
 import { UnitDefinition, unitDefinitions, UnitType } from "model/unit";
 import { getOpponentRole, participantTagResources, unitTagResources } from "./participant";
 
@@ -141,9 +146,10 @@ function resolveCombatStage(state: CombatState, input: CalculationInput): Combat
             const defenderHits: HitsProbabilityOutcome = defenderHitOutcomes[def];
             const probability: number = attackerHits.probability * defenderHits.probability;
 
-            const nextAttacker: ParticipantState = assignHits(state.attacker, attackerUnits, defenderHits);
-            const nextDefender: ParticipantState = assignHits(state.defender, defenderUnits, attackerHits);
-            const nextState: CombatState = new CombatState(getNextStage(state.stage), nextAttacker, nextDefender);
+            let nextState: CombatState = state;
+            nextState = assignHits(nextState, input, ParticipantRole.Attacker, attackerUnits, defenderHits.hits);
+            nextState = assignHits(nextState, input, ParticipantRole.Defender, defenderUnits, attackerHits.hits);
+            nextState = nextState.setStage(getNextStage(nextState.stage));
             const identicalState: CombatStateProbability | undefined = findIdenticalCombatState(nextStates, nextState);
             if (identicalState) {
                 identicalState.probability += probability;
@@ -279,7 +285,7 @@ function applyUnitSnapshotUnitTags(
 
 interface ParticipantTagValueAndState {
     tag: ParticipantTag;
-    value: any;
+    inputValue: any;
     state: number | undefined;
 }
 function getParticipantTagValues(input: ParticipantInput, state: ParticipantState): ParticipantTagValueAndState[] {
@@ -288,7 +294,7 @@ function getParticipantTagValues(input: ParticipantInput, state: ParticipantStat
         const tag: ParticipantTag = Number(tagStr);
         const tagInputValue: any = input.tags[tag];
         const tagState = state.tags[tag];
-        values.push({ tag, value: tagInputValue, state: tagState });
+        values.push({ tag, inputValue: tagInputValue, state: tagState });
     }
     return values;
 }
@@ -374,19 +380,70 @@ function addHitChance(hitChances: number[], hitProbability: number): number[] {
     return nextHitChances;
 }
 
-function assignHits(participant: ParticipantState, units: ComputedUnitSnapshot[], hitOutcomes: HitsProbabilityOutcome): ParticipantState {
+function assignHits(
+    combatState: CombatState,
+    input: CalculationInput,
+    role: ParticipantRole,
+    units: ComputedUnitSnapshot[],
+    hits: SparseDictionary<HitType, number>
+): CombatState {
+    const { modifiedCombatState, modifiedHits } = applyPreAssignHitTags(combatState, input, role, units, hits);
     const newUnits: ComputedUnitSnapshot[] = [...units];
-    for (let hitTypeStr of Object.keys(hitOutcomes.hits)) {
+    for (let hitTypeStr of Object.keys(modifiedHits)) {
         const hitType: HitType = Number(hitTypeStr);
-        const numberOfHits: number = hitOutcomes.hits[hitType]!;
+        const numberOfHits: number = modifiedHits[hitType]!;
         for (let i = 0; i < numberOfHits; i++) {
             assignHit(newUnits, hitType);
         }
     }
-    return new ParticipantState(
-        newUnits.map((u) => u.base),
-        participant.tags
+
+    return modifiedCombatState.setParticipantUnits(
+        role,
+        newUnits.map((u) => u.base)
     );
+}
+
+interface ApplyPreAssignHitTagsResponse {
+    modifiedCombatState: CombatState;
+    modifiedHits: SparseDictionary<HitType, number>;
+}
+
+function applyPreAssignHitTags(
+    combatState: CombatState,
+    calculationInput: CalculationInput,
+    role: ParticipantRole,
+    units: ComputedUnitSnapshot[],
+    hits: SparseDictionary<HitType, number>
+): ApplyPreAssignHitTagsResponse {
+    let modifiedCombatState: CombatState = combatState;
+    let modifiedHits: SparseDictionary<HitType, number> = hits;
+    const participant: ParticipantState = combatState[role];
+    const participantInput: ParticipantInput = calculationInput[role];
+    const tagValues: ParticipantTagValueAndState[] = getParticipantTagValues(participantInput, participant);
+    for (let { tag, state } of tagValues) {
+        const impl: ParticipantTagImplementation | false = participantTagResources[tag].implementation;
+        if (!!impl && !!impl.preAssignHits) {
+            const effectInput: PreAssignHitsInput = {
+                calculationInput,
+                combatState: modifiedCombatState,
+                role,
+                hits: modifiedHits,
+                units,
+                tagState: state,
+            };
+            const { newHits, newTagState } = impl.preAssignHits(effectInput);
+            if (newHits !== undefined) {
+                modifiedHits = newHits;
+            }
+            if (newTagState !== undefined) {
+                modifiedCombatState = modifiedCombatState.setParticipantTagValue(role, tag, newTagState);
+            }
+        }
+    }
+    return {
+        modifiedCombatState,
+        modifiedHits,
+    };
 }
 
 function assignHit(units: ComputedUnitSnapshot[], hitType: HitType) {
@@ -414,9 +471,11 @@ function assignHit(units: ComputedUnitSnapshot[], hitType: HitType) {
 
 /**
  * Returns the index of the unit that should suffer the hit.
+ *
+ * -1 indicates that no unit can suffer the hit.
  * @param units
  */
-function determineHitTarget(units: ComputedUnitSnapshot[], hitType: HitType): number {
+export function determineHitTarget(units: ComputedUnitSnapshot[], hitType: HitType): number {
     let maxPrioIndex: number = -1;
     let maxPrioValue: number = -1;
     for (let i = 0; i < units.length; i++) {

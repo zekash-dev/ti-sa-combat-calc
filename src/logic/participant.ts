@@ -146,7 +146,7 @@ export const technologyResources: KeyedDictionary<Technology, TechnologyResource
         shortName: "IMP",
         color: technologyColors[TechnologyType.RED],
         type: TechnologyType.RED,
-        implementation: false,
+        implementation: effects.impulsionShields,
     },
     [Technology.AUTOMATED_TURRETS]: {
         name: "Automated turrets",

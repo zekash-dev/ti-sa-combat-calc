@@ -1,5 +1,6 @@
-import { CalculationInput, CombatStage, ParticipantRole } from "./calculation";
+import { CalculationInput, CombatStage, HitType, ParticipantRole } from "./calculation";
 import { CombatState, ComputedUnitSnapshot } from "./combatState";
+import { SparseDictionary } from "./common";
 
 export interface ParticipantOnComputeSnapshotInput {
     calculationInput: CalculationInput;
@@ -7,6 +8,21 @@ export interface ParticipantOnComputeSnapshotInput {
     role: ParticipantRole;
     stage: CombatStage;
     units: ComputedUnitSnapshot[];
+}
+
+export interface PreAssignHitsInput {
+    calculationInput: CalculationInput;
+    combatState: CombatState;
+    role: ParticipantRole;
+    units: ComputedUnitSnapshot[];
+    hits: SparseDictionary<HitType, number>;
+    tagState: number | undefined;
+}
+
+export interface PreAssignHitsOutput {
+    newHits?: SparseDictionary<HitType, number>;
+    newTagState?: number | undefined;
+    // newCombatState?: CombatState | undefined;
 }
 
 export interface ParticipantTagImplementation {
@@ -21,6 +37,18 @@ export interface ParticipantTagImplementation {
      * 'role' in the input describes the tag owner's role, not the opponent's role.
      */
     onComputeOpponentUnitSnapshots?: (input: ParticipantOnComputeSnapshotInput) => void;
+
+    /**
+     * Called before assigning hits to your own units.
+     */
+    preAssignHits?: (input: PreAssignHitsInput) => PreAssignHitsOutput;
+
+    /**
+     * Called before your opponent assigns hits to their units.
+     *
+     * 'role' in the input describes the tag owner's role, not the opponent's role.
+     */
+    preAssignOpponentHits?: (input: PreAssignHitsInput) => PreAssignHitsOutput;
 }
 
 export interface UnitOnComputeSnapshotInput {

@@ -4,6 +4,7 @@ export * from "./assaultCannons";
 export * from "./automatedTurrets";
 export * from "./cybernetics";
 export * from "./hylarVLaser";
+export * from "./impulsionShields";
 export * from "./jolnarUnitMod";
 export * from "./lizixDreadnoughtMod";
 export * from "./mentakPreCombatShots";

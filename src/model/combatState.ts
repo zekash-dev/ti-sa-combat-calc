@@ -1,6 +1,6 @@
 import { Dictionary } from "lodash";
 
-import { CalculationInput, CombatStage, CombatStateOutput, HitType, ParticipantInput, UnitInput } from "./calculation";
+import { CalculationInput, CombatStage, CombatStateOutput, HitType, ParticipantInput, ParticipantRole, UnitInput } from "./calculation";
 import { ParticipantTag, UnitTag } from "./combatTags";
 import { UnitType } from "./unit";
 
@@ -58,6 +58,22 @@ export class CombatState {
         };
     }
 
+    public setStage(newStage: CombatStage): CombatState {
+        return new CombatState(newStage, this.attacker, this.defender);
+    }
+
+    public setParticipantTagValue(role: ParticipantRole, tag: ParticipantTag, value: number): CombatState {
+        const newAttacker: ParticipantState = role === ParticipantRole.Attacker ? this.attacker.setTagValue(tag, value) : this.attacker;
+        const newDefender: ParticipantState = role === ParticipantRole.Defender ? this.defender.setTagValue(tag, value) : this.defender;
+        return new CombatState(this.stage, newAttacker, newDefender);
+    }
+
+    public setParticipantUnits(role: ParticipantRole, newUnits: UnitState[]): CombatState {
+        const newAttacker: ParticipantState = role === ParticipantRole.Attacker ? this.attacker.setUnits(newUnits) : this.attacker;
+        const newDefender: ParticipantState = role === ParticipantRole.Defender ? this.defender.setUnits(newUnits) : this.defender;
+        return new CombatState(this.stage, newAttacker, newDefender);
+    }
+
     public static compare(a: CombatState, b: CombatState): number {
         if (a.hash !== b.hash) return a.hash - b.hash;
         const attackerComparison: number = ParticipantState.compare(a.attacker, b.attacker);
@@ -94,6 +110,18 @@ export class ParticipantState {
             units: this.units.map((u) => u.toOutput()),
             tags: this.tags,
         };
+    }
+
+    public setTagValue(tag: ParticipantTag, value: number): ParticipantState {
+        const newTags: CombatStateTags = {
+            ...this.tags,
+            [tag]: value,
+        };
+        return new ParticipantState(this.units, newTags);
+    }
+
+    public setUnits(newUnits: UnitState[]): ParticipantState {
+        return new ParticipantState(newUnits, this.tags);
     }
 
     public static compare(a: ParticipantState, b: ParticipantState): number {

@@ -37,6 +37,9 @@ export function FaqDialog({ open, onClose }: Props) {
                         "oversaturation" of hits (i.e. all hits can't be assigned). In these cases, both expected and assigned hits will be
                         displayed.
                     </Paragraph>
+                    <Paragraph>
+                        Effects such as Impulsion shields and Berzerker genome can also cause the expected hits and assigned hits to differ.
+                    </Paragraph>
                 </DialogContent>
             </OverlayScrollbarsComponent>
             <DialogActions>
