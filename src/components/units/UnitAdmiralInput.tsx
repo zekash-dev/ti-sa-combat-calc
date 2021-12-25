@@ -2,7 +2,8 @@ import { Box, IconButton, Typography } from "@mui/material";
 import { useDispatch } from "react-redux";
 
 import { AdmiralImage } from "components/graphics";
-import { ParticipantRole, RichUnit } from "model/calculation";
+import { unitIsCombatant } from "logic/calculator";
+import { CombatType, ParticipantRole, RichUnit } from "model/calculation";
 import { UnitTag } from "model/combatTags";
 import { setUnitTag, unsetUnitTag } from "redux/participant/participantSlice";
 
@@ -13,6 +14,8 @@ interface Props {
 
 export function UnitAdmiralInput({ role, unit }: Props) {
     const dispatch = useDispatch();
+    if (!unitIsCombatant(unit.input.type, CombatType.SpaceBattle)) return null;
+
     const hasAdmiral: boolean = !!unit.input.tags && unit.input.tags[UnitTag.ADMIRAL] === true;
 
     const toggleAdmiral = () => {

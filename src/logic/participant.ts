@@ -1,6 +1,16 @@
 import { blue, green, red, yellow } from "@mui/material/colors";
+import { union } from "lodash";
 
-import { CombatStage, CombatStageResources, ParticipantInputTags, ParticipantRole, RichUnit } from "model/calculation";
+import {
+    CalculationInput,
+    CombatStage,
+    CombatStageResources,
+    CombatType,
+    ParticipantInputTags,
+    ParticipantRole,
+    RichUnit,
+} from "model/calculation";
+import { CombatState, ComputedUnitSnapshot } from "model/combatState";
 import {
     Faction,
     FactionAbility,
@@ -17,6 +27,7 @@ import {
 } from "model/combatTags";
 import { KeyedDictionary } from "model/common";
 import { allUnitTypes, unitDefinitions, UnitType } from "model/unit";
+import { getInitialState, getUnitSnapshots } from "./calculator";
 import { getAllEnumValues } from "./common";
 import * as effects from "./effects";
 
@@ -31,6 +42,34 @@ export function grantDefaultFactionAbilities(participantTags: ParticipantInputTa
         newTags[newAbility] = getDefaultFactionAbilityValue(newAbility);
     }
     return newTags;
+}
+
+export function getSelectableUnitTypes(combatType: CombatType, calculationInput: CalculationInput, role: ParticipantRole): UnitType[] {
+    let unitTypes: UnitType[] = Object.values(unitDefinitions)
+        .filter((def) => def.combatantIn.includes(combatType))
+        .map((def) => def.type);
+    if (combatType === CombatType.SpaceBattle) {
+        unitTypes = union(unitTypes, getUnitTypesWithCombatRollsInStage(calculationInput, role, CombatStage.SpaceCannon));
+    }
+    return unitTypes;
+}
+
+function getUnitTypesWithCombatRollsInStage(calculationInput: CalculationInput, role: ParticipantRole, stage: CombatStage): UnitType[] {
+    const input: CalculationInput = {
+        combatType: calculationInput.combatType,
+        attacker: {
+            ...calculationInput.attacker,
+            units: [],
+        },
+        defender: {
+            ...calculationInput.defender,
+            units: [],
+        },
+    };
+    input[role].units = allUnitTypes.map((uType) => ({ type: uType, sustainedHits: 0 }));
+    const combatState: CombatState = getInitialState(input);
+    const snapshots: ComputedUnitSnapshot[] = getUnitSnapshots(combatState, input, role, stage);
+    return snapshots.filter((unit) => unit.rolls > 0).map((unit) => unit.type);
 }
 
 export const unitSizes: KeyedDictionary<UnitType, number> = Object.fromEntries(
@@ -381,7 +420,7 @@ export const unitTagResources: KeyedDictionary<UnitTag, UnitTagResources> = {
 
 export const combatStageResources: KeyedDictionary<CombatStage, CombatStageResources> = {
     [CombatStage.SpaceMines]: { name: "Space mines", shortName: "Mines" },
-    [CombatStage.PDS]: { name: "PDS fire", shortName: "PDS" },
+    [CombatStage.SpaceCannon]: { name: "PDS fire", shortName: "PDS" },
     [CombatStage.StartOfBattle]: { name: "Start of battle", shortName: "Start" },
     [CombatStage.AntiFighterBarrage]: { name: "Anti-fighter barrage", shortName: "AFB" },
     [CombatStage.PreCombat]: { name: "Pre-combat abilities", shortName: "Pre-combat" },

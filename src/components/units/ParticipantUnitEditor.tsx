@@ -4,9 +4,16 @@ import { isInteger, round } from "lodash";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
-import { ParticipantInput, ParticipantRole } from "model/calculation";
-import { allUnitTypes, unitDefinitions, UnitType } from "model/unit";
-import { clearParticipantUnits, getUnitCount, selectParticipant, setUnitCount } from "redux/participant/participantSlice";
+import { getSelectableUnitTypes } from "logic/participant";
+import { CalculationInput, CombatType, ParticipantInput, ParticipantRole } from "model/calculation";
+import { unitDefinitions, UnitType } from "model/unit";
+import {
+    clearParticipantUnits,
+    getUnitCount,
+    selectCalculationInput,
+    selectParticipant,
+    setUnitCount,
+} from "redux/participant/participantSlice";
 
 interface Props {
     role: ParticipantRole;
@@ -14,16 +21,19 @@ interface Props {
 
 export function ParticipantUnitEditor({ role }: Props) {
     const dispatch = useDispatch();
+    const calculationInput: CalculationInput = useSelector(selectCalculationInput);
     const participant: ParticipantInput = useSelector(selectParticipant(role));
     const handleSetUnitCount = (unit: UnitType, count: number) => dispatch(setUnitCount({ role, unit, count }));
     const handleClearAllunits = () => dispatch(clearParticipantUnits(role));
+
+    const selectableUnitTypes: UnitType[] = getSelectableUnitTypes(CombatType.SpaceBattle, calculationInput, role);
 
     return (
         <Box sx={{ m: 2 }}>
             <TableContainer component={Paper}>
                 <Table size="small">
                     <TableBody>
-                        {allUnitTypes
+                        {selectableUnitTypes
                             .filter((u) => u !== UnitType.Flagship)
                             .map((unitType: UnitType) => (
                                 <UnitCountEditor

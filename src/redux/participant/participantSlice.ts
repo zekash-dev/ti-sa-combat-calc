@@ -7,6 +7,7 @@ import {
     allCombatStages,
     CalculationInput,
     CombatStage,
+    CombatType,
     ParticipantInput,
     ParticipantRole,
     RichParticipant,
@@ -219,6 +220,7 @@ export const selectParticipant = (role: ParticipantRole) => (rootState: RootStat
 
 export const selectCalculationInput = createSelector([selectparticipantState], (participantState): CalculationInput => {
     return {
+        combatType: CombatType.SpaceBattle,
         attacker: participantState.participants.attacker,
         defender: participantState.participants.defender,
     };

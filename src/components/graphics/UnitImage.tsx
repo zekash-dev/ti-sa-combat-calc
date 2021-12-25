@@ -78,6 +78,18 @@ function getSvgPath(unitType: UnitType): string {
         case UnitType.Flagship:
             imageName = "flagship.svg";
             break;
+        case UnitType.Mech:
+            imageName = "mech.svg";
+            break;
+        case UnitType.GroundForce:
+            imageName = "groundforce.svg";
+            break;
+        case UnitType.ShockTroop:
+            imageName = "shocktroop.svg";
+            break;
+        case UnitType.PDS:
+            imageName = "pds.svg";
+            break;
     }
     return `${base}/${subfolder}/${imageName}`;
 }

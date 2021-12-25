@@ -13,6 +13,8 @@ interface Props {
 export function UnitSustainDamageInput({ role, unit }: Props) {
     const dispatch = useDispatch();
     const sustainDamage: number = unit.baseline?.sustainDamage ?? 0;
+
+    if (sustainDamage === 0) return null;
     const sustainedHits: number = unit.input.sustainedHits;
 
     const setSustainedHits = (sustainedHits: number) => () => {
@@ -43,12 +45,12 @@ export function UnitSustainDamageInput({ role, unit }: Props) {
         );
     }
 
-    return buttons.length ? (
+    return (
         <Box>
             <Typography variant="body2" sx={{ display: "inline", marginRight: 1 }}>
                 Sustain
             </Typography>
             {buttons}
         </Box>
-    ) : null;
+    );
 }

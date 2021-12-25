@@ -25,7 +25,7 @@ export function CombatStageResultView({ output, participants }: CombatStageResul
     return (
         <>
             <CombatStageView output={output} participants={participants} stage={CombatStage.SpaceMines} />
-            <CombatStageView output={output} participants={participants} stage={CombatStage.PDS} />
+            <CombatStageView output={output} participants={participants} stage={CombatStage.SpaceCannon} />
             <CombatStageView output={output} participants={participants} stage={CombatStage.StartOfBattle} />
             <CombatStageView output={output} participants={participants} stage={CombatStage.AntiFighterBarrage} />
             <CombatStageView output={output} participants={participants} stage={CombatStage.PreCombat} />

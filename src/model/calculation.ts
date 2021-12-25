@@ -4,9 +4,14 @@ import { Faction, ParticipantTag, UnitTag } from "./combatTags";
 import { KeyedDictionary, SparseDictionary } from "./common";
 import { UnitType } from "./unit";
 
+export enum CombatType {
+    SpaceBattle = 1,
+    InvasionCombat = 2,
+}
+
 export enum CombatStage {
     SpaceMines = 1,
-    PDS = 2,
+    SpaceCannon = 2,
     StartOfBattle = 3,
     AntiFighterBarrage = 4,
     PreCombat = 5,
@@ -32,6 +37,7 @@ export enum ParticipantRole {
 export type CombatVictor = ParticipantRole.Attacker | ParticipantRole.Defender | "draw";
 
 export interface CalculationInput {
+    combatType: CombatType;
     [ParticipantRole.Attacker]: ParticipantInput;
     [ParticipantRole.Defender]: ParticipantInput;
 }

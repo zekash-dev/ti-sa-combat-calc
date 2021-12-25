@@ -8,6 +8,7 @@ import {
     CombatStageOutput,
     CombatStageParticipantStatistics,
     CombatStateProbabilityOutput,
+    CombatType,
     CombatVictor,
     HitsProbabilityOutcome,
     HitType,
@@ -52,7 +53,7 @@ export function calculateCombatOutcome(input: CalculationInput): CalculationOutp
         const nextStates: CombatStateProbability[] = resolveState(activeState, input, stateResolutions);
         appendCombatStateProbabilities(stateDictionary, nextStates);
         addStatesByStage(statesByStage, activeState.probability, nextStates);
-        activeState = popNextActiveState(stateDictionary);
+        activeState = popNextActiveState(stateDictionary, input.combatType);
     }
     const output = createCalculationOutput(stateDictionary, statesByStage, input);
     if (process.env.NODE_ENV === "development") {
@@ -77,8 +78,8 @@ function getInitialParticipantState(participant: ParticipantInput): ParticipantS
 export function getNextStage(stage: CombatStage): CombatStage {
     switch (stage) {
         case CombatStage.SpaceMines:
-            return CombatStage.PDS;
-        case CombatStage.PDS:
+            return CombatStage.SpaceCannon;
+        case CombatStage.SpaceCannon:
             return CombatStage.StartOfBattle;
         case CombatStage.StartOfBattle:
             return CombatStage.AntiFighterBarrage;
@@ -303,8 +304,8 @@ export function getCombatRollsForStage(def: UnitDefinition, stage: CombatStage):
     switch (stage) {
         case CombatStage.SpaceMines:
             return 0;
-        case CombatStage.PDS:
-            return 0;
+        case CombatStage.SpaceCannon:
+            return def.spaceCannon;
         case CombatStage.StartOfBattle:
             return 0;
         case CombatStage.AntiFighterBarrage:
@@ -394,7 +395,7 @@ function assignHits(
         const hitType: HitType = Number(hitTypeStr);
         const numberOfHits: number = hits[hitType]!;
         for (let i = 0; i < numberOfHits; i++) {
-            assignHit(newUnits, hitType);
+            assignHit(newUnits, hitType, input.combatType);
         }
     }
 
@@ -485,8 +486,8 @@ function applyOpponentPreAssignHitTags(
     };
 }
 
-function assignHit(units: ComputedUnitSnapshot[], hitType: HitType) {
-    const hitIndex: number = determineHitTarget(units, hitType);
+function assignHit(units: ComputedUnitSnapshot[], hitType: HitType, combatType: CombatType) {
+    const hitIndex: number = determineHitTarget(units, hitType, combatType);
     if (hitIndex !== -1) {
         // account for "can't assign fighter hits" etc.? Loop list until we find a unit that it can be assigned to?
         const selectedUnit: ComputedUnitSnapshot | undefined = units[hitIndex];
@@ -514,11 +515,11 @@ function assignHit(units: ComputedUnitSnapshot[], hitType: HitType) {
  * -1 indicates that no unit can suffer the hit.
  * @param units
  */
-export function determineHitTarget(units: ComputedUnitSnapshot[], hitType: HitType): number {
+export function determineHitTarget(units: ComputedUnitSnapshot[], hitType: HitType, combatType: CombatType): number {
     let maxPrioIndex: number = -1;
     let maxPrioValue: number = -1;
     for (let i = 0; i < units.length; i++) {
-        if (!canAssignHitToUnit(units[i], hitType)) continue;
+        if (!canAssignHitToUnit(units[i], hitType, combatType)) continue;
         const prio = calculateHitPriority(units[i]);
         if (prio > maxPrioValue) {
             maxPrioIndex = i;
@@ -528,13 +529,19 @@ export function determineHitTarget(units: ComputedUnitSnapshot[], hitType: HitTy
     return maxPrioIndex;
 }
 
-function canAssignHitToUnit(unit: ComputedUnitSnapshot, hitType: HitType): boolean {
+function canAssignHitToUnit(unit: ComputedUnitSnapshot, hitType: HitType, combatType: CombatType): boolean {
+    if (!unitIsCombatant(unit.type, combatType)) return false;
+
     switch (hitType) {
         case HitType.AssignToFighter:
             return unit.type === UnitType.Fighter;
         case HitType.Normal:
             return true;
     }
+}
+
+export function unitIsCombatant(unitType: UnitType, combatType: CombatType): boolean {
+    return unitDefinitions[unitType].combatantIn.includes(combatType);
 }
 
 function calculateHitPriority(unit: ComputedUnitSnapshot): number {
@@ -556,7 +563,7 @@ export function calculateAverageHits(hitChances: number[]): number {
     );
 }
 
-function popNextActiveState(dict: CombatStateDictionary): CombatStateProbability | undefined {
+function popNextActiveState(dict: CombatStateDictionary, combatType: CombatType): CombatStateProbability | undefined {
     let next: CombatStateProbability | undefined = undefined;
     let nextUnitCount: number = 0;
     let nextDictKey: string = "";
@@ -565,7 +572,7 @@ function popNextActiveState(dict: CombatStateDictionary): CombatStateProbability
     for (let key of Object.keys(dict)) {
         for (let i = 0; i < dict[key].length; i++) {
             const stateProbability: CombatStateProbability = dict[key][i];
-            if (!combatStateIsFinished(stateProbability.state)) {
+            if (!combatStateIsFinished(stateProbability.state, combatType)) {
                 const unitCount: number = stateProbability.state.attacker.units.length + stateProbability.state.defender.units.length;
                 if (unitCount > nextUnitCount) {
                     next = stateProbability;
@@ -586,22 +593,35 @@ function popNextActiveState(dict: CombatStateDictionary): CombatStateProbability
     return next;
 }
 
-function combatStateIsFinished(state: CombatState): boolean {
-    return determineVictor(state) !== undefined;
+function combatStateIsFinished(state: CombatState, combatType: CombatType): boolean {
+    return determineVictor(state, combatType) !== undefined;
 }
 
-type CombatStateLike = { [key in ParticipantRole]: { units: UnitInput[] } };
-function determineVictor(state: CombatStateLike): CombatVictor | undefined {
-    if (state.attacker.units.length === 0) {
-        if (state.defender.units.length === 0) {
+type CombatStateLike = { [key in ParticipantRole]: { units: UnitInput[] } } & { stage: CombatStage };
+function determineVictor(state: CombatStateLike, combatType: CombatType): CombatVictor | undefined {
+    const attackerAlive: boolean = participantIsAlive(state.attacker.units, combatType, state.stage);
+    const defenderAlive: boolean = participantIsAlive(state.defender.units, combatType, state.stage);
+    if (!attackerAlive) {
+        if (!defenderAlive) {
             return "draw";
         }
         return ParticipantRole.Defender;
     }
-    if (state.defender.units.length === 0) {
+    if (!defenderAlive) {
         return ParticipantRole.Attacker;
     }
     return undefined;
+}
+
+function participantIsAlive(units: UnitInput[], combatType: CombatType, combatStage: CombatStage): boolean {
+    switch (combatStage) {
+        case CombatStage.SpaceMines:
+        case CombatStage.SpaceCannon:
+            // Non-combatant abilities might still need to be resolved
+            return units.length > 0;
+        default:
+            return units.filter((u) => unitIsCombatant(u.type, combatType)).length > 0;
+    }
 }
 
 function appendCombatStateProbabilities(combatStateDictionary: CombatStateDictionary, stateProbabilities: CombatStateProbability[]) {
@@ -689,7 +709,7 @@ function createCalculationOutput(
 ): CalculationOutput {
     const resultStates: CombatStateProbability[] = Object.values(stateDictionary).flat();
     const resultStatesOutput: CombatStateProbabilityOutput[] = toCombatStateProbabilityOutputs(resultStates, input);
-    const victorProbabilities: KeyedDictionary<CombatVictor, number> = getVictorProbabilities(resultStatesOutput);
+    const victorProbabilities: KeyedDictionary<CombatVictor, number> = getVictorProbabilities(input, resultStatesOutput);
 
     return {
         victorProbabilities: victorProbabilities,
@@ -751,7 +771,7 @@ function createCombatStageOutputs(
         };
         if (Object.values(statistics).every((stat) => stat.expectedHits === 0)) continue;
 
-        let victorProbabilities: KeyedDictionary<CombatVictor, number> = getVictorProbabilities(afterStatesOutput);
+        let victorProbabilities: KeyedDictionary<CombatVictor, number> = getVictorProbabilities(input, afterStatesOutput);
         if (previousVictorProbabilities) {
             victorProbabilities = mergeVictorProbabilities(previousVictorProbabilities, victorProbabilities);
         }
@@ -786,15 +806,17 @@ function calculateCombatStageParticipantStatistics(
         expectedHits += expHits * stateProbability.probability;
 
         const opponentUnits: ComputedUnitSnapshot[] = getUnitSnapshots(stateProbability.state, input, opponent, stage);
-        const health: number = sum(opponentUnits.map(getUnitHealth)) * stateProbability.probability;
+        const health: number =
+            sum(opponentUnits.filter((u) => unitIsCombatant(u.type, input.combatType)).map(getUnitHealth)) * stateProbability.probability;
         opponentHealthBefore += health;
-        if (determineVictor(stateProbability.state) === opponent) {
+        if (determineVictor(stateProbability.state, input.combatType) === opponent) {
             opponentHealthAfter += health;
         }
     }
     for (let stateProbability of afterStates) {
         const opponentUnits: ComputedUnitSnapshot[] = getUnitSnapshots(stateProbability.state, input, opponent, stage);
-        opponentHealthAfter += sum(opponentUnits.map(getUnitHealth)) * stateProbability.probability;
+        opponentHealthAfter +=
+            sum(opponentUnits.filter((u) => unitIsCombatant(u.type, input.combatType)).map(getUnitHealth)) * stateProbability.probability;
     }
     return {
         expectedHits: expectedHits / totalProbabilityBefore,
@@ -813,14 +835,17 @@ function getUnitHealth(unit: ComputedUnitSnapshot): number {
     return unit.sustainDamage - unit.sustainedHits + 1;
 }
 
-export function getVictorProbabilities(combatStates: CombatStateProbabilityOutput[]): KeyedDictionary<CombatVictor, number> {
+export function getVictorProbabilities(
+    input: CalculationInput,
+    combatStates: CombatStateProbabilityOutput[]
+): KeyedDictionary<CombatVictor, number> {
     const victorProbabilities: KeyedDictionary<CombatVictor, number> = {
         attacker: 0,
         defender: 0,
         draw: 0,
     };
     for (let state of combatStates) {
-        const victor: CombatVictor | undefined = determineVictor(state.state);
+        const victor: CombatVictor | undefined = determineVictor(state.state, input.combatType);
         if (victor) {
             victorProbabilities[victor] += state.probability;
         }
