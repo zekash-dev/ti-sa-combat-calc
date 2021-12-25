@@ -39,10 +39,14 @@ export const UnitImage = React.memo(({ unitType, faction, role, scale, badges }:
                 <SvgProxy selector="#color-darker" fill={darkColor} />
                 <SvgProxy selector="#color-brighter" fill={brightColor} />
             </SvgLoader>
-            <BadgeContainer scale={scale} anchor={unitDef.imageBadgeAnchor}>
+            <BadgeContainer role={role} scale={scale} anchor={unitDef.imageBadgeAnchor}>
                 {badges
                     .filter((badge: JSX.Element | false): badge is JSX.Element => !!badge)
-                    .map((badge: JSX.Element) => React.cloneElement(badge, { style: { float: "left", width: "min(20px, 50%)" } }))}
+                    .map((badge: JSX.Element) =>
+                        React.cloneElement(badge, {
+                            style: { float: role === ParticipantRole.Attacker ? "left" : "right", width: "min(30px, 50%)" },
+                        })
+                    )}
             </BadgeContainer>
         </div>
     );
@@ -79,19 +83,20 @@ function getSvgPath(unitType: UnitType): string {
 }
 
 interface BadgeContainerProps {
+    role: ParticipantRole;
     scale: number;
     anchor: Dimensions;
     children: React.ReactNode;
 }
 
-function BadgeContainer({ scale, anchor, children }: BadgeContainerProps) {
+function BadgeContainer({ role, scale, anchor, children }: BadgeContainerProps) {
     return (
         <div
             style={{
                 position: "absolute",
-                left: anchor.x * scale,
+                left: role === ParticipantRole.Attacker ? anchor.x * scale : 0,
                 bottom: anchor.y * scale,
-                right: 0,
+                right: role === ParticipantRole.Defender ? anchor.x * scale : 0,
             }}
         >
             {children}

@@ -78,6 +78,12 @@ interface UnsetUnitTagPayload {
     tag: UnitTag;
 }
 
+interface SetUnitSustainedHitsPayload {
+    role: ParticipantRole;
+    unitIndex: number;
+    sustainedHits: number;
+}
+
 const participantSlice = createSlice({
     name: "participant",
     initialState: initialState,
@@ -140,6 +146,13 @@ const participantSlice = createSlice({
                 }
             }
         },
+        setUnitSustainedHits: (state: ParticipantSliceState, action: PayloadAction<SetUnitSustainedHitsPayload>) => {
+            const { role, unitIndex, sustainedHits } = action.payload;
+            const unit: UnitInput | undefined = state.participants[role].units[unitIndex];
+            if (unit) {
+                unit.sustainedHits = sustainedHits;
+            }
+        },
     },
 });
 
@@ -155,13 +168,34 @@ function addUnits(participant: ParticipantInput, unitType: UnitType, count: numb
 
 function removeUnits(participant: ParticipantInput, unitType: UnitType, count: number) {
     for (let i = 0; i < count; i++) {
-        const idx: number = participant.units.findIndex((u) => u.type === unitType);
+        const idx: number = determineRemovalIndex(participant.units, unitType);
         if (idx !== -1) {
             participant.units.splice(idx, 1);
         } else {
             break;
         }
     }
+}
+
+/**
+ * Prioritize keeping units with:
+ * 1) tags applied to them
+ * 2) hits sustained
+ */
+function determineRemovalIndex(units: UnitInput[], unitType: UnitType): number {
+    let maxPrioIndex: number = -1;
+    let maxPrioValue: number = -1;
+    for (let i = 0; i < units.length; i++) {
+        const unit: UnitInput = units[i];
+        if (unit.type !== unitType) continue;
+        const tagCount = unit.tags === undefined ? 0 : Object.keys(unit.tags).length;
+        const prio = 100 - tagCount * 2 - unit.sustainedHits;
+        if (prio > maxPrioValue) {
+            maxPrioIndex = i;
+            maxPrioValue = prio;
+        }
+    }
+    return maxPrioIndex;
 }
 
 export const {
@@ -175,6 +209,7 @@ export const {
     setUnitCount,
     setUnitTag,
     unsetUnitTag,
+    setUnitSustainedHits,
 } = participantSlice.actions;
 
 export const selectparticipantState = (rootState: RootState) => rootState.participant;
@@ -263,6 +298,7 @@ function createUnitStageStats(
             .map(() => snapshot.combatValue)
             .concat(snapshot.nonStandardRolls.map((r) => snapshot.combatValue + r.valueMod)),
         hitType: snapshot.hitType,
+        sustainDamage: snapshot.sustainDamage,
     };
 
     if (stageStats.rolls.length === 0) return undefined;

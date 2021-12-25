@@ -151,4 +151,5 @@ export interface UnitStageStats {
      */
     rolls: number[];
     hitType: HitType;
+    sustainDamage: number;
 }

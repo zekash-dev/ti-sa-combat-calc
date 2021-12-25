@@ -1,13 +1,13 @@
-import { Box, IconButton, Popover, Typography } from "@mui/material";
+import { Box, Popover, Typography } from "@mui/material";
 import React, { useState } from "react";
-import { useDispatch } from "react-redux";
 
-import { AdmiralImage, CombatRollImage, UnitImage } from "components/graphics";
+import { AdmiralImage, CombatRollImage, HitCounterImage, UnitImage } from "components/graphics";
 import { combatStageResources } from "logic/participant";
 import { CombatStage, ParticipantRole, RichUnit, UnitStageStats } from "model/calculation";
 import { Faction, UnitTag } from "model/combatTags";
 import { unitDefinitions } from "model/unit";
-import { setUnitTag, unsetUnitTag } from "redux/participant/participantSlice";
+import { UnitAdmiralInput } from "./UnitAdmiralInput";
+import { UnitSustainDamageInput } from "./UnitSustainDamageInput";
 
 interface Props {
     unit: RichUnit;
@@ -48,7 +48,10 @@ export function UnitBattlefieldRepresentation({ unit, faction, role, scale }: Pr
                     faction={faction}
                     role={role}
                     scale={scale}
-                    badges={[hasAdmiral && <AdmiralImage key="admiral" />]}
+                    badges={[
+                        hasAdmiral && <AdmiralImage key="admiral" />,
+                        ...[...Array(unit.input.sustainedHits)].map((v, idx) => <HitCounterImage key={`hit-${idx}`} />),
+                    ]}
                 />
             </div>
             <Popover
@@ -88,6 +91,7 @@ function UnitPopover({ role, unit }: UnitPopoverProps) {
             })}
             {unit.baseline && <UnitStageStatsView label="Combat" stats={unit.baseline} />}
             <UnitAdmiralInput role={role} unit={unit} />
+            <UnitSustainDamageInput role={role} unit={unit} />
         </Box>
     );
 }
@@ -110,53 +114,6 @@ function UnitStageStatsView({ label, stats }: UnitStageStatsViewProps) {
                     style={{ width: 20, height: 20, margin: 2, verticalAlign: "middle" }}
                 />
             ))}
-        </Box>
-    );
-}
-
-function UnitAdmiralInput({ role, unit }: UnitPopoverProps) {
-    const dispatch = useDispatch();
-    const hasAdmiral: boolean = !!unit.input.tags && unit.input.tags[UnitTag.ADMIRAL] === true;
-
-    const toggleAdmiral = () => {
-        if (hasAdmiral) {
-            dispatch(
-                unsetUnitTag({
-                    role: role,
-                    unitIndex: unit.unitIndex,
-                    tag: UnitTag.ADMIRAL,
-                })
-            );
-        } else {
-            dispatch(
-                setUnitTag({
-                    role: role,
-                    unitIndex: unit.unitIndex,
-                    tag: UnitTag.ADMIRAL,
-                    value: true,
-                })
-            );
-        }
-    };
-    return (
-        <Box>
-            <Typography variant="body2" sx={{ display: "inline", marginRight: 1 }}>
-                Admiral
-            </Typography>
-            <IconButton size="small" onClick={toggleAdmiral}>
-                <AdmiralImage
-                    style={{
-                        width: 20,
-                        height: 20,
-                        filter: hasAdmiral ? undefined : "grayscale(0.8)",
-                        opacity: hasAdmiral ? undefined : "0.7",
-                        borderRadius: "50%",
-                        borderStyle: "solid",
-                        borderWidth: "2px",
-                        borderColor: hasAdmiral ? "#DDDDDD" : "transparent",
-                    }}
-                />
-            </IconButton>
         </Box>
     );
 }
