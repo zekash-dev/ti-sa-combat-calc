@@ -1,9 +1,9 @@
 import { Box, Typography } from "@mui/material";
 
-import { combatStageResources } from "logic/participant";
+import { combatStageResources, flagshipDefinitions } from "logic/participant";
 import { CombatStage, ParticipantRole, RichUnit } from "model/calculation";
 import { Faction } from "model/combatTags";
-import { FlagshipDefinition, flagshipDefinitions, unitDefinitions, UnitType } from "model/unit";
+import { FlagshipDefinition, unitDefinitions, UnitType } from "model/unit";
 import { UnitAdmiralInput } from "./UnitAdmiralInput";
 import { UnitStageStatsView } from "./UnitStageStatsView";
 import { UnitSustainDamageInput } from "./UnitSustainDamageInput";

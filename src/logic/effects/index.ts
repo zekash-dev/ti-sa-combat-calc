@@ -12,6 +12,7 @@ export * from "./magenDefenseGrid";
 export * from "./maneuveringJets";
 export * from "./mentakPreCombatShots";
 export * from "./naaluFighterMod";
+export * from "./naaluFlagship";
 export * from "./saarChaosMapping";
 export * from "./sardakkBerzerkerGenome";
 export * from "./sardakkUnitMod";

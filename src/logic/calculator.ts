@@ -34,8 +34,8 @@ import {
     PreAssignHitsInput,
     UnitOnComputeSnapshotInput,
 } from "model/effects";
-import { flagshipDefinitions, UnitDefinition, unitDefinitions, UnitType } from "model/unit";
-import { getOpponentRole, participantTagResources, unitTagResources } from "./participant";
+import { UnitDefinition, unitDefinitions, UnitType } from "model/unit";
+import { flagshipDefinitions, getOpponentRole, participantTagResources, unitTagResources } from "./participant";
 
 export function calculateCombatOutcome(input: CalculationInput): CalculationOutput | null {
     if (input.attacker.units.length === 0 && input.defender.units.length === 0) return null;
