@@ -76,13 +76,19 @@ export enum Technology {
     MANEUVERING_JETS = 414,
 }
 
+export enum CommonParticipantTag {
+    HIGH_ALERT_TOKEN = 501,
+    GENERAL = 502,
+    AGENT = 503,
+}
+
 export enum FlagshipTag {
-    FLAGSHIP = 501,
+    FLAGSHIP = 601,
 }
 
 export const technologies: Technology[] = getAllEnumValues<Technology>(Technology);
 
-export type ParticipantTag = FactionAbility | FactionUpgrade | Technology | FlagshipTag;
+export type ParticipantTag = FactionAbility | FactionUpgrade | Technology | CommonParticipantTag | FlagshipTag;
 
 export interface JolnarRerollStrategy {
     maxRerolls: number;

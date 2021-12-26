@@ -1,3 +1,4 @@
+import { clamp } from "lodash";
 import React from "react";
 import { SvgLoader, SvgProxy } from "react-svgmt";
 
@@ -11,9 +12,10 @@ interface Props {
 export const CombatRollImage = React.memo(({ combatValue, style }: Props) => {
     const [loaded, setLoaded] = React.useState(false);
     const handleLoaded = () => setLoaded(true);
-    const path: string = getSvgPath(combatValue);
-    const baseColor: string = diceColors[combatValue] ?? diceColors[10];
-    const textColor: string = getTextColor(combatValue);
+    const clampedCombatValue = clamp(combatValue, 1, 10);
+    const path: string = getSvgPath(clampedCombatValue);
+    const baseColor: string = diceColors[clampedCombatValue] ?? diceColors[10];
+    const textColor: string = getTextColor(clampedCombatValue);
 
     // Let the image load before showing it, to prevent flickers while the SvgProxys are being handled
     return (

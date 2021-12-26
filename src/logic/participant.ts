@@ -12,6 +12,7 @@ import {
 } from "model/calculation";
 import { CombatState, ComputedUnitSnapshot } from "model/combatState";
 import {
+    CommonParticipantTag,
     Faction,
     FactionAbility,
     FactionResources,
@@ -267,8 +268,7 @@ export const technologyResources: KeyedDictionary<Technology, TechnologyResource
         implementation: effects.maneuveringJets,
     },
 };
-
-export const participantTagResources: KeyedDictionary<ParticipantTag, ParticipantTagResources> = {
+const factionAbilityResources: KeyedDictionary<FactionAbility, ParticipantTagResources> = {
     [FactionAbility.MENTAK_PRECOMBAT_SHOTS]: {
         name: "Pre-combat shots",
         color: factionResources[Faction.MENTAK_COALITION].color,
@@ -324,6 +324,9 @@ export const participantTagResources: KeyedDictionary<ParticipantTag, Participan
         color: factionResources[Faction.ARBOREC_ECOSYSTEM].color,
         implementation: false,
     },
+};
+
+const factionUpgradeResources: KeyedDictionary<FactionUpgrade, ParticipantTagResources> = {
     [FactionUpgrade.LETNEV_SAIMOC_INFUSED_HULLS]: {
         name: "Saimoc-infused hulls",
         color: factionResources[Faction.BARONY_OF_LETNEV].color,
@@ -394,7 +397,31 @@ export const participantTagResources: KeyedDictionary<ParticipantTag, Participan
         color: factionResources[Faction.ORDER_OF_THE_LAST].color,
         implementation: false,
     },
+};
+
+const commonParticipantTagResources: KeyedDictionary<CommonParticipantTag, ParticipantTagResources> = {
+    [CommonParticipantTag.HIGH_ALERT_TOKEN]: {
+        name: "High alert token",
+        color: "white",
+        implementation: effects.highAlertToken,
+    },
+    [CommonParticipantTag.GENERAL]: {
+        name: "General",
+        color: "white",
+        implementation: false,
+    },
+    [CommonParticipantTag.AGENT]: {
+        name: "Agent",
+        color: "white",
+        implementation: false,
+    },
+};
+
+export const participantTagResources: KeyedDictionary<ParticipantTag, ParticipantTagResources> = {
+    ...factionAbilityResources,
+    ...factionUpgradeResources,
     ...technologyResources,
+    ...commonParticipantTagResources,
     // Flagship here is just a placeholder, to be replaced by faction-specific flagship implementations.
     [FlagshipTag.FLAGSHIP]: {
         name: "Flagship",

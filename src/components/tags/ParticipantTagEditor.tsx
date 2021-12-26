@@ -1,23 +1,34 @@
-import { ChevronLeft, ChevronRight, Stars } from "@mui/icons-material";
+import { ChevronLeft, ChevronRight } from "@mui/icons-material";
 import { Divider, Drawer as MuiDrawer, List, ListItem, ListItemIcon, ListItemText, styled, Theme, Typography } from "@mui/material";
 import { OverlayScrollbarsComponent } from "overlayscrollbars-react";
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
-import { FactionImage, TechnologyTypeImage } from "components/graphics";
+import { FactionImage } from "components/graphics";
 import {
     availableFactionUpgrades,
     defaultFactionAbilities,
     factionResources,
     getDefaultFactionAbilityValue,
-    participantTagResources,
     technologyResources,
 } from "logic/participant";
 import { ParticipantInput, ParticipantRole } from "model/calculation";
-import { Faction, FactionAbility, FactionResources, FactionUpgrade, ParticipantTag, technologies, Technology } from "model/combatTags";
+import {
+    CommonParticipantTag,
+    Faction,
+    FactionAbility,
+    FactionResources,
+    FactionUpgrade,
+    ParticipantTag,
+    technologies,
+    Technology,
+} from "model/combatTags";
 import { selectParticipant, setFaction, setParticipantTag, unsetParticipantTag } from "redux/participant/participantSlice";
+import { CommonParticipantTagIcon } from "./CommonParticipantTagIcon";
 import { ParticipantTagListItem } from "./ParticipantTagListItem";
 import { SelectFactionDialog } from "./SelectFactionDialog";
+import { TagStarIcon } from "./TagStarIcon";
+import { TechnologyIcon } from "./TechnologyIcon";
 
 interface Props {
     location: "left" | "right";
@@ -124,6 +135,21 @@ function DrawerContent({ role, open }: DrawerContentProps) {
                         onToggle={toggleParticipantTag(tag)}
                     />
                 ))}
+                <ListItem sx={{ visibility: open ? "visible" : "hidden" }}>
+                    <ListItemText>Other</ListItemText>
+                </ListItem>
+                <ParticipantTagListItem
+                    tag={CommonParticipantTag.HIGH_ALERT_TOKEN}
+                    icon={
+                        <CommonParticipantTagIcon
+                            tag={CommonParticipantTag.HIGH_ALERT_TOKEN}
+                            selected={participant.tags[CommonParticipantTag.HIGH_ALERT_TOKEN] !== undefined}
+                        />
+                    }
+                    selected={participant.tags[CommonParticipantTag.HIGH_ALERT_TOKEN] !== undefined}
+                    open={open}
+                    onToggle={toggleParticipantTag(CommonParticipantTag.HIGH_ALERT_TOKEN)}
+                />
             </List>
             <SelectFactionDialog
                 open={factionDialogOpen}
@@ -132,44 +158,6 @@ function DrawerContent({ role, open }: DrawerContentProps) {
                 onSelect={handleSelectFaction}
             />
         </>
-    );
-}
-
-function TagStarIcon({ tag, selected }: { tag: ParticipantTag; selected: boolean }) {
-    return (
-        <Stars
-            sx={{
-                fontSize: 32,
-                color: participantTagResources[tag].color,
-                marginLeft: "auto",
-                marginRight: "auto",
-                filter: selected ? undefined : "grayscale(0.8)",
-                opacity: selected ? undefined : "0.7",
-                borderRadius: "50%",
-                borderStyle: "solid",
-                borderWidth: "2px",
-                borderColor: selected ? "#DDDDDD" : "transparent",
-            }}
-        />
-    );
-}
-
-function TechnologyIcon({ tag, selected }: { tag: Technology; selected: boolean }) {
-    return (
-        <TechnologyTypeImage
-            technologyType={technologyResources[tag].type}
-            style={{
-                width: 30,
-                marginLeft: "auto",
-                marginRight: "auto",
-                filter: selected ? undefined : "grayscale(0.8)",
-                opacity: selected ? undefined : "0.7",
-                borderRadius: "50%",
-                borderStyle: "solid",
-                borderWidth: "2px",
-                borderColor: selected ? "#DDDDDD" : "transparent",
-            }}
-        />
     );
 }
 
