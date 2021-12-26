@@ -16,6 +16,7 @@ import {
     FactionAbility,
     FactionResources,
     FactionUpgrade,
+    FlagshipTag,
     JolnarRerollStrategy,
     ParticipantTag,
     ParticipantTagResources,
@@ -394,6 +395,12 @@ export const participantTagResources: KeyedDictionary<ParticipantTag, Participan
         implementation: false,
     },
     ...technologyResources,
+    // Flagship here is just a placeholder, to be replaced by faction-specific flagship implementations.
+    [FlagshipTag.FLAGSHIP]: {
+        name: "Flagship",
+        color: "white",
+        implementation: false,
+    },
 };
 
 export const unitTagResources: KeyedDictionary<UnitTag, UnitTagResources> = {

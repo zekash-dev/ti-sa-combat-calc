@@ -1,13 +1,11 @@
-import { Box, Popover, Typography } from "@mui/material";
+import { Popover } from "@mui/material";
 import React, { useState } from "react";
 
-import { AdmiralImage, CombatRollImage, HitCounterImage, UnitImage } from "components/graphics";
-import { combatStageResources } from "logic/participant";
-import { CombatStage, ParticipantRole, RichUnit, UnitStageStats } from "model/calculation";
+import { AdmiralImage, HitCounterImage, UnitImage } from "components/graphics";
+import { ParticipantRole, RichUnit } from "model/calculation";
 import { Faction, UnitTag } from "model/combatTags";
 import { unitDefinitions } from "model/unit";
-import { UnitAdmiralInput } from "./UnitAdmiralInput";
-import { UnitSustainDamageInput } from "./UnitSustainDamageInput";
+import { UnitPopover } from "./UnitPopover";
 
 interface Props {
     unit: RichUnit;
@@ -68,52 +66,8 @@ export function UnitBattlefieldRepresentation({ unit, faction, role, scale }: Pr
                     horizontal: "left",
                 }}
             >
-                <UnitPopover role={role} unit={unit} />
+                <UnitPopover unit={unit} faction={faction} role={role} />
             </Popover>
         </>
-    );
-}
-
-interface UnitPopoverProps {
-    role: ParticipantRole;
-    unit: RichUnit;
-}
-
-function UnitPopover({ role, unit }: UnitPopoverProps) {
-    return (
-        <Box sx={{ p: 1 }}>
-            <Typography variant="body1" sx={{ fontWeight: "bold", paddingBottom: 1 }}>
-                {unitDefinitions[unit.input.type].name}
-            </Typography>
-            {Object.keys(unit.byStage).map((stageKey: string) => {
-                const stage: CombatStage = Number(stageKey);
-                return <UnitStageStatsView label={combatStageResources[stage].shortName} stats={unit.byStage[stage]!} />;
-            })}
-            {unit.baseline && <UnitStageStatsView label="Combat" stats={unit.baseline} />}
-            <UnitAdmiralInput role={role} unit={unit} />
-            <UnitSustainDamageInput role={role} unit={unit} />
-        </Box>
-    );
-}
-
-interface UnitStageStatsViewProps {
-    label: string;
-    stats: UnitStageStats;
-}
-
-function UnitStageStatsView({ label, stats }: UnitStageStatsViewProps) {
-    return (
-        <Box>
-            <Typography variant="body2" sx={{ display: "inline", marginRight: 1 }}>
-                {label}
-            </Typography>
-            {stats.rolls.map((combatValue, idx) => (
-                <CombatRollImage
-                    key={`${combatValue}-${idx}`}
-                    combatValue={combatValue}
-                    style={{ width: 20, height: 20, margin: 2, verticalAlign: "middle" }}
-                />
-            ))}
-        </Box>
     );
 }

@@ -26,7 +26,7 @@ import {
     ParticipantState,
     UnitState,
 } from "model/combatState";
-import { ParticipantTag, UnitTag, UnitTagResources } from "model/combatTags";
+import { FlagshipTag, ParticipantTag, UnitTag, UnitTagResources } from "model/combatTags";
 import { KeyedDictionary, SparseDictionary } from "model/common";
 import {
     ParticipantOnComputeSnapshotInput,
@@ -34,7 +34,7 @@ import {
     PreAssignHitsInput,
     UnitOnComputeSnapshotInput,
 } from "model/effects";
-import { UnitDefinition, unitDefinitions, UnitType } from "model/unit";
+import { flagshipDefinitions, UnitDefinition, unitDefinitions, UnitType } from "model/unit";
 import { getOpponentRole, participantTagResources, unitTagResources } from "./participant";
 
 export function calculateCombatOutcome(input: CalculationInput): CalculationOutput | null {
@@ -183,7 +183,7 @@ export function getUnitSnapshots(
     const unitSnapshots: ComputedUnitSnapshot[] = [];
     const participant: ParticipantState = combatState[role];
     for (let unit of participant.units) {
-        const def: UnitDefinition = unitDefinitions[unit.type];
+        const def: UnitDefinition = unit.type === UnitType.Flagship ? flagshipDefinitions[input[role].faction] : unitDefinitions[unit.type];
         const baseRolls: number = getCombatRollsForStage(def, stage);
         const rolls: number = baseRolls === 0 ? 0 : max([baseRolls - unit.sustainedHits, 1])!;
         unitSnapshots.push({
@@ -221,10 +221,9 @@ function applyUnitSnapshotParticipantTags(
         stage,
         units: unitSnapshots,
     };
-    for (let { tag } of tagValues) {
-        const impl: ParticipantTagImplementation | false = participantTagResources[tag].implementation;
-        if (!!impl && !!impl.onComputeUnitSnapshots) {
-            impl.onComputeUnitSnapshots(effectInput);
+    for (let { implementation } of tagValues) {
+        if (!!implementation && !!implementation.onComputeUnitSnapshots) {
+            implementation.onComputeUnitSnapshots(effectInput);
         }
     }
 }
@@ -249,10 +248,9 @@ function applyOpponentUnitSnapshotParticipantTags(
         stage,
         units: unitSnapshots,
     };
-    for (let { tag } of opponentTagValues) {
-        const impl: ParticipantTagImplementation | false = participantTagResources[tag].implementation;
-        if (!!impl && !!impl.onComputeOpponentUnitSnapshots) {
-            impl.onComputeOpponentUnitSnapshots(effectInput);
+    for (let { implementation } of opponentTagValues) {
+        if (!!implementation && !!implementation.onComputeOpponentUnitSnapshots) {
+            implementation.onComputeOpponentUnitSnapshots(effectInput);
         }
     }
 }
@@ -286,6 +284,7 @@ function applyUnitSnapshotUnitTags(
 
 interface ParticipantTagValueAndState {
     tag: ParticipantTag;
+    implementation: ParticipantTagImplementation | false;
     inputValue: any;
     state: number | undefined;
 }
@@ -293,9 +292,29 @@ function getParticipantTagValues(input: ParticipantInput, state: ParticipantStat
     const values: ParticipantTagValueAndState[] = [];
     for (let tagStr of Object.keys(input.tags)) {
         const tag: ParticipantTag = Number(tagStr);
+        if (tag === FlagshipTag.FLAGSHIP) continue; // Flagship has custom handling, see below.
         const tagInputValue: any = input.tags[tag];
         const tagState = state.tags[tag];
-        values.push({ tag, inputValue: tagInputValue, state: tagState });
+        values.push({
+            tag,
+            implementation: participantTagResources[tag].implementation,
+            inputValue: tagInputValue,
+            state: tagState,
+        });
+    }
+    // Add the flagship effect if the flagship is part of the fleet and has a special effect.
+    if (state.units.some((u) => u.type === UnitType.Flagship)) {
+        const flagshipEffect: ParticipantTagImplementation | undefined = flagshipDefinitions[input.faction].effect;
+        if (flagshipEffect) {
+            const tagInputValue: any = input.tags[FlagshipTag.FLAGSHIP];
+            const tagState = state.tags[FlagshipTag.FLAGSHIP];
+            values.push({
+                tag: FlagshipTag.FLAGSHIP,
+                implementation: flagshipEffect,
+                inputValue: tagInputValue,
+                state: tagState,
+            });
+        }
     }
     return values;
 }
@@ -422,9 +441,8 @@ function applyPreAssignHitTags(
     const participant: ParticipantState = combatState[role];
     const participantInput: ParticipantInput = calculationInput[role];
     const tagValues: ParticipantTagValueAndState[] = getParticipantTagValues(participantInput, participant);
-    for (let { tag, state } of tagValues) {
-        const impl: ParticipantTagImplementation | false = participantTagResources[tag].implementation;
-        if (!!impl && !!impl.preAssignHits) {
+    for (let { tag, implementation, state } of tagValues) {
+        if (!!implementation && !!implementation.preAssignHits) {
             const effectInput: PreAssignHitsInput = {
                 calculationInput,
                 combatState: modifiedCombatState,
@@ -433,7 +451,7 @@ function applyPreAssignHitTags(
                 units,
                 tagState: state,
             };
-            const { newHits, newTagState } = impl.preAssignHits(effectInput);
+            const { newHits, newTagState } = implementation.preAssignHits(effectInput);
             if (newHits !== undefined) {
                 modifiedHits = newHits;
             }
@@ -460,9 +478,8 @@ function applyOpponentPreAssignHitTags(
     const opponent: ParticipantState = combatState[opponentRole];
     const opponentInput: ParticipantInput = calculationInput[opponentRole];
     const opponentTagValues: ParticipantTagValueAndState[] = getParticipantTagValues(opponentInput, opponent);
-    for (let { tag, state } of opponentTagValues) {
-        const impl: ParticipantTagImplementation | false = participantTagResources[tag].implementation;
-        if (!!impl && !!impl.preAssignOpponentHits) {
+    for (let { tag, implementation, state } of opponentTagValues) {
+        if (!!implementation && !!implementation.preAssignOpponentHits) {
             const effectInput: PreAssignHitsInput = {
                 calculationInput,
                 combatState: modifiedCombatState,
@@ -471,7 +488,7 @@ function applyOpponentPreAssignHitTags(
                 units,
                 tagState: state,
             };
-            const { newHits, newTagState } = impl.preAssignOpponentHits(effectInput);
+            const { newHits, newTagState } = implementation.preAssignOpponentHits(effectInput);
             if (newHits !== undefined) {
                 modifiedHits = newHits;
             }

@@ -1,6 +1,8 @@
 import { getAllEnumValues } from "logic/common";
 import { CombatType } from "./calculation";
+import { Faction } from "./combatTags";
 import { KeyedDictionary } from "./common";
+import { ParticipantTagImplementation } from "./effects";
 
 export enum UnitType {
     WarSun = 101,
@@ -43,6 +45,11 @@ export interface UnitDefinition {
     spaceCannon: number;
 
     /**
+     * Number of bombardment shots.
+     */
+    bombardment: number;
+
+    /**
      * Number of invasion defence shots.
      */
     invasionDefence: number;
@@ -66,6 +73,23 @@ export interface UnitDefinition {
     imageBadgeAnchor: Dimensions;
 }
 
+export interface FlagshipDefinition extends UnitDefinition {
+    flagshipName: string;
+    /**
+     * Implementation of custom effects for the flagship.
+     */
+    effect?: ParticipantTagImplementation;
+    /**
+     * Describes special effects of the flagship.
+     */
+    notes?: string;
+
+    /**
+     * Indicates that the effect is not implemented.
+     */
+    nyi?: true;
+}
+
 export interface Dimensions {
     x: number;
     y: number;
@@ -80,6 +104,7 @@ export const unitDefinitions: KeyedDictionary<UnitType, UnitDefinition> = {
         preCombatShots: 0,
         antiFigherBarrage: 0,
         spaceCannon: 0,
+        bombardment: 1,
         invasionDefence: 0,
         planetaryShield: 0,
         name: "War sun",
@@ -95,6 +120,7 @@ export const unitDefinitions: KeyedDictionary<UnitType, UnitDefinition> = {
         preCombatShots: 0,
         antiFigherBarrage: 0,
         spaceCannon: 0,
+        bombardment: 1,
         invasionDefence: 0,
         planetaryShield: 0,
         name: "Dreadnought",
@@ -110,6 +136,7 @@ export const unitDefinitions: KeyedDictionary<UnitType, UnitDefinition> = {
         preCombatShots: 0,
         antiFigherBarrage: 0,
         spaceCannon: 0,
+        bombardment: 0,
         invasionDefence: 0,
         planetaryShield: 0,
         name: "Cruiser",
@@ -125,6 +152,7 @@ export const unitDefinitions: KeyedDictionary<UnitType, UnitDefinition> = {
         preCombatShots: 0,
         antiFigherBarrage: 2,
         spaceCannon: 0,
+        bombardment: 0,
         invasionDefence: 0,
         planetaryShield: 0,
         name: "Destroyer",
@@ -140,6 +168,7 @@ export const unitDefinitions: KeyedDictionary<UnitType, UnitDefinition> = {
         preCombatShots: 0,
         antiFigherBarrage: 0,
         spaceCannon: 0,
+        bombardment: 0,
         invasionDefence: 0,
         planetaryShield: 0,
         name: "Carrier",
@@ -155,6 +184,7 @@ export const unitDefinitions: KeyedDictionary<UnitType, UnitDefinition> = {
         preCombatShots: 0,
         antiFigherBarrage: 0,
         spaceCannon: 0,
+        bombardment: 0,
         invasionDefence: 0,
         planetaryShield: 0,
         name: "Fighter",
@@ -170,6 +200,7 @@ export const unitDefinitions: KeyedDictionary<UnitType, UnitDefinition> = {
         preCombatShots: 0,
         antiFigherBarrage: 0,
         spaceCannon: 0,
+        bombardment: 0,
         invasionDefence: 0,
         planetaryShield: 0,
         name: "Flagship",
@@ -185,6 +216,7 @@ export const unitDefinitions: KeyedDictionary<UnitType, UnitDefinition> = {
         preCombatShots: 0,
         antiFigherBarrage: 0,
         spaceCannon: 0,
+        bombardment: 0,
         invasionDefence: 0,
         planetaryShield: 0,
         name: "Mech",
@@ -200,6 +232,7 @@ export const unitDefinitions: KeyedDictionary<UnitType, UnitDefinition> = {
         preCombatShots: 0,
         antiFigherBarrage: 0,
         spaceCannon: 0,
+        bombardment: 0,
         invasionDefence: 0,
         planetaryShield: 0,
         name: "Ground force",
@@ -215,6 +248,7 @@ export const unitDefinitions: KeyedDictionary<UnitType, UnitDefinition> = {
         preCombatShots: 0,
         antiFigherBarrage: 0,
         spaceCannon: 0,
+        bombardment: 0,
         invasionDefence: 0,
         planetaryShield: 0,
         name: "Shock troop",
@@ -230,11 +264,171 @@ export const unitDefinitions: KeyedDictionary<UnitType, UnitDefinition> = {
         preCombatShots: 0,
         antiFigherBarrage: 0,
         spaceCannon: 1,
+        bombardment: 0,
         invasionDefence: 1,
         planetaryShield: 1,
         name: "PDS",
         combatantIn: [],
         imageSize: { x: 40, y: 40 },
         imageBadgeAnchor: { x: 10, y: 10 },
+    },
+};
+
+export const flagshipDefinitions: KeyedDictionary<Faction, FlagshipDefinition> = {
+    [Faction.BARONY_OF_LETNEV]: {
+        ...unitDefinitions[UnitType.Flagship],
+        flagshipName: "Arc Secundus",
+        combatValue: 5,
+        combatRolls: 2,
+        sustainDamage: 2,
+        preCombatShots: 1,
+        antiFigherBarrage: 1,
+        bombardment: 1,
+    },
+    [Faction.CLAN_OF_SAAR]: {
+        ...unitDefinitions[UnitType.Flagship],
+        flagshipName: "Son of Ragh",
+        combatValue: 7,
+        combatRolls: 3,
+        sustainDamage: 1,
+        antiFigherBarrage: 2,
+    },
+    [Faction.EMIRATES_OF_HACAN]: {
+        ...unitDefinitions[UnitType.Flagship],
+        flagshipName: "Kenaran Sun",
+        combatValue: 6,
+        combatRolls: 2,
+        sustainDamage: 2,
+    },
+    [Faction.FEDERATION_OF_SOL]: {
+        ...unitDefinitions[UnitType.Flagship],
+        flagshipName: "Genesis I",
+        combatValue: 5,
+        combatRolls: 2,
+        sustainDamage: 2,
+    },
+    [Faction.MENTAK_COALITION]: {
+        ...unitDefinitions[UnitType.Flagship],
+        flagshipName: "Fourth Moon",
+        combatValue: 4,
+        combatRolls: 2,
+        sustainDamage: 1,
+        preCombatShots: 1,
+    },
+    [Faction.NAALU_COLLECTIVE]: {
+        ...unitDefinitions[UnitType.Flagship],
+        flagshipName: "The Matriarch",
+        combatValue: 6,
+        combatRolls: 2,
+        sustainDamage: 1,
+        notes: "Protect half of your fighters against AFB",
+        nyi: true,
+    },
+    [Faction.KROTOAN_VIRUS]: {
+        ...unitDefinitions[UnitType.Flagship],
+        flagshipName: "The Alastor",
+        combatValue: 6,
+        combatRolls: 1,
+        sustainDamage: 1,
+        notes: "Reanimate a destroyed opposing ship after every round",
+        nyi: true,
+    },
+    [Faction.HIVES_OF_SARDAKK_NORR]: {
+        ...unitDefinitions[UnitType.Flagship],
+        flagshipName: "C'morran Norr",
+        combatValue: 6,
+        combatRolls: 2,
+        sustainDamage: 1,
+        spaceCannon: 1,
+        notes: "+1 to all combat rolls as attacker",
+        nyi: true,
+    },
+    [Faction.UNIVERSITIES_OF_JOLNAR]: {
+        ...unitDefinitions[UnitType.Flagship],
+        flagshipName: "J.N.S Hylarim",
+        combatValue: 2,
+        combatRolls: 1,
+        sustainDamage: 1,
+        notes: "Cancel opponent's technologies",
+        nyi: true,
+    },
+    [Faction.WINNU_SOVEREIGNTY]: {
+        ...unitDefinitions[UnitType.Flagship],
+        flagshipName: "Salai Sai Corian",
+        combatValue: 8,
+        combatRolls: 4,
+        sustainDamage: 1,
+        notes: "Force opponent to reroll one die",
+        nyi: true,
+    },
+    [Faction.XXCHA_KINGDOM]: {
+        ...unitDefinitions[UnitType.Flagship],
+        flagshipName: "Loncara Ssodu",
+        combatValue: 6,
+        combatRolls: 2,
+        sustainDamage: 3,
+    },
+    [Faction.TRIBES_OF_YSSARIL]: {
+        ...unitDefinitions[UnitType.Flagship],
+        flagshipName: "Y'sia Y'ssrila",
+        combatValue: 6,
+        combatRolls: 1,
+        sustainDamage: 1,
+        preCombatShots: 3,
+        notes: "Fleet does not trigger space mines and space cannons",
+        nyi: true,
+    },
+    [Faction.YIN_BROTHERHOOD]: {
+        ...unitDefinitions[UnitType.Flagship],
+        flagshipName: "Van Hauge",
+        combatValue: 5,
+        combatRolls: 2,
+        sustainDamage: 1,
+        antiFigherBarrage: 1,
+        notes: "Ground forces on board function as fighters",
+        nyi: true,
+    },
+    [Faction.EMBERS_OF_MUAAT]: {
+        ...unitDefinitions[UnitType.Flagship],
+        flagshipName: "The Inferno",
+        combatValue: 6,
+        combatRolls: 1,
+        sustainDamage: 1,
+        antiFigherBarrage: 3,
+        notes: "Has combat dice equal to the number of non-fighter ships in the opposing fleet",
+        nyi: true,
+    },
+    [Faction.GHOSTS_OF_CREUSS]: {
+        ...unitDefinitions[UnitType.Flagship],
+        flagshipName: "Hil Colish",
+        combatValue: 4,
+        combatRolls: 1,
+        sustainDamage: 1,
+    },
+    [Faction.LIZIX_MINDNET]: {
+        ...unitDefinitions[UnitType.Flagship],
+        flagshipName: "0.0.1",
+        combatValue: 5,
+        combatRolls: 3,
+        sustainDamage: 2,
+        spaceCannon: 1,
+        notes: "Hits must be taken by non-fighter ships",
+        nyi: true,
+    },
+    [Faction.ARBOREC_ECOSYSTEM]: {
+        ...unitDefinitions[UnitType.Flagship],
+        flagshipName: "Duha Menaimon",
+        combatValue: 6,
+        combatRolls: 2,
+        sustainDamage: 2,
+    },
+    [Faction.ORDER_OF_THE_LAST]: {
+        ...unitDefinitions[UnitType.Flagship],
+        flagshipName: "Last Chance",
+        combatValue: 7,
+        combatRolls: 2,
+        sustainDamage: 1,
+        antiFigherBarrage: 1,
+        bombardment: 1,
     },
 };
