@@ -184,13 +184,11 @@ export function getUnitSnapshots(
     const participant: ParticipantState = combatState[role];
     for (let unit of participant.units) {
         const def: UnitDefinition = unit.type === UnitType.Flagship ? flagshipDefinitions[input[role].faction] : unitDefinitions[unit.type];
-        const baseRolls: number = getCombatRollsForStage(def, stage);
-        const rolls: number = baseRolls === 0 ? 0 : max([baseRolls - unit.sustainedHits, 1])!;
         unitSnapshots.push({
             base: unit,
             type: unit.type,
             combatValue: def.combatValue,
-            rolls: rolls,
+            rolls: getCombatRollsForStage(def, stage),
             hitType: getHitTypeForStage(def, stage),
             nonStandardRolls: [],
             sustainDamage: def.sustainDamage,
@@ -201,6 +199,7 @@ export function getUnitSnapshots(
     applyUnitSnapshotParticipantTags(combatState, input, role, stage, unitSnapshots);
     applyUnitSnapshotUnitTags(combatState, input, role, stage, unitSnapshots);
     applyOpponentUnitSnapshotParticipantTags(combatState, input, getOpponentRole(role), stage, unitSnapshots);
+    adjustCombatRollsForSustainDamage(unitSnapshots);
     return unitSnapshots;
 }
 
@@ -344,6 +343,14 @@ function getHitTypeForStage(def: UnitDefinition, stage: CombatStage): HitType {
             return HitType.AssignToFighter;
     }
     return HitType.Normal;
+}
+
+function adjustCombatRollsForSustainDamage(units: ComputedUnitSnapshot[]) {
+    for (let unit of units) {
+        if (unit.rolls > 0 && unit.sustainedHits > 0) {
+            unit.rolls = max([unit.rolls - unit.sustainedHits, 1])!;
+        }
+    }
 }
 
 function calculateHits(units: ComputedUnitSnapshot[]): HitsProbabilityOutcome[] {

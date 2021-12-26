@@ -469,8 +469,8 @@ export const flagshipDefinitions: KeyedDictionary<Faction, FlagshipDefinition> =
         combatRolls: 2,
         sustainDamage: 1,
         spaceCannon: 1,
+        effect: effects.sardakkFlagship,
         notes: "+1 to all combat rolls as attacker",
-        nyi: true,
     },
     [Faction.UNIVERSITIES_OF_JOLNAR]: {
         ...unitDefinitions[UnitType.Flagship],
@@ -504,8 +504,8 @@ export const flagshipDefinitions: KeyedDictionary<Faction, FlagshipDefinition> =
         combatRolls: 1,
         sustainDamage: 1,
         preCombatShots: 3,
+        effect: effects.yssarilFlagship,
         notes: "Fleet does not trigger space mines and space cannons",
-        nyi: true,
     },
     [Faction.YIN_BROTHERHOOD]: {
         ...unitDefinitions[UnitType.Flagship],
@@ -524,8 +524,8 @@ export const flagshipDefinitions: KeyedDictionary<Faction, FlagshipDefinition> =
         combatRolls: 1,
         sustainDamage: 1,
         antiFigherBarrage: 3,
+        effect: effects.muaatFlagship,
         notes: "Has combat dice equal to the number of non-fighter ships in the opposing fleet",
-        nyi: true,
     },
     [Faction.GHOSTS_OF_CREUSS]: {
         ...unitDefinitions[UnitType.Flagship],
