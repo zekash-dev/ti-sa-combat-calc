@@ -30,17 +30,24 @@ The next priority is to add support for invasion combat.
 5. PDS fire
 6. Bombardment
 
-### 3. Quality of life improvements
+### 3. Feature requests
+
+Community feature requests
+
+1. Hit assignment protocols (for example designating a specific unit to save until last)
+2. Casualty result view (probability of X number of units surviving)
+
+### 4. Quality of life improvements
 
 Improvements that increase the usability of the calculator
 
 1. Swap attacker and defender
-2. Assign default technologies when switching faction
+2. Assign default technologies when switching faction (reset other techs)
 3. Pick any faction upgrade as Virus
 4. Save input states (in-browser storage)
 5. _&lt;other improvements depending on feedback&gt;_
 
-### 4. Rare and complicated effects
+### 5. Rare and complicated effects
 
 Effects that come up rarely or are complicated to implement
 

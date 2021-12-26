@@ -244,13 +244,6 @@ export const technologyResources: KeyedDictionary<Technology, TechnologyResource
         type: TechnologyType.GREEN,
         implementation: false,
     },
-    [Technology.DACXIVE_ANIMATORS]: {
-        name: "Dacxive animators",
-        shortName: "DAX",
-        color: technologyColors[TechnologyType.GREEN],
-        type: TechnologyType.GREEN,
-        implementation: false,
-    },
     [Technology.X89_BACTERIAL_WEAPON]: {
         name: "X-89 bacterial weapon",
         shortName: "X89",
