@@ -18,7 +18,6 @@ import {
     FactionResources,
     FactionUpgrade,
     FlagshipTag,
-    JolnarRerollStrategy,
     ParticipantTag,
     ParticipantTagResources,
     Technology,
@@ -41,7 +40,7 @@ export function grantDefaultFactionAbilities(participantTags: ParticipantInputTa
         delete newTags[oldAbility];
     }
     for (let newAbility of defaultFactionAbilities[faction]) {
-        newTags[newAbility] = getDefaultFactionAbilityValue(newAbility);
+        newTags[newAbility] = getParticipantTagDefaultValue(newAbility);
     }
     return newTags;
 }
@@ -132,19 +131,9 @@ export const availableFactionUpgrades: KeyedDictionary<Faction, FactionUpgrade[]
     [Faction.ORDER_OF_THE_LAST]: [FactionUpgrade.ORDER_CHRONOS_FIELD],
 };
 
-export function getDefaultFactionAbilityValue<T extends ParticipantTag>(factionAbility: T): any {
-    switch (factionAbility) {
-        case FactionAbility.JOLNAR_REROLL:
-            return JOLNAR_REROLL_DEFAULT;
-        default:
-            return true;
-    }
+export function getParticipantTagDefaultValue<T extends ParticipantTag>(tag: T): any {
+    return participantTagResources[tag].defaultSettings ?? true;
 }
-
-const JOLNAR_REROLL_DEFAULT: JolnarRerollStrategy = {
-    maxRerolls: 0,
-    combatValueBreakpoint: 7,
-};
 
 export const factionResources: KeyedDictionary<Faction, FactionResources> = {
     [Faction.BARONY_OF_LETNEV]: { name: "The Barony of Letnev", color: "#909090" },
@@ -355,7 +344,8 @@ const factionUpgradeResources: KeyedDictionary<FactionUpgrade, ParticipantTagRes
     [FactionUpgrade.MENTAK_ADAPTABLE_ORDNANCE_RIGS]: {
         name: "Adaptable ordnance rigs",
         color: factionResources[Faction.MENTAK_COALITION].color,
-        implementation: false,
+        implementation: effects.mentakAdaptableOrdnanceRigs,
+        defaultSettings: effects.mentakAdaptableOrdnanceRigsDefaultSettings,
     },
     [FactionUpgrade.SARDAKK_BERZERKER_GENOME]: {
         name: "Berzerker genome",

@@ -163,6 +163,10 @@ export class UnitState {
         };
     }
 
+    public hasTagValue(tag: number, value: number): boolean {
+        return !!this.tags && this.tags[tag] === value;
+    }
+
     public static compare(a: UnitState, b: UnitState): number {
         if (a.hash !== b.hash) return a.hash - b.hash;
         if (a.type !== b.type) return a.type - b.type;

@@ -11,6 +11,7 @@ export * from "./jolnarUnitMod";
 export * from "./lizixDreadnoughtMod";
 export * from "./magenDefenseGrid";
 export * from "./maneuveringJets";
+export * from "./mentakAdaptableOrdnanceRigs";
 export * from "./mentakPreCombatShots";
 export * from "./muaatFlagship";
 export * from "./naaluFighterMod";

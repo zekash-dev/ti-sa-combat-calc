@@ -49,5 +49,3 @@ export const theme: Theme = createTheme({
         },
     },
 });
-
-console.log(theme);

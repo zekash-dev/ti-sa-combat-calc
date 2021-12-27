@@ -1,22 +1,28 @@
-import { CheckBox, CheckBoxOutlineBlank } from "@mui/icons-material";
+import { CheckBox, CheckBoxOutlineBlank, SubdirectoryArrowRight } from "@mui/icons-material";
 import { ListItem, ListItemIcon, ListItemText, Tooltip, Typography } from "@mui/material";
+import { useCallback } from "react";
 
-import { participantTagResources } from "logic/participant";
+import { participantTagSettingsUi } from "components/effectSettings";
+import { getParticipantTagDefaultValue, participantTagResources } from "logic/participant";
+import { ParticipantInput } from "model/calculation";
 import { ParticipantTag, ParticipantTagResources } from "model/combatTags";
+import { ParticipantTagCustomSettingsUiProps } from "model/effects";
 import { ParticipantTagBadge } from "./ParticipantTagBadge";
 
 interface Props {
+    participant: ParticipantInput;
     tag: ParticipantTag;
     icon?: JSX.Element;
     iconBadge?: string;
-    selected: boolean;
     open: boolean;
-    onToggle: (key: ParticipantTag) => void;
+    onChange: (key: ParticipantTag, selected: boolean, value?: any) => void;
 }
 
-export function ParticipantTagListItem({ tag, icon, iconBadge, selected, open, onToggle }: Props) {
+export function ParticipantTagListItem({ participant, tag, icon, iconBadge, open, onChange }: Props) {
     const tagResources: ParticipantTagResources = participantTagResources[tag];
+    const SettingsUi: React.FC<ParticipantTagCustomSettingsUiProps> | undefined = participantTagSettingsUi[tag];
     const tagTitle: string = (tagResources.implementation ? "" : "[NYI] ") + tagResources.name;
+    const selected: boolean = participant.tags[tag] !== undefined;
 
     let iconElement: JSX.Element | undefined = undefined;
     if (icon) {
@@ -26,8 +32,23 @@ export function ParticipantTagListItem({ tag, icon, iconBadge, selected, open, o
         }
     }
 
-    const listItem: JSX.Element = (
-        <ListItem button disabled={!tagResources.implementation} disableRipple onClick={() => onToggle(tag)} disableGutters>
+    const onToggle = useCallback(() => {
+        if (selected) {
+            onChange(tag, false);
+        } else {
+            onChange(tag, true, getParticipantTagDefaultValue(tag));
+        }
+    }, [onChange, tag, selected]);
+
+    const onSettingsChange = useCallback(
+        (newSettings: any) => {
+            onChange(tag, true, newSettings);
+        },
+        [onChange, tag]
+    );
+
+    let listItem: JSX.Element = (
+        <ListItem button disabled={!tagResources.implementation} disableRipple onClick={onToggle} disableGutters>
             {iconElement}
             {open && (
                 <>
@@ -36,19 +57,39 @@ export function ParticipantTagListItem({ tag, icon, iconBadge, selected, open, o
                             {tagTitle}
                         </Typography>
                     </ListItemText>
-                    {!!tagResources.implementation && <ListItemIcon>{selected ? <CheckBox /> : <CheckBoxOutlineBlank />}</ListItemIcon>}
+                    {!!tagResources.implementation && (
+                        <ListItemIcon>{selected ? <CheckBox color="primary" /> : <CheckBoxOutlineBlank color="disabled" />}</ListItemIcon>
+                    )}
                 </>
             )}
         </ListItem>
     );
 
     if (!open) {
-        return (
+        listItem = (
             <Tooltip title={tagTitle} placement="right">
                 <span>{listItem}</span>
             </Tooltip>
         );
-    } else {
-        return listItem;
     }
+
+    if (SettingsUi && open && selected) {
+        listItem = (
+            <div style={{ backgroundColor: "rgba(255, 255, 255, 0.05)" }}>
+                {listItem}
+                <ListItem disableGutters>
+                    <ListItemIcon>
+                        <SubdirectoryArrowRight
+                            sx={{
+                                marginLeft: "auto",
+                                marginRight: "auto",
+                            }}
+                        />
+                    </ListItemIcon>
+                    <ListItemText>{<SettingsUi settings={participant.tags[tag]} onSettingsChange={onSettingsChange} />}</ListItemText>
+                </ListItem>
+            </div>
+        );
+    }
+    return listItem;
 }

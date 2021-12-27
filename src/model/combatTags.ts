@@ -90,11 +90,6 @@ export const technologies: Technology[] = getAllEnumValues<Technology>(Technolog
 
 export type ParticipantTag = FactionAbility | FactionUpgrade | Technology | CommonParticipantTag | FlagshipTag;
 
-export interface JolnarRerollStrategy {
-    maxRerolls: number;
-    combatValueBreakpoint: number;
-}
-
 export enum UnitTag {
     ADMIRAL = 901,
     SCIENTIST = 902,
@@ -117,6 +112,7 @@ export interface ParticipantTagResources {
     icon?: JSX.Element;
     color: string;
     implementation: false | ParticipantTagImplementation;
+    defaultSettings?: any;
 }
 
 export interface TechnologyResources extends ParticipantTagResources {

@@ -1,0 +1,1 @@
+export { participantTagSettingsUi } from "./componentDictionary";

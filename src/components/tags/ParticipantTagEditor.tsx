@@ -5,13 +5,7 @@ import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 import { FactionImage } from "components/graphics";
-import {
-    availableFactionUpgrades,
-    defaultFactionAbilities,
-    factionResources,
-    getDefaultFactionAbilityValue,
-    technologyResources,
-} from "logic/participant";
+import { availableFactionUpgrades, defaultFactionAbilities, factionResources, technologyResources } from "logic/participant";
 import { ParticipantInput, ParticipantRole } from "model/calculation";
 import {
     CommonParticipantTag,
@@ -69,19 +63,21 @@ function DrawerContent({ role, open }: DrawerContentProps) {
     const factionUpgrades: FactionUpgrade[] = availableFactionUpgrades[participant.faction];
 
     const handleSelectFaction = (newValue: Faction) => dispatch(setFaction({ role: role, faction: newValue }));
-    const toggleParticipantTag = (tag: ParticipantTag) => () => {
-        if (participant.tags[tag] !== undefined) {
-            dispatch(unsetParticipantTag({ role, key: tag }));
+    const handleTagChanged = (tag: ParticipantTag, selected: boolean, value: any) => {
+        if (selected) {
+            dispatch(setParticipantTag({ role, key: tag, value }));
         } else {
-            dispatch(setParticipantTag({ role, key: tag, value: getDefaultFactionAbilityValue(tag) }));
+            dispatch(unsetParticipantTag({ role, key: tag }));
         }
     };
     return (
         <>
             <List dense>
-                <ListItem sx={{ visibility: open ? "visible" : "hidden" }}>
-                    <ListItemText>Faction</ListItemText>
-                </ListItem>
+                {open && (
+                    <ListItem>
+                        <ListItemText>Faction</ListItemText>
+                    </ListItem>
+                )}
                 <ListItem button disableRipple disableGutters onClick={openFactionDialog}>
                     <ListItemIcon>
                         <FactionImage faction={participant.faction} style={{ width: "30px", marginLeft: "auto", marginRight: "auto" }} />
@@ -97,48 +93,55 @@ function DrawerContent({ role, open }: DrawerContentProps) {
                 {factionAbilities.map((tag: FactionAbility) => (
                     <ParticipantTagListItem
                         key={tag}
+                        participant={participant}
                         tag={tag}
                         icon={<TagStarIcon tag={tag} selected={participant.tags[tag] !== undefined} />}
-                        selected={participant.tags[tag] !== undefined}
                         open={open}
-                        onToggle={toggleParticipantTag(tag)}
+                        onChange={handleTagChanged}
                     />
                 ))}
                 {factionUpgrades.length > 0 && (
                     <>
-                        <ListItem sx={{ visibility: open ? "visible" : "hidden" }}>
-                            <ListItemText>Faction upgrades</ListItemText>
-                        </ListItem>
+                        {open && (
+                            <ListItem>
+                                <ListItemText>Faction upgrades</ListItemText>
+                            </ListItem>
+                        )}
                         {factionUpgrades.map((tag: FactionUpgrade) => (
                             <ParticipantTagListItem
                                 key={tag}
+                                participant={participant}
                                 tag={tag}
                                 icon={<TagStarIcon tag={tag} selected={participant.tags[tag] !== undefined} />}
-                                selected={participant.tags[tag] !== undefined}
                                 open={open}
-                                onToggle={toggleParticipantTag(tag)}
+                                onChange={handleTagChanged}
                             />
                         ))}
                     </>
                 )}
-                <ListItem sx={{ visibility: open ? "visible" : "hidden" }}>
-                    <ListItemText>Technologies</ListItemText>
-                </ListItem>
+                {open && (
+                    <ListItem>
+                        <ListItemText>Technologies</ListItemText>
+                    </ListItem>
+                )}
                 {technologies.map((tag: Technology) => (
                     <ParticipantTagListItem
                         key={tag}
+                        participant={participant}
                         tag={tag}
                         icon={<TechnologyIcon tag={tag} selected={participant.tags[tag] !== undefined} />}
                         iconBadge={technologyResources[tag].shortName}
-                        selected={participant.tags[tag] !== undefined}
                         open={open}
-                        onToggle={toggleParticipantTag(tag)}
+                        onChange={handleTagChanged}
                     />
                 ))}
-                <ListItem sx={{ visibility: open ? "visible" : "hidden" }}>
-                    <ListItemText>Other</ListItemText>
-                </ListItem>
+                {open && (
+                    <ListItem>
+                        <ListItemText>Other</ListItemText>
+                    </ListItem>
+                )}
                 <ParticipantTagListItem
+                    participant={participant}
                     tag={CommonParticipantTag.HIGH_ALERT_TOKEN}
                     icon={
                         <CommonParticipantTagIcon
@@ -146,9 +149,8 @@ function DrawerContent({ role, open }: DrawerContentProps) {
                             selected={participant.tags[CommonParticipantTag.HIGH_ALERT_TOKEN] !== undefined}
                         />
                     }
-                    selected={participant.tags[CommonParticipantTag.HIGH_ALERT_TOKEN] !== undefined}
                     open={open}
-                    onToggle={toggleParticipantTag(CommonParticipantTag.HIGH_ALERT_TOKEN)}
+                    onChange={handleTagChanged}
                 />
             </List>
             <SelectFactionDialog

@@ -21,8 +21,14 @@ export interface PreAssignHitsInput {
 
 export interface PreAssignHitsOutput {
     newHits?: SparseDictionary<HitType, number>;
+    newUnits?: ComputedUnitSnapshot[];
     newTagState?: number | undefined;
     // newCombatState?: CombatState | undefined;
+}
+
+export interface ParticipantTagCustomSettingsUiProps<T = any> {
+    settings: T;
+    onSettingsChange: (newSettings: T) => void;
 }
 
 export interface ParticipantTagImplementation {

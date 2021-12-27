@@ -18,7 +18,7 @@ describe(FactionAbility[FactionAbility.MENTAK_PRECOMBAT_SHOTS], () => {
                 mockUnit({ type: UnitType.Destroyer, rolls: 0 }),
                 mockUnit({ type: UnitType.Destroyer, rolls: 0 }),
             ],
-        };
+        } as ParticipantOnComputeSnapshotInput;
 
         const expectedUnits: ComputedUnitSnapshot[] = [
             mockUnit({ type: UnitType.Cruiser, rolls: 1 }),
@@ -41,7 +41,7 @@ describe(FactionAbility[FactionAbility.MENTAK_PRECOMBAT_SHOTS], () => {
                 mockUnit({ type: UnitType.Destroyer, rolls: 0 }),
                 mockUnit({ type: UnitType.Destroyer, rolls: 0 }),
             ],
-        };
+        } as ParticipantOnComputeSnapshotInput;
 
         const expectedUnits: ComputedUnitSnapshot[] = [
             mockUnit({ type: UnitType.Cruiser, rolls: 1 }),
