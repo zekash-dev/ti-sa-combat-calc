@@ -1,3 +1,4 @@
+import { enumerateHitTypesByPriorityOrder } from "logic/calculator";
 import { CombatStage, HitType, ParticipantRole } from "model/calculation";
 import { ComputedUnitSnapshot, UnitState } from "model/combatState";
 import { FactionUpgrade } from "model/combatTags";
@@ -72,7 +73,8 @@ interface SustainHitOutput {
 }
 
 function sustainHitIfRequired(hits: SparseDictionary<HitType, number>, unit: ComputedUnitSnapshot): SustainHitOutput | undefined {
-    for (let hitType of cancelHitPriorityOrder) {
+    const orderedHitTypes: HitType[] = enumerateHitTypesByPriorityOrder(hits, cancelHitPriorityOrder);
+    for (let hitType of orderedHitTypes) {
         const hitsOfType: number | undefined = hits[hitType];
         if (hitsOfType === undefined || hitsOfType === 0) continue; // No hits of type
 
@@ -96,4 +98,4 @@ function sustainHitIfRequired(hits: SparseDictionary<HitType, number>, unit: Com
     return undefined;
 }
 
-const cancelHitPriorityOrder: HitType[] = [HitType.Normal];
+const cancelHitPriorityOrder: HitType[] = [HitType.AssignToNonFighterFirst, HitType.AssignToNonFighter, HitType.Normal];

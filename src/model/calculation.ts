@@ -102,12 +102,31 @@ export enum HitType {
     /**
      * Normal hit that can be assigned to any unit.
      */
-    Normal = 1,
+    Normal = 0b0001,
 
     /**
      * Hit that can only be assigned to a fighter, for example from AFB.
      */
-    AssignToFighter = 2,
+    AssignToFighter = 0b0010,
+
+    /**
+     * Hit that can only be assigned to a non-fighter, for example Dimensional Splicer
+     */
+    AssignToNonFighter = 0b0011,
+
+    /**
+     * Hit that must be assigned to a non-fighter if possible, for example L1z1x flagship
+     */
+    AssignToNonFighterFirst = 0b0100,
+}
+
+export const HIT_TYPE_BITMASK = 0b00111111;
+
+export enum HitTypeFlags {
+    /**
+     * Flag applied to hits that are not caused by combat rolls (and thus can't be negated by e.g. Impulsion Shields)
+     */
+    NotCombatRoll = 0b01000000,
 }
 
 export interface HitsProbabilityOutcome {

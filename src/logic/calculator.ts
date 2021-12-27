@@ -12,6 +12,7 @@ import {
     CombatVictor,
     HitsProbabilityOutcome,
     HitType,
+    HIT_TYPE_BITMASK,
     ParticipantInput,
     ParticipantRole,
     UnitInput,
@@ -556,11 +557,11 @@ function assignHit(units: ComputedUnitSnapshot[], hitType: HitType, combatType: 
  */
 export function determineHitTarget(units: ComputedUnitSnapshot[], hitType: HitType, combatType: CombatType): number {
     let maxPrioIndex: number = -1;
-    let maxPrioValue: number = -1;
+    let maxPrioValue: number = NaN;
     for (let i = 0; i < units.length; i++) {
         if (!canAssignHitToUnit(units[i], hitType, combatType)) continue;
-        const prio = calculateHitPriority(units[i]);
-        if (prio > maxPrioValue) {
+        const prio = calculateHitPriority(units[i], hitType);
+        if (isNaN(maxPrioValue) || prio > maxPrioValue) {
             maxPrioIndex = i;
             maxPrioValue = prio;
         }
@@ -571,10 +572,14 @@ export function determineHitTarget(units: ComputedUnitSnapshot[], hitType: HitTy
 function canAssignHitToUnit(unit: ComputedUnitSnapshot, hitType: HitType, combatType: CombatType): boolean {
     if (!unitIsCombatant(unit.type, combatType)) return false;
 
-    switch (hitType) {
+    switch (hitType & HIT_TYPE_BITMASK) {
         case HitType.AssignToFighter:
             return unit.type === UnitType.Fighter;
+        case HitType.AssignToNonFighter:
+            return unit.type !== UnitType.Fighter;
+        case HitType.AssignToNonFighterFirst:
         case HitType.Normal:
+        default:
             return true;
     }
 }
@@ -583,12 +588,29 @@ export function unitIsCombatant(unitType: UnitType, combatType: CombatType): boo
     return unitDefinitions[unitType].combatantIn.includes(combatType);
 }
 
-function calculateHitPriority(unit: ComputedUnitSnapshot): number {
+function calculateHitPriority(unit: ComputedUnitSnapshot, hitType: HitType): number {
     let priority: number = unit.combatValue;
+    if (hitType === HitType.AssignToNonFighterFirst && unit.type === UnitType.Fighter) {
+        priority -= 100;
+    }
     if (canSustainWithoutDying(unit)) {
         priority += 10;
     }
     return priority;
+}
+
+export const defaultCancelHitPriorityOrder: HitType[] = [
+    HitType.AssignToNonFighterFirst,
+    HitType.AssignToNonFighter,
+    HitType.Normal,
+    HitType.AssignToFighter,
+];
+
+export function enumerateHitTypesByPriorityOrder(hits: SparseDictionary<HitType, number>, priorityOrder: HitType[]): HitType[] {
+    return Object.keys(hits)
+        .map((s) => Number(s) as HitType)
+        .filter((hitType: HitType) => priorityOrder.includes(hitType & HIT_TYPE_BITMASK))
+        .sort((a: HitType, b: HitType) => priorityOrder.indexOf(a & HIT_TYPE_BITMASK) - priorityOrder.indexOf(b & HIT_TYPE_BITMASK));
 }
 
 function canSustainWithoutDying(unit: ComputedUnitSnapshot): boolean {

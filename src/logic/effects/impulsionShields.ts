@@ -1,5 +1,5 @@
-import { determineHitTarget } from "logic/calculator";
-import { HitType, ParticipantRole } from "model/calculation";
+import { defaultCancelHitPriorityOrder, determineHitTarget, enumerateHitTypesByPriorityOrder } from "logic/calculator";
+import { HitType, HitTypeFlags, ParticipantRole } from "model/calculation";
 import { ParticipantTagImplementation, PreAssignHitsInput, PreAssignHitsOutput } from "model/effects";
 
 export const impulsionShields: ParticipantTagImplementation = {
@@ -8,7 +8,11 @@ export const impulsionShields: ParticipantTagImplementation = {
         if (!canCancelHit) {
             return {};
         }
-        for (let hitType of cancelHitPriorityOrder) {
+        const orderedHitTypes: HitType[] = enumerateHitTypesByPriorityOrder(hits, defaultCancelHitPriorityOrder);
+        for (let hitType of orderedHitTypes) {
+            // Can't cancel hits not scored by combat rolls
+            if (hitType & HitTypeFlags.NotCombatRoll) continue;
+
             const hitsOfType: number | undefined = hits[hitType];
             if (hitsOfType === undefined || hitsOfType === 0) continue; // No hits of type
             if (determineHitTarget(units, hitType, calculationInput.combatType) === -1) continue; // Hit of type can't be assigned to any of your units
@@ -25,5 +29,3 @@ export const impulsionShields: ParticipantTagImplementation = {
         return {};
     },
 };
-
-const cancelHitPriorityOrder: HitType[] = [HitType.Normal, HitType.AssignToFighter];
