@@ -2,6 +2,7 @@ export * from "./admiral";
 export * from "./advancedFighters";
 export * from "./assaultCannons";
 export * from "./automatedTurrets";
+export * from "./creussDimensionalSplicer";
 export * from "./cybernetics";
 export * from "./gravitonLaserSystem";
 export * from "./highAlertToken";

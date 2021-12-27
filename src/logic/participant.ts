@@ -401,7 +401,7 @@ const factionUpgradeResources: KeyedDictionary<FactionUpgrade, ParticipantTagRes
         name: "Magmus reactor",
         color: factionResources[Faction.EMBERS_OF_MUAAT].color,
         implementation: effects.muaatMagmusReactor,
-        defaultSettings: effects.muaatMagmusReactorDefaultSettings,
+        defaultSettings: effects.creussDimensionalSplicerDefaultSettings,
     },
     [FactionUpgrade.MUAAT_MAGMA_OBLITERATOR]: {
         name: "Magma obliterator",
@@ -411,7 +411,8 @@ const factionUpgradeResources: KeyedDictionary<FactionUpgrade, ParticipantTagRes
     [FactionUpgrade.CREUSS_DIMENSIONAL_SPLICER]: {
         name: "Dimensional splicer",
         color: factionResources[Faction.GHOSTS_OF_CREUSS].color,
-        implementation: false,
+        implementation: effects.creussDimensionalSplicer,
+        defaultSettings: effects.creussDimensionalSplicerDefaultSettings,
     },
     [FactionUpgrade.ORDER_CHRONOS_FIELD]: {
         name: "Chronos field",

@@ -1,7 +1,7 @@
 import { Switch, TableCell, TableRow, Typography } from "@mui/material";
 
 import { IncrementalNumberInput, UnstyledSmallTable } from "components/common";
-import { MentakAdaptableOrdnanceRigsSettings } from "logic/effects/mentakAdaptableOrdnanceRigs";
+import { MentakAdaptableOrdnanceRigsSettings } from "logic/effects";
 import { ParticipantTagCustomSettingsUiProps } from "model/effects";
 
 export function MentakAdaptableOrdnanceRigs({

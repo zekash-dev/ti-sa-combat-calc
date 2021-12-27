@@ -830,7 +830,7 @@ function createCombatStageOutputs(
                 stage
             ),
         };
-        if (Object.values(statistics).every((stat) => stat.expectedHits === 0)) continue;
+        if (Object.values(statistics).every((stat) => stat.expectedHits === 0 && stat.assignedHits === 0)) continue;
 
         let victorProbabilities: KeyedDictionary<CombatVictor, number> = getVictorProbabilities(input, afterStatesOutput);
         if (previousVictorProbabilities) {
