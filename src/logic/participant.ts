@@ -39,7 +39,16 @@ export function grantDefaultFactionAbilities(participantTags: ParticipantInputTa
     for (let oldAbility of getAllEnumValues<FactionAbility>(FactionAbility)) {
         delete newTags[oldAbility];
     }
+    for (let oldAbility of getAllEnumValues<FactionUpgrade>(FactionUpgrade)) {
+        delete newTags[oldAbility];
+    }
+    for (let oldAbility of getAllEnumValues<Technology>(Technology)) {
+        delete newTags[oldAbility];
+    }
     for (let newAbility of defaultFactionAbilities[faction]) {
+        newTags[newAbility] = getParticipantTagDefaultValue(newAbility);
+    }
+    for (let newAbility of defaultFactionTechnologies[faction]) {
         newTags[newAbility] = getParticipantTagDefaultValue(newAbility);
     }
     return newTags;
@@ -103,6 +112,27 @@ export const defaultFactionAbilities: KeyedDictionary<Faction, FactionAbility[]>
     [Faction.GHOSTS_OF_CREUSS]: [],
     [Faction.LIZIX_MINDNET]: [FactionAbility.LIZIX_DREADNOUGHT_MOD, FactionAbility.LIZIX_GROUND_FORCE_MOD],
     [Faction.ARBOREC_ECOSYSTEM]: [FactionAbility.ARBOREC_GROUND_FORCE_MOD],
+    [Faction.ORDER_OF_THE_LAST]: [],
+};
+
+export const defaultFactionTechnologies: KeyedDictionary<Faction, Technology[]> = {
+    [Faction.BARONY_OF_LETNEV]: [Technology.HYLAR_V_LASER, Technology.IMPULSION_SHIELDS],
+    [Faction.CLAN_OF_SAAR]: [],
+    [Faction.EMIRATES_OF_HACAN]: [],
+    [Faction.FEDERATION_OF_SOL]: [Technology.CYBERNETICS],
+    [Faction.MENTAK_COALITION]: [Technology.HYLAR_V_LASER],
+    [Faction.NAALU_COLLECTIVE]: [],
+    [Faction.KROTOAN_VIRUS]: [Technology.HYLAR_V_LASER, Technology.GEN_SYNTHESIS],
+    [Faction.HIVES_OF_SARDAKK_NORR]: [Technology.HYLAR_V_LASER],
+    [Faction.UNIVERSITIES_OF_JOLNAR]: [Technology.HYLAR_V_LASER],
+    [Faction.WINNU_SOVEREIGNTY]: [],
+    [Faction.XXCHA_KINGDOM]: [],
+    [Faction.TRIBES_OF_YSSARIL]: [Technology.MANEUVERING_JETS],
+    [Faction.YIN_BROTHERHOOD]: [Technology.HYLAR_V_LASER, Technology.AUTOMATED_TURRETS],
+    [Faction.EMBERS_OF_MUAAT]: [Technology.HYLAR_V_LASER],
+    [Faction.GHOSTS_OF_CREUSS]: [],
+    [Faction.LIZIX_MINDNET]: [Technology.CYBERNETICS, Technology.IMPULSION_SHIELDS],
+    [Faction.ARBOREC_ECOSYSTEM]: [],
     [Faction.ORDER_OF_THE_LAST]: [],
 };
 
