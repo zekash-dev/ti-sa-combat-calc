@@ -24,5 +24,6 @@ export * from "./sardakkFlagship";
 export * from "./sardakkUnitMod";
 export * from "./solAdvancedFleetTactics";
 export * from "./solMark2AdvancedCarriers";
+export * from "./xxchaArchonEnergyShell";
 export * from "./xxchaRound1Mod";
 export * from "./yssarilFlagship";

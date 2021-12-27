@@ -385,7 +385,7 @@ const factionUpgradeResources: KeyedDictionary<FactionUpgrade, ParticipantTagRes
     [FactionUpgrade.XXCHA_ARCHON_ENERGY_SHELL]: {
         name: "Archon energy shells",
         color: factionResources[Faction.XXCHA_KINGDOM].color,
-        implementation: false,
+        implementation: effects.xxchaArchonEnergyShell,
     },
     [FactionUpgrade.YIN_BLADE_OF_ZEAL]: {
         name: "Blade of zeal",
