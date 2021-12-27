@@ -400,7 +400,8 @@ const factionUpgradeResources: KeyedDictionary<FactionUpgrade, ParticipantTagRes
     [FactionUpgrade.MUAAT_MAGMUS_REACTOR]: {
         name: "Magmus reactor",
         color: factionResources[Faction.EMBERS_OF_MUAAT].color,
-        implementation: false,
+        implementation: effects.muaatMagmusReactor,
+        defaultSettings: effects.muaatMagmusReactorDefaultSettings,
     },
     [FactionUpgrade.MUAAT_MAGMA_OBLITERATOR]: {
         name: "Magma obliterator",

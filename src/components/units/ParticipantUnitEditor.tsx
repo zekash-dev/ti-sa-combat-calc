@@ -1,7 +1,7 @@
 import { Box, Button, Paper, Table, TableBody, TableCell, TableContainer, TableRow } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 
-import { IncrementalNumberInput } from "components/input";
+import { IncrementalNumberInput } from "components/common";
 import { getSelectableUnitTypes } from "logic/participant";
 import { CalculationInput, CombatType, ParticipantInput, ParticipantRole } from "model/calculation";
 import { unitDefinitions, UnitType } from "model/unit";

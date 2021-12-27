@@ -1,7 +1,6 @@
-import { Switch, Table, TableCell, TableRow, Typography } from "@mui/material";
-import { styled } from "@mui/system";
+import { Switch, TableCell, TableRow, Typography } from "@mui/material";
 
-import { IncrementalNumberInput } from "components/input/IncrementalNumberInput";
+import { IncrementalNumberInput, UnstyledSmallTable } from "components/common";
 import { MentakAdaptableOrdnanceRigsSettings } from "logic/effects/mentakAdaptableOrdnanceRigs";
 import { ParticipantTagCustomSettingsUiProps } from "model/effects";
 
@@ -22,7 +21,7 @@ export function MentakAdaptableOrdnanceRigs({
         });
     };
     return (
-        <UnstyledTable size="small">
+        <UnstyledSmallTable>
             <TableRow>
                 <TableCell>
                     <Typography>Cruisers carrying GF</Typography>
@@ -39,14 +38,6 @@ export function MentakAdaptableOrdnanceRigs({
                     <Switch disableRipple size="small" checked={settings.useSustain} onChange={onToggleUseSustain} />
                 </TableCell>
             </TableRow>
-        </UnstyledTable>
+        </UnstyledSmallTable>
     );
 }
-
-const UnstyledTable = styled(Table)({
-    "& td": {
-        padding: "unset",
-        border: "none",
-        justifyContent: "center",
-    },
-});

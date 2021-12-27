@@ -14,6 +14,7 @@ export * from "./maneuveringJets";
 export * from "./mentakAdaptableOrdnanceRigs";
 export * from "./mentakPreCombatShots";
 export * from "./muaatFlagship";
+export * from "./muaatMagmusReactor";
 export * from "./naaluFighterMod";
 export * from "./naaluFlagship";
 export * from "./saarChaosMapping";
