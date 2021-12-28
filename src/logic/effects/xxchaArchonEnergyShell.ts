@@ -6,7 +6,7 @@ import { ParticipantTagImplementation, PreAssignHitsInput, PreAssignHitsOutput }
 const CANCEL_HIT_LIMIT: number = 2;
 
 export const xxchaArchonEnergyShell: ParticipantTagImplementation = {
-    preAssignHits: ({ calculationInput, role, units, hits, tagState }: PreAssignHitsInput): PreAssignHitsOutput => {
+    preAssignHits: ({ calculationInput, combatState, role, units, hits, tagState }: PreAssignHitsInput): PreAssignHitsOutput => {
         const canCancelHit: boolean = role === ParticipantRole.Defender && (tagState === undefined || tagState < CANCEL_HIT_LIMIT);
         if (!canCancelHit) {
             return {};
@@ -18,7 +18,7 @@ export const xxchaArchonEnergyShell: ParticipantTagImplementation = {
         const orderedHitTypes: HitType[] = enumerateHitTypesByPriorityOrder(hits, defaultCancelHitPriorityOrder);
         for (let hitType of orderedHitTypes) {
             if (newTagState >= CANCEL_HIT_LIMIT) break;
-            if (determineHitTarget(units, hitType, calculationInput.combatType) === -1) continue; // Hit of type can't be assigned to any of your units
+            if (determineHitTarget(combatState, calculationInput, units, hitType) === -1) continue; // Hit of type can't be assigned to any of your units
             while (newTagState < CANCEL_HIT_LIMIT && (newHits[hitType] ?? 0) > 0) {
                 newTagState++;
                 newHits = {

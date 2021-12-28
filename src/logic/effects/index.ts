@@ -18,6 +18,7 @@ export * from "./muaatFlagship";
 export * from "./muaatMagmusReactor";
 export * from "./naaluFighterMod";
 export * from "./naaluFlagship";
+export * from "./planetaryShield";
 export * from "./saarChaosMapping";
 export * from "./sardakkBerzerkerGenome";
 export * from "./sardakkFlagship";

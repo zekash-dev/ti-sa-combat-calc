@@ -188,6 +188,7 @@ export interface ComputedUnitSnapshot {
     nonStandardRolls: NonStandardRoll[];
     sustainDamage: number;
     sustainedHits: number;
+    planetaryShield: number;
     tagEffects: UnitSnapshotTag[];
 }
 

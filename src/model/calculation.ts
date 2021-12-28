@@ -43,6 +43,8 @@ export const combatStagesByCombatType: KeyedDictionary<CombatType, CombatStage[]
     ],
 };
 
+export const combatRoundStages: CombatStage[] = [CombatStage.Round1, CombatStage.Round2, CombatStage.RoundN];
+
 export interface CombatStageResources {
     name: string;
     shortName: string;

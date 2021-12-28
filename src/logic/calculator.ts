@@ -3,6 +3,7 @@ import { clamp, max, round, sum } from "lodash";
 import {
     CalculationInput,
     CalculationOutput,
+    combatRoundStages,
     CombatStage,
     CombatStageOutput,
     CombatStageParticipantStatistics,
@@ -10,9 +11,9 @@ import {
     CombatStateProbabilityOutput,
     CombatType,
     CombatVictor,
+    HIT_TYPE_BITMASK,
     HitsProbabilityOutcome,
     HitType,
-    HIT_TYPE_BITMASK,
     ParticipantInput,
     ParticipantRole,
     UnitInput,
@@ -27,7 +28,7 @@ import {
     ParticipantState,
     UnitState,
 } from "model/combatState";
-import { FlagshipTag, ParticipantTag, UnitTag, UnitTagResources } from "model/combatTags";
+import { ConstantTag, FlagshipTag, ParticipantTag, UnitTag, UnitTagResources } from "model/combatTags";
 import { KeyedDictionary, SparseDictionary } from "model/common";
 import {
     ParticipantOnComputeSnapshotInput,
@@ -189,6 +190,7 @@ export function getUnitSnapshots(
             nonStandardRolls: [],
             sustainDamage: def.sustainDamage,
             sustainedHits: unit.sustainedHits,
+            planetaryShield: def.planetaryShield,
             tagEffects: [],
         });
     }
@@ -311,6 +313,12 @@ function getParticipantTagValues(input: ParticipantInput, state: ParticipantStat
             });
         }
     }
+    values.push({
+        tag: ConstantTag.PLANETARY_SHIELD,
+        implementation: participantTagResources[ConstantTag.PLANETARY_SHIELD].implementation,
+        inputValue: undefined,
+        state: undefined,
+    });
     return values;
 }
 
@@ -425,7 +433,7 @@ function assignHits(
         const hitType: HitType = Number(hitTypeStr);
         const numberOfHits: number = hits[hitType]!;
         for (let i = 0; i < numberOfHits; i++) {
-            assignHit(newUnits, hitType, input.combatType);
+            assignHit(combatState, input, newUnits, hitType);
         }
     }
 
@@ -525,13 +533,13 @@ function applyOpponentPreAssignHitTags(
     };
 }
 
-function assignHit(units: ComputedUnitSnapshot[], hitType: HitType, combatType: CombatType) {
-    const hitIndex: number = determineHitTarget(units, hitType, combatType);
+function assignHit(combatState: CombatState, input: CalculationInput, units: ComputedUnitSnapshot[], hitType: HitType) {
+    const hitIndex: number = determineHitTarget(combatState, input, units, hitType);
     if (hitIndex !== -1) {
         // account for "can't assign fighter hits" etc.? Loop list until we find a unit that it can be assigned to?
         const selectedUnit: ComputedUnitSnapshot | undefined = units[hitIndex];
         if (selectedUnit) {
-            if (!canSustainWithoutDying(selectedUnit)) {
+            if (!canSustainWithoutDying(selectedUnit, combatState.stage)) {
                 units.splice(hitIndex, 1);
             } else {
                 const sustainedHits: number = selectedUnit.sustainedHits + 1;
@@ -554,12 +562,17 @@ function assignHit(units: ComputedUnitSnapshot[], hitType: HitType, combatType: 
  * -1 indicates that no unit can suffer the hit.
  * @param units
  */
-export function determineHitTarget(units: ComputedUnitSnapshot[], hitType: HitType, combatType: CombatType): number {
+export function determineHitTarget(
+    combatState: CombatState,
+    input: CalculationInput,
+    units: ComputedUnitSnapshot[],
+    hitType: HitType
+): number {
     let maxPrioIndex: number = -1;
     let maxPrioValue: number = NaN;
     for (let i = 0; i < units.length; i++) {
-        if (!canAssignHitToUnit(units[i], hitType, combatType)) continue;
-        const prio = calculateHitPriority(units[i], hitType);
+        if (!canAssignHitToUnit(units[i], hitType, input.combatType)) continue;
+        const prio = calculateHitPriority(units[i], hitType, combatState.stage);
         if (isNaN(maxPrioValue) || prio > maxPrioValue) {
             maxPrioIndex = i;
             maxPrioValue = prio;
@@ -587,12 +600,18 @@ export function unitIsCombatant(unitType: UnitType, combatType: CombatType): boo
     return unitDefinitions[unitType].combatantIn.includes(combatType);
 }
 
-function calculateHitPriority(unit: ComputedUnitSnapshot, hitType: HitType): number {
+function calculateHitPriority(unit: ComputedUnitSnapshot, hitType: HitType, stage: CombatStage): number {
     let priority: number = unit.combatValue;
     if (hitType === HitType.AssignToNonFighterFirst && unit.type === UnitType.Fighter) {
         priority -= 100;
     }
-    if (canSustainWithoutDying(unit)) {
+    if (stage === CombatStage.Bombardment && unit.type === UnitType.Mech) {
+        priority -= 100;
+    }
+    if (combatRoundStages.includes(stage) && unit.type === UnitType.ShockTroop) {
+        priority -= 100;
+    }
+    if (canSustainWithoutDying(unit, stage)) {
         priority += 10;
     }
     return priority;
@@ -612,7 +631,9 @@ export function enumerateHitTypesByPriorityOrder(hits: SparseDictionary<HitType,
         .sort((a: HitType, b: HitType) => priorityOrder.indexOf(a & HIT_TYPE_BITMASK) - priorityOrder.indexOf(b & HIT_TYPE_BITMASK));
 }
 
-function canSustainWithoutDying(unit: ComputedUnitSnapshot): boolean {
+function canSustainWithoutDying(unit: ComputedUnitSnapshot, stage: CombatStage): boolean {
+    if (unit.type === UnitType.Mech && stage === CombatStage.Bombardment) return false;
+
     return unit.sustainedHits < unit.sustainDamage;
 }
 

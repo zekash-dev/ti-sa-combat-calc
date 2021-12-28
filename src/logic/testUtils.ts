@@ -12,6 +12,7 @@ export function mockUnit(partial: Partial<ComputedUnitSnapshot> & Pick<ComputedU
         nonStandardRolls: partial.nonStandardRolls ?? [],
         sustainDamage: partial.sustainDamage ?? unitDefinitions[partial.type].sustainDamage,
         sustainedHits: partial.sustainedHits ?? 0,
+        planetaryShield: partial.planetaryShield ?? unitDefinitions[partial.type].planetaryShield,
         tagEffects: partial.tagEffects ?? [],
     };
 }

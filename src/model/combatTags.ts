@@ -86,9 +86,13 @@ export enum FlagshipTag {
     FLAGSHIP = 601,
 }
 
+export enum ConstantTag {
+    PLANETARY_SHIELD = 701,
+}
+
 export const technologies: Technology[] = getAllEnumValues<Technology>(Technology);
 
-export type ParticipantTag = FactionAbility | FactionUpgrade | Technology | CommonParticipantTag | FlagshipTag;
+export type ParticipantTag = FactionAbility | FactionUpgrade | Technology | CommonParticipantTag | FlagshipTag | ConstantTag;
 
 export enum UnitTag {
     ADMIRAL = 901,

@@ -13,6 +13,7 @@ import {
 import { CombatState, ComputedUnitSnapshot } from "model/combatState";
 import {
     CommonParticipantTag,
+    ConstantTag,
     Faction,
     FactionAbility,
     FactionResources,
@@ -453,6 +454,11 @@ export const participantTagResources: KeyedDictionary<ParticipantTag, Participan
         name: "Flagship",
         color: "white",
         implementation: false,
+    },
+    [ConstantTag.PLANETARY_SHIELD]: {
+        name: "Planetary shield",
+        color: "white",
+        implementation: effects.planetaryShield,
     },
 };
 
