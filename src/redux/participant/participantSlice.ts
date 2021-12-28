@@ -321,8 +321,6 @@ function createUnitStageStats(
         sustainDamage: snapshot.sustainDamage,
     };
 
-    if (stageStats.rolls.length === 0) return undefined;
-
     if (
         // If R1/R2 are the same as RoundN, no need to display them separately
         (stage === CombatStage.Round1 || stage === CombatStage.Round2) &&

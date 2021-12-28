@@ -9,6 +9,7 @@ interface Props {
 }
 
 export function UnitStageStatsView({ label, stats }: Props) {
+    if (stats.rolls.length === 0) return null;
     return (
         <Box>
             <Typography variant="body2" sx={{ display: "inline", marginRight: 1 }}>

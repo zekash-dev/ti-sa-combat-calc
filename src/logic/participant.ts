@@ -435,12 +435,12 @@ const commonParticipantTagResources: KeyedDictionary<CommonParticipantTag, Parti
     [CommonParticipantTag.GENERAL]: {
         name: "General",
         color: "white",
-        implementation: false,
+        implementation: effects.general,
     },
     [CommonParticipantTag.AGENT]: {
         name: "Agent",
         color: "white",
-        implementation: false,
+        implementation: effects.agent,
     },
 };
 

@@ -21,10 +21,10 @@ function getImagePath(tag: CommonParticipantTag): string {
             imageName = "highalert.png";
             break;
         case CommonParticipantTag.GENERAL:
-            imageName = "general.png";
+            imageName = "leaders/general.png";
             break;
         case CommonParticipantTag.AGENT:
-            imageName = "agent.png";
+            imageName = "leaders/agent.png";
             break;
     }
     return `${base}/${subfolder}/${imageName}`;

@@ -152,6 +152,30 @@ function DrawerContent({ role, open }: DrawerContentProps) {
                     open={open}
                     onChange={handleTagChanged}
                 />
+                <ParticipantTagListItem
+                    participant={participant}
+                    tag={CommonParticipantTag.GENERAL}
+                    icon={
+                        <CommonParticipantTagIcon
+                            tag={CommonParticipantTag.GENERAL}
+                            selected={participant.tags[CommonParticipantTag.GENERAL] !== undefined}
+                        />
+                    }
+                    open={open}
+                    onChange={handleTagChanged}
+                />
+                <ParticipantTagListItem
+                    participant={participant}
+                    tag={CommonParticipantTag.AGENT}
+                    icon={
+                        <CommonParticipantTagIcon
+                            tag={CommonParticipantTag.AGENT}
+                            selected={participant.tags[CommonParticipantTag.AGENT] !== undefined}
+                        />
+                    }
+                    open={open}
+                    onChange={handleTagChanged}
+                />
             </List>
             <SelectFactionDialog
                 open={factionDialogOpen}

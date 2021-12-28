@@ -29,7 +29,7 @@ export function UnitPopover({ unit, faction, role }: Props) {
             )}
             {Object.keys(unit.byStage).map((stageKey: string) => {
                 const stage: CombatStage = Number(stageKey);
-                return <UnitStageStatsView label={combatStageResources[stage].shortName} stats={unit.byStage[stage]!} />;
+                return <UnitStageStatsView key={stage} label={combatStageResources[stage].shortName} stats={unit.byStage[stage]!} />;
             })}
             {unit.baseline && <UnitStageStatsView label="Combat" stats={unit.baseline} />}
             <UnitAdmiralInput role={role} unit={unit} />
