@@ -2,11 +2,11 @@ import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 import { getInitialState, getUnitSnapshots } from "logic/calculator";
 import { uniqueFilter } from "logic/common";
-import { grantDefaultFactionAbilities, unitSizeComparer } from "logic/participant";
+import { getSelectableUnitTypes, grantDefaultFactionAbilities, unitSizeComparer } from "logic/participant";
 import {
-    allCombatStages,
     CalculationInput,
     CombatStage,
+    combatStagesByCombatType,
     CombatType,
     ParticipantInput,
     ParticipantRole,
@@ -23,10 +23,12 @@ import { UnitType } from "model/unit";
 import { RootState } from "redux/store";
 
 export interface ParticipantSliceState {
+    combatType: CombatType;
     participants: KeyedDictionary<ParticipantRole, ParticipantInput>;
 }
 
 export const initialState: ParticipantSliceState = {
+    combatType: CombatType.SpaceBattle,
     participants: {
         attacker: {
             faction: Faction.EMIRATES_OF_HACAN,
@@ -89,6 +91,11 @@ const participantSlice = createSlice({
     name: "participant",
     initialState: initialState,
     reducers: {
+        setCombatType: (state: ParticipantSliceState, action: PayloadAction<CombatType>) => {
+            state.combatType = action.payload;
+            state.participants.attacker.units = filterBySelectableUnitTypes(state, ParticipantRole.Attacker);
+            state.participants.defender.units = filterBySelectableUnitTypes(state, ParticipantRole.Defender);
+        },
         setFaction: (state: ParticipantSliceState, action: PayloadAction<SetFactionPayload>) => {
             const { role, faction } = action.payload;
             state.participants[role].faction = faction;
@@ -157,6 +164,12 @@ const participantSlice = createSlice({
     },
 });
 
+function filterBySelectableUnitTypes(state: ParticipantSliceState, role: ParticipantRole): UnitInput[] {
+    const calculationInput: CalculationInput = toCalculationInput(state);
+    const selectableUnitTypes: UnitType[] = getSelectableUnitTypes(calculationInput, role);
+    return state.participants[role].units.filter((u: UnitInput) => selectableUnitTypes.includes(u.type));
+}
+
 export function getUnitCount(participant: ParticipantInput, unitType: UnitType): number {
     return participant.units.filter((u) => u.type === unitType).length;
 }
@@ -200,6 +213,7 @@ function determineRemovalIndex(units: UnitInput[], unitType: UnitType): number {
 }
 
 export const {
+    setCombatType,
     setFaction,
     setParticipantTag,
     unsetParticipantTag,
@@ -213,18 +227,21 @@ export const {
     setUnitSustainedHits,
 } = participantSlice.actions;
 
-export const selectparticipantState = (rootState: RootState) => rootState.participant;
-export const selectparticipants = (rootState: RootState): KeyedDictionary<ParticipantRole, ParticipantInput> =>
+export const selectParticipantState = (rootState: RootState) => rootState.participant;
+export const selectCombatType = (rootState: RootState): CombatType => rootState.participant.combatType;
+export const selectParticipants = (rootState: RootState): KeyedDictionary<ParticipantRole, ParticipantInput> =>
     rootState.participant.participants;
 export const selectParticipant = (role: ParticipantRole) => (rootState: RootState) => rootState.participant.participants[role];
 
-export const selectCalculationInput = createSelector([selectparticipantState], (participantState): CalculationInput => {
+export const selectCalculationInput = createSelector([selectParticipantState], toCalculationInput);
+
+function toCalculationInput(sliceState: ParticipantSliceState): CalculationInput {
     return {
-        combatType: CombatType.SpaceBattle,
-        attacker: participantState.participants.attacker,
-        defender: participantState.participants.defender,
+        combatType: sliceState.combatType,
+        attacker: sliceState.participants.attacker,
+        defender: sliceState.participants.defender,
     };
-});
+}
 
 export const selectRichParticipantsInput = createSelector(
     [selectCalculationInput],
@@ -249,8 +266,9 @@ function createRichUnits(calculationInput: CalculationInput, role: ParticipantRo
     const participant: ParticipantInput = calculationInput[role];
     const richUnits: RichUnit[] = [];
     const snapshotsByStage: SparseDictionary<CombatStage, ComputedUnitSnapshot>[] = Array.from(participant.units.map(() => ({})));
+    const combatStages: CombatStage[] = combatStagesByCombatType[calculationInput.combatType];
 
-    for (let stage of allCombatStages) {
+    for (let stage of combatStages) {
         const snapshots: ComputedUnitSnapshot[] = getUnitSnapshots(combatState, calculationInput, role, stage);
         for (let i = 0; i < participant.units.length; i++) {
             snapshotsByStage[i][stage] = snapshots[i];
@@ -262,7 +280,7 @@ function createRichUnits(calculationInput: CalculationInput, role: ParticipantRo
 
         const baseline: UnitStageStats | undefined = createUnitStageStats(snapshots[CombatStage.RoundN], undefined, CombatStage.RoundN);
         const byStage: SparseDictionary<CombatStage, UnitStageStats> = {};
-        for (let stage of allCombatStages.filter((s): s is CombatStage => s !== CombatStage.RoundN)) {
+        for (let stage of combatStages.filter((s): s is CombatStage => s !== CombatStage.RoundN)) {
             const snapshot: ComputedUnitSnapshot | undefined = snapshots[stage];
             if (!snapshot) continue;
             const stageDescription: UnitStageStats | undefined = createUnitStageStats(snapshot, baseline, stage);

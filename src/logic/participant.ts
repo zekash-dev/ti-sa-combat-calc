@@ -54,12 +54,16 @@ export function grantDefaultFactionAbilities(participantTags: ParticipantInputTa
     return newTags;
 }
 
-export function getSelectableUnitTypes(combatType: CombatType, calculationInput: CalculationInput, role: ParticipantRole): UnitType[] {
+export function getSelectableUnitTypes(calculationInput: CalculationInput, role: ParticipantRole): UnitType[] {
     let unitTypes: UnitType[] = Object.values(unitDefinitions)
-        .filter((def) => def.combatantIn.includes(combatType))
+        .filter((def) => def.combatantIn.includes(calculationInput.combatType))
         .map((def) => def.type);
-    if (combatType === CombatType.SpaceBattle) {
+    if (calculationInput.combatType === CombatType.SpaceBattle) {
         unitTypes = union(unitTypes, getUnitTypesWithCombatRollsInStage(calculationInput, role, CombatStage.SpaceCannon));
+    }
+    if (calculationInput.combatType === CombatType.InvasionCombat) {
+        unitTypes = union(unitTypes, getUnitTypesWithCombatRollsInStage(calculationInput, role, CombatStage.Bombardment));
+        unitTypes = union(unitTypes, getUnitTypesWithCombatRollsInStage(calculationInput, role, CombatStage.InvasionDefence));
     }
     return unitTypes;
 }
@@ -628,7 +632,9 @@ export const unitTagResources: KeyedDictionary<UnitTag, UnitTagResources> = {
 
 export const combatStageResources: KeyedDictionary<CombatStage, CombatStageResources> = {
     [CombatStage.SpaceMines]: { name: "Space mines", shortName: "Mines" },
+    [CombatStage.Bombardment]: { name: "Bombardment", shortName: "Bombard" },
     [CombatStage.SpaceCannon]: { name: "PDS fire", shortName: "PDS" },
+    [CombatStage.InvasionDefence]: { name: "Invasion defense", shortName: "PDS" },
     [CombatStage.StartOfBattle]: { name: "Start of battle", shortName: "Start" },
     [CombatStage.AntiFighterBarrage]: { name: "Anti-fighter barrage", shortName: "AFB" },
     [CombatStage.PreCombat]: { name: "Pre-combat abilities", shortName: "Pre-combat" },

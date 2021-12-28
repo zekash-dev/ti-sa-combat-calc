@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { IncrementalNumberInput } from "components/common";
 import { getSelectableUnitTypes } from "logic/participant";
-import { CalculationInput, CombatType, ParticipantInput, ParticipantRole } from "model/calculation";
+import { CalculationInput, ParticipantInput, ParticipantRole } from "model/calculation";
 import { unitDefinitions, UnitType } from "model/unit";
 import {
     clearParticipantUnits,
@@ -24,10 +24,10 @@ export function ParticipantUnitEditor({ role }: Props) {
     const handleSetUnitCount = (unit: UnitType, count: number) => dispatch(setUnitCount({ role, unit, count }));
     const handleClearAllunits = () => dispatch(clearParticipantUnits(role));
 
-    const selectableUnitTypes: UnitType[] = getSelectableUnitTypes(CombatType.SpaceBattle, calculationInput, role);
+    const selectableUnitTypes: UnitType[] = getSelectableUnitTypes(calculationInput, role);
 
     return (
-        <Box sx={{ m: 2 }}>
+        <Box sx={{ m: 2, marginTop: 1 }}>
             <TableContainer component={Paper}>
                 <Table size="small">
                     <TableBody>

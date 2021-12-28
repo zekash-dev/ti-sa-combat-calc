@@ -5,7 +5,7 @@ import { useSelector } from "react-redux";
 import { ParticipantRole, RichParticipantsInput } from "model/calculation";
 import { selectRichParticipantsInput } from "redux/participant/participantSlice";
 import { CalculationTrigger } from "./CalculationTrigger";
-import { FloatingMenu } from "./menu/FloatingMenu";
+import { HeaderMenu } from "./menu/HeaderMenu";
 import { ParticipantsDivider } from "./ParticipantsDivider";
 import { ResultView } from "./results/ResultView";
 import { ParticipantTagEditor } from "./tags/ParticipantTagEditor";
@@ -22,13 +22,25 @@ export function Home() {
             <CalculationTrigger />
             <ParticipantTagEditor location="left" role={ParticipantRole.Attacker} open={attackerOpen} onOpenChange={setAttackerOpen} />
             <ParticipantTagEditor location="right" role={ParticipantRole.Defender} open={defenderOpen} onOpenChange={setDefenderOpen} />
-            <div style={{ margin: "0 72px" }}>
+            <div style={{ margin: "0 56px" }}>
                 <Box sx={{ position: "relative" }}>
                     <Grid container>
                         <Grid item sx={{ width: 290 }}>
                             <Typography variant="h4" color="text.primary" sx={{ textAlign: "center" }}>
                                 {ParticipantRole.Attacker}
                             </Typography>
+                        </Grid>
+                        <Grid item sx={{ width: "calc(100% - 580px)" }}>
+                            <HeaderMenu />
+                        </Grid>
+                        <Grid item sx={{ width: 290 }}>
+                            <Typography variant="h4" color="text.primary" sx={{ textAlign: "center" }}>
+                                {ParticipantRole.Defender}
+                            </Typography>
+                        </Grid>
+                    </Grid>
+                    <Grid container sx={{ position: "relative" }}>
+                        <Grid item sx={{ width: 290 }}>
                             <ParticipantUnitEditor role={ParticipantRole.Attacker} />
                         </Grid>
                         <Grid item sx={{ width: "calc(50% - 290px)" }}>
@@ -44,13 +56,10 @@ export function Home() {
                             />
                         </Grid>
                         <Grid item sx={{ width: 290 }}>
-                            <Typography variant="h4" color="text.primary" sx={{ textAlign: "center" }}>
-                                {ParticipantRole.Defender}
-                            </Typography>
                             <ParticipantUnitEditor role={ParticipantRole.Defender} />
                         </Grid>
+                        <ParticipantsDivider />
                     </Grid>
-                    <ParticipantsDivider />
                 </Box>
                 <Grid container>
                     <Grid item xs={12}>
@@ -58,7 +67,6 @@ export function Home() {
                     </Grid>
                 </Grid>
             </div>
-            <FloatingMenu defenderOpen={defenderOpen} />
         </div>
     );
 }

@@ -7,12 +7,11 @@ const applicableGroundUnitTypes: UnitType[] = [UnitType.Mech, UnitType.GroundFor
 
 /**
  * NYI:
- * * +1 to PDS in Invasion Defense stage
  * * Use Planetary Shield to cancel hits in invasion combat.
  */
 export const magenDefenseGrid: ParticipantTagImplementation = {
     onComputeUnitSnapshots: ({ calculationInput, role, stage, units }: ParticipantOnComputeSnapshotInput) => {
-        if (stage === CombatStage.SpaceCannon) {
+        if (stage === CombatStage.SpaceCannon || stage === CombatStage.InvasionDefence) {
             for (let unit of units.filter((u: ComputedUnitSnapshot) => u.type === UnitType.PDS)) {
                 unit.combatValue--;
             }

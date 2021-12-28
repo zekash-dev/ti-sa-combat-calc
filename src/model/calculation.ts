@@ -1,4 +1,3 @@
-import { getAllEnumValues } from "logic/common";
 import { UnitSnapshotTag } from "./combatState";
 import { Faction, ParticipantTag, UnitTag } from "./combatTags";
 import { KeyedDictionary, SparseDictionary } from "./common";
@@ -11,23 +10,43 @@ export enum CombatType {
 
 export enum CombatStage {
     SpaceMines = 1,
-    SpaceCannon = 2,
-    StartOfBattle = 3,
-    AntiFighterBarrage = 4,
-    PreCombat = 5,
-    Round1 = 6,
-    Round2 = 7,
-    RoundN = 8,
+    Bombardment = 2,
+    SpaceCannon = 3,
+    InvasionDefence = 4,
+    StartOfBattle = 5,
+    AntiFighterBarrage = 6,
+    PreCombat = 7,
+    Round1 = 8,
+    Round2 = 9,
+    RoundN = 10,
 }
 
-export const allCombatStages: CombatStage[] = getAllEnumValues<CombatStage>(CombatStage);
+export const combatStagesByCombatType: KeyedDictionary<CombatType, CombatStage[]> = {
+    [CombatType.SpaceBattle]: [
+        CombatStage.SpaceMines,
+        CombatStage.SpaceCannon,
+        CombatStage.StartOfBattle,
+        CombatStage.AntiFighterBarrage,
+        CombatStage.PreCombat,
+        CombatStage.Round1,
+        CombatStage.Round2,
+        CombatStage.RoundN,
+    ],
+    [CombatType.InvasionCombat]: [
+        CombatStage.Bombardment,
+        CombatStage.InvasionDefence,
+        CombatStage.StartOfBattle,
+        CombatStage.PreCombat,
+        CombatStage.Round1,
+        CombatStage.Round2,
+        CombatStage.RoundN,
+    ],
+};
 
 export interface CombatStageResources {
     name: string;
     shortName: string;
 }
-
-export type IntermediateCombatStage = Omit<CombatStage, CombatStage.RoundN>;
 
 export enum ParticipantRole {
     Attacker = "attacker",
@@ -46,7 +65,6 @@ export interface CalculationOutput {
     victorProbabilities: KeyedDictionary<CombatVictor, number>;
     finalStates: CombatStateProbabilityOutput[];
     stages: SparseDictionary<CombatStage, CombatStageOutput>;
-    // statesByStage: SparseDictionary<CombatStage, CombatStateProbabilityOutput[]>;
 }
 
 export interface CombatStateProbabilityOutput {

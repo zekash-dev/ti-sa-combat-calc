@@ -1,12 +1,12 @@
 import { clamp, max, round, sum } from "lodash";
 
 import {
-    allCombatStages,
     CalculationInput,
     CalculationOutput,
     CombatStage,
     CombatStageOutput,
     CombatStageParticipantStatistics,
+    combatStagesByCombatType,
     CombatStateProbabilityOutput,
     CombatType,
     CombatVictor,
@@ -36,6 +36,7 @@ import {
     UnitOnComputeSnapshotInput,
 } from "model/effects";
 import { UnitDefinition, unitDefinitions, UnitType } from "model/unit";
+import { equalsZero } from "./common";
 import { flagshipDefinitions, getOpponentRole, participantTagResources, unitTagResources } from "./participant";
 
 export function calculateCombatOutcome(input: CalculationInput): CalculationOutput | null {
@@ -48,7 +49,9 @@ export function calculateCombatOutcome(input: CalculationInput): CalculationOutp
         probability: 1.0,
     };
     const stateDictionary: CombatStateDictionary = {};
-    const statesByStage: SparseDictionary<CombatStage, CombatStateProbability[]> = {};
+    const statesByStage: SparseDictionary<CombatStage, CombatStateProbability[]> = {
+        [activeState.state.stage]: [activeState],
+    };
     const stateResolutions: CombatStateResolutionDictionary = {};
     while (activeState !== undefined) {
         const nextStates: CombatStateProbability[] = resolveState(activeState, input, stateResolutions);
@@ -64,7 +67,8 @@ export function calculateCombatOutcome(input: CalculationInput): CalculationOutp
 }
 
 export function getInitialState(input: CalculationInput): CombatState {
-    return new CombatState(CombatStage.SpaceMines, getInitialParticipantState(input.attacker), getInitialParticipantState(input.defender));
+    const initialStage: CombatStage = input.combatType === CombatType.SpaceBattle ? CombatStage.SpaceMines : CombatStage.Bombardment;
+    return new CombatState(initialStage, getInitialParticipantState(input.attacker), getInitialParticipantState(input.defender));
 }
 
 function getInitialParticipantState(participant: ParticipantInput): ParticipantState {
@@ -76,24 +80,15 @@ function getInitialParticipantState(participant: ParticipantInput): ParticipantS
     );
 }
 
-export function getNextStage(stage: CombatStage): CombatStage {
-    switch (stage) {
-        case CombatStage.SpaceMines:
-            return CombatStage.SpaceCannon;
-        case CombatStage.SpaceCannon:
-            return CombatStage.StartOfBattle;
-        case CombatStage.StartOfBattle:
-            return CombatStage.AntiFighterBarrage;
-        case CombatStage.AntiFighterBarrage:
-            return CombatStage.PreCombat;
-        case CombatStage.PreCombat:
-            return CombatStage.Round1;
-        case CombatStage.Round1:
-            return CombatStage.Round2;
-        case CombatStage.Round2:
-        case CombatStage.RoundN:
-            return CombatStage.RoundN;
+export function getNextStage(combatType: CombatType, stage: CombatStage): CombatStage {
+    const currentIndex = combatStagesByCombatType[combatType].indexOf(stage);
+    if (currentIndex === -1) {
+        throw new Error(`Unexpected combat stage for CombatType ${combatType}: ${stage}`);
     }
+    if (currentIndex === combatStagesByCombatType[combatType].length - 1) {
+        return stage;
+    }
+    return combatStagesByCombatType[combatType][currentIndex + 1];
 }
 
 function resolveState(
@@ -151,7 +146,7 @@ function resolveCombatStage(state: CombatState, input: CalculationInput): Combat
             let nextState: CombatState = state;
             nextState = assignHits(nextState, input, ParticipantRole.Attacker, attackerUnits, defenderHits.hits);
             nextState = assignHits(nextState, input, ParticipantRole.Defender, defenderUnits, attackerHits.hits);
-            nextState = nextState.setStage(getNextStage(nextState.stage));
+            nextState = nextState.setStage(getNextStage(input.combatType, nextState.stage));
             const identicalState: CombatStateProbability | undefined = findIdenticalCombatState(nextStates, nextState);
             if (identicalState) {
                 identicalState.probability += probability;
@@ -189,7 +184,7 @@ export function getUnitSnapshots(
             base: unit,
             type: unit.type,
             combatValue: def.combatValue,
-            rolls: getCombatRollsForStage(def, stage),
+            rolls: getCombatRollsForStage(def, stage, role, input.combatType),
             hitType: getHitTypeForStage(def, stage),
             nonStandardRolls: [],
             sustainDamage: def.sustainDamage,
@@ -319,12 +314,16 @@ function getParticipantTagValues(input: ParticipantInput, state: ParticipantStat
     return values;
 }
 
-export function getCombatRollsForStage(def: UnitDefinition, stage: CombatStage): number {
+export function getCombatRollsForStage(def: UnitDefinition, stage: CombatStage, role: ParticipantRole, combatType: CombatType): number {
     switch (stage) {
         case CombatStage.SpaceMines:
             return 0;
+        case CombatStage.Bombardment:
+            return role === ParticipantRole.Attacker ? def.bombardment : 0;
         case CombatStage.SpaceCannon:
             return def.spaceCannon;
+        case CombatStage.InvasionDefence:
+            return role === ParticipantRole.Defender ? def.invasionDefence : 0;
         case CombatStage.StartOfBattle:
             return 0;
         case CombatStage.AntiFighterBarrage:
@@ -334,7 +333,7 @@ export function getCombatRollsForStage(def: UnitDefinition, stage: CombatStage):
         case CombatStage.Round1:
         case CombatStage.Round2:
         case CombatStage.RoundN:
-            return def.combatRolls;
+            return unitIsCombatant(def.type, combatType) ? def.combatRolls : 0;
     }
 }
 
@@ -346,7 +345,7 @@ function getHitTypeForStage(def: UnitDefinition, stage: CombatStage): HitType {
     return HitType.Normal;
 }
 
-const sustainDamageReductionStages: CombatStage[] = [CombatStage.Round1, CombatStage.Round2, CombatStage.RoundN];
+const sustainDamageReductionStages: CombatStage[] = [CombatStage.Bombardment, CombatStage.Round1, CombatStage.Round2, CombatStage.RoundN];
 
 function adjustCombatRollsForSustainDamage(stage: CombatStage, units: ComputedUnitSnapshot[]) {
     if (sustainDamageReductionStages.includes(stage)) {
@@ -677,7 +676,9 @@ function determineVictor(state: CombatStateLike, combatType: CombatType): Combat
 function participantIsAlive(units: UnitInput[], combatType: CombatType, combatStage: CombatStage): boolean {
     switch (combatStage) {
         case CombatStage.SpaceMines:
+        case CombatStage.Bombardment:
         case CombatStage.SpaceCannon:
+        case CombatStage.InvasionDefence:
             // Non-combatant abilities might still need to be resolved
             return units.length > 0;
         default:
@@ -792,13 +793,14 @@ function toCombatStateProbabilityOutputs(
     );
 }
 
-// We can't generate intermediate statistics for Round2 and RoundN, since RoundN is repeating
-const outputStages: CombatStage[] = allCombatStages.filter((s) => s !== CombatStage.Round2 && s !== CombatStage.RoundN);
-
 function createCombatStageOutputs(
     statesByStage: SparseDictionary<CombatStage, CombatStateProbability[]>,
     input: CalculationInput
 ): SparseDictionary<CombatStage, CombatStageOutput> {
+    // We can't generate intermediate statistics for Round2 and RoundN, since RoundN is repeating
+    const outputStages: CombatStage[] = combatStagesByCombatType[input.combatType].filter(
+        (s) => s !== CombatStage.Round2 && s !== CombatStage.RoundN
+    );
     const outputs: SparseDictionary<CombatStage, CombatStageOutput> = {};
 
     const byStage: SparseDictionary<CombatStage, CombatStateProbability[]> = Object.fromEntries(
@@ -808,7 +810,7 @@ function createCombatStageOutputs(
 
     for (let stage of outputStages) {
         const beforeStates: CombatStateProbability[] | undefined = byStage[stage];
-        const afterStates: CombatStateProbability[] | undefined = byStage[getNextStage(stage)];
+        const afterStates: CombatStateProbability[] | undefined = byStage[getNextStage(input.combatType, stage)];
         if (!beforeStates || !afterStates) continue;
 
         const beforeStatesOutput: CombatStateProbabilityOutput[] = toCombatStateProbabilityOutputs(beforeStates, input);
@@ -830,7 +832,7 @@ function createCombatStageOutputs(
                 stage
             ),
         };
-        if (Object.values(statistics).every((stat) => stat.expectedHits === 0 && stat.assignedHits === 0)) continue;
+        if (Object.values(statistics).every((stat) => equalsZero(stat.expectedHits) && equalsZero(stat.assignedHits))) continue;
 
         let victorProbabilities: KeyedDictionary<CombatVictor, number> = getVictorProbabilities(input, afterStatesOutput);
         if (previousVictorProbabilities) {
