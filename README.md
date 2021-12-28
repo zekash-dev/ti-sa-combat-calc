@@ -6,64 +6,51 @@ Combat calculator for Twilight Imperium: Shattered Ascension.
 
 The following is a roadmap for planned features in a rough priority order. Feedback is welcome, either as issues on Github or in the community Discord.
 
-### 1. Space battle
+### 1. Common effects
 
-The highest priority is to flesh out the space battle feature by implementing the most common special effects.
+The highest priority is to implement remaining common effects that are relatively easy to implement.
 
-1. Admiral, high alert token
-2. Remaining technologies for space battles\*
-3. Remaining faction abilities/upgrades for space battles\*
-4. Pre-assign hits to participating units
-5. Flagships\*
-6. PDS fire (including scientists, deep space cannon, etc.)
+1. Scientist
+2. L1z1x Flagship
 
-_\* Some particularly complicated abilities will be implemented at a later point. See below._
+### 2. Feature requests
 
-### 2. Invasion combat
-
-The next priority is to add support for invasion combat.
-
-1. Invasion combat rounds (ground forces, shock troops, mechs)
-2. Technologies for invasion combat
-3. Faction abilities/upgrades for invasion combat
-4. Generals
-5. PDS fire
-6. Bombardment
-
-### 3. Feature requests
-
-Community feature requests
+Community feature requests.
 
 1. Hit assignment protocols (for example designating a specific unit to save until last)
 2. Casualty result view (probability of X number of units surviving)
+3. _&lt;other improvements depending on feedback&gt;_
 
-### 4. Quality of life improvements
+### 3. Quality of life improvements
 
-Improvements that increase the usability of the calculator
+Improvements that increase the usability of the calculator.
 
 1. Swap attacker and defender
-2. Assign default technologies when switching faction (reset other techs)
-3. Pick any faction upgrade as Virus
-4. Save input states (in-browser storage)
-5. _&lt;other improvements depending on feedback&gt;_
+2. Pick any faction upgrade as Virus
+3. Save input states (in-browser storage)
+4. Display application version in "About" page
 
-### 5. Rare and complicated effects
+### 4. Rare and complicated effects
 
-Effects that come up rarely or are complicated to implement
+Effects that come up rarely or are complicated to implement.
 
 1. Space mines
-2. Complicated faction abilities
+2. Complicated faction abilities and upgrades
     - Jol-nar reroll
     - Chronos field
     - Saimoc-infused hulls
-    - Winnu flagship ability
-    - Virus flagship ability
     - Yin suicide ability
-    - Yin flagship ability
-3. Niche technologies
+    - Yin conversion ability
+3. Complicated flagship abilities
+    - Virus
+    - Jol-nar
+    - Winnu
+    - Yin
+4. Niche technologies
     - X-89 bacterial weapon
-4. Action cards
-5. Political cards
+5. General reroll
+6. Action cards
+7. Political cards
 
 More details on action cards and political cards in [this design document](https://docs.google.com/document/d/1myrFlhOxZmVVMTQ5_ifuWtBJudk-OBHYiEUXKU03j98/edit?usp=sharing) (anyone with the link can comment).
 

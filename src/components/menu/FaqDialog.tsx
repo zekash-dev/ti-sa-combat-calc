@@ -1,7 +1,7 @@
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Typography } from "@mui/material";
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, List, ListItem, Typography } from "@mui/material";
 import { OverlayScrollbarsComponent } from "overlayscrollbars-react";
 
-import { Paragraph } from "./Common";
+import { Paragraph, Subheading } from "./Common";
 
 interface Props {
     open: boolean;
@@ -18,9 +18,7 @@ export function FaqDialog({ open, onClose }: Props) {
             </DialogTitle>
             <OverlayScrollbarsComponent>
                 <DialogContent>
-                    <Typography variant="h5" color="text.primary" sx={{ marginTop: 3 }}>
-                        Expected and assigned hits
-                    </Typography>
+                    <Subheading first>Expected and assigned hits</Subheading>
                     <Paragraph>
                         For each combat stage, the number of expected hits for each participant is printed. Expected hits are an average of
                         all possible outcomes at the beginning of the stage, weighed by probability. Combat outcomes that end before the
@@ -39,6 +37,17 @@ export function FaqDialog({ open, onClose }: Props) {
                     </Paragraph>
                     <Paragraph>
                         Effects such as Impulsion shields and Berzerker genome can also cause the expected hits and assigned hits to differ.
+                    </Paragraph>
+                    <Subheading>Hit assignment priority</Subheading>
+                    <Paragraph>
+                        Currently, hit assignment priority is very simplified:
+                        <ol>
+                            <li>Assign hits to units that can sustain damage</li>
+                            <li>Assign hits to the unit with the worst combat value</li>
+                        </ol>
+                        The plan is to implement some ways for the user to modify this priority, such as prioritizing by unit resource value
+                        or assigning a specific unit to keep alive (usually a Carrier). Suggestions for other hit assignment rules are
+                        welcome.
                     </Paragraph>
                 </DialogContent>
             </OverlayScrollbarsComponent>

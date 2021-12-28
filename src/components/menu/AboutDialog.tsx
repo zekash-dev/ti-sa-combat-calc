@@ -35,7 +35,11 @@ export function AboutDialog({ open, onClose }: Props) {
                         <Link href="https://github.com/zekash-dev/ti-sa-combat-calc" target="_blank">
                             Github project page
                         </Link>
-                        . Questions, feature requests and issues can be posted either on Github or in the community Discord server.
+                        . Questions, feature requests and issues can be posted either on Github or in the{" "}
+                        <Link href="https://discord.gg/rUxMcUe" target="_blank">
+                            community Discord server
+                        </Link>
+                        .
                     </Paragraph>
                     <Paragraph sx={{ marginTop: 4 }}>Made by Zekash.</Paragraph>
                 </DialogContent>
