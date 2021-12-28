@@ -341,12 +341,12 @@ const factionAbilityResources: KeyedDictionary<FactionAbility, ParticipantTagRes
     [FactionAbility.LIZIX_GROUND_FORCE_MOD]: {
         name: "Ground forces +1 (+2 with MU)",
         color: factionResources[Faction.LIZIX_MINDNET].color,
-        implementation: false,
+        implementation: effects.lizixGroundForceMod,
     },
     [FactionAbility.ARBOREC_GROUND_FORCE_MOD]: {
         name: "Ground forces -1",
         color: factionResources[Faction.ARBOREC_ECOSYSTEM].color,
-        implementation: false,
+        implementation: effects.arborecGroundForceMod,
     },
 };
 
@@ -374,7 +374,7 @@ const factionUpgradeResources: KeyedDictionary<FactionUpgrade, ParticipantTagRes
     [FactionUpgrade.SOL_VERSATILE_COMBAT_TACTICS]: {
         name: "Versatile combat tactics",
         color: factionResources[Faction.FEDERATION_OF_SOL].color,
-        implementation: false,
+        implementation: effects.solVersatileCombatTactics,
     },
     [FactionUpgrade.MENTAK_ADAPTABLE_ORDNANCE_RIGS]: {
         name: "Adaptable ordnance rigs",
@@ -411,7 +411,7 @@ const factionUpgradeResources: KeyedDictionary<FactionUpgrade, ParticipantTagRes
     [FactionUpgrade.MUAAT_MAGMA_OBLITERATOR]: {
         name: "Magma obliterator",
         color: factionResources[Faction.EMBERS_OF_MUAAT].color,
-        implementation: false,
+        implementation: effects.muaatMagmaObliterator,
     },
     [FactionUpgrade.CREUSS_DIMENSIONAL_SPLICER]: {
         name: "Dimensional splicer",
