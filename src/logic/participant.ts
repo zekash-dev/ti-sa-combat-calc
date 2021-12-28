@@ -226,14 +226,14 @@ export const technologyResources: KeyedDictionary<Technology, TechnologyResource
 
         color: technologyColors[TechnologyType.RED],
         type: TechnologyType.RED,
-        implementation: false,
+        implementation: effects.warSun,
     },
     [Technology.GRAVITON_NETAGOR]: {
         name: "Graviton negator",
         shortName: "GRN",
         color: technologyColors[TechnologyType.RED],
         type: TechnologyType.RED,
-        implementation: false,
+        implementation: effects.gravitonNegator,
     },
     [Technology.MAGEN_DEFENSE_GRID]: {
         name: "Magen defense grid",
@@ -268,7 +268,7 @@ export const technologyResources: KeyedDictionary<Technology, TechnologyResource
         shortName: "GEN",
         color: technologyColors[TechnologyType.GREEN],
         type: TechnologyType.GREEN,
-        implementation: false,
+        implementation: effects.genSynthesis,
     },
     [Technology.X89_BACTERIAL_WEAPON]: {
         name: "X-89 bacterial weapon",
