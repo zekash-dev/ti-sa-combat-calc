@@ -26,12 +26,18 @@ export interface PreAssignHitsOutput {
     // newCombatState?: CombatState | undefined;
 }
 
+export interface ParticipantTagSettings<T> {
+    default: T;
+    encode: (settings: T) => string;
+    decode: (str: string) => T;
+}
+
 export interface ParticipantTagCustomSettingsUiProps<T = any> {
     settings: T;
     onSettingsChange: (newSettings: T) => void;
 }
 
-export interface ParticipantTagImplementation {
+export interface ParticipantTagImplementation<T = any> {
     /**
      * Called when computing snapshots for your own units.
      */
@@ -55,6 +61,11 @@ export interface ParticipantTagImplementation {
      * 'role' in the input describes the tag owner's role, not the opponent's role.
      */
     preAssignOpponentHits?: (input: PreAssignHitsInput) => PreAssignHitsOutput;
+
+    /**
+     * Custom settings for the tag
+     */
+    settings?: ParticipantTagSettings<T>;
 }
 
 export interface UnitOnComputeSnapshotInput {

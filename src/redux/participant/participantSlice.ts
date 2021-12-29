@@ -2,6 +2,7 @@ import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 import { getInitialState, getUnitSnapshots } from "logic/calculator";
 import { uniqueFilter } from "logic/common";
+import { encodeParticipantsState } from "logic/compression";
 import { getSelectableUnitTypes, grantDefaultFactionAbilities, unitSizeComparer } from "logic/participant";
 import {
     CalculationInput,
@@ -161,6 +162,9 @@ const participantSlice = createSlice({
                 unit.sustainedHits = sustainedHits;
             }
         },
+        importParticipantsState: (state: ParticipantSliceState, action: PayloadAction<ParticipantSliceState>) => {
+            return action.payload;
+        },
     },
 });
 
@@ -225,6 +229,7 @@ export const {
     setUnitTag,
     unsetUnitTag,
     setUnitSustainedHits,
+    importParticipantsState,
 } = participantSlice.actions;
 
 export const selectParticipantState = (rootState: RootState) => rootState.participant;
@@ -234,6 +239,8 @@ export const selectParticipants = (rootState: RootState): KeyedDictionary<Partic
 export const selectParticipant = (role: ParticipantRole) => (rootState: RootState) => rootState.participant.participants[role];
 
 export const selectCalculationInput = createSelector([selectParticipantState], toCalculationInput);
+
+export const selectCompressedState = createSelector([selectParticipantState], encodeParticipantsState);
 
 function toCalculationInput(sliceState: ParticipantSliceState): CalculationInput {
     return {

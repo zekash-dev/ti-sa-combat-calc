@@ -7,11 +7,11 @@ export interface CreussDimensionalSplicerSettings {
     wormholePresent: boolean;
 }
 
-export const creussDimensionalSplicerDefaultSettings: CreussDimensionalSplicerSettings = {
+const creussDimensionalSplicerDefaultSettings: CreussDimensionalSplicerSettings = {
     wormholePresent: true,
 };
 
-export const creussDimensionalSplicer: ParticipantTagImplementation = {
+export const creussDimensionalSplicer: ParticipantTagImplementation<CreussDimensionalSplicerSettings> = {
     preAssignOpponentHits: ({ calculationInput, combatState, role, hits }: PreAssignHitsInput): PreAssignHitsOutput => {
         const settings: CreussDimensionalSplicerSettings =
             calculationInput[role].tags[FactionUpgrade.CREUSS_DIMENSIONAL_SPLICER] ?? creussDimensionalSplicerDefaultSettings;
@@ -27,5 +27,12 @@ export const creussDimensionalSplicer: ParticipantTagImplementation = {
             return { newHits };
         }
         return {};
+    },
+    settings: {
+        default: creussDimensionalSplicerDefaultSettings,
+        encode: (settings: CreussDimensionalSplicerSettings) => (settings.wormholePresent ? "1" : "0"),
+        decode: (str: string) => ({
+            wormholePresent: str === "1",
+        }),
     },
 };

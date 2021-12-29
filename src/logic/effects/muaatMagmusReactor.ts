@@ -7,11 +7,11 @@ export interface MuaatMagmusReactorSettings {
     warSunsLeavingSupernova: number;
 }
 
-export const muaatMagmusReactorDefaultSettings: MuaatMagmusReactorSettings = {
+const muaatMagmusReactorDefaultSettings: MuaatMagmusReactorSettings = {
     warSunsLeavingSupernova: 0,
 };
 
-export const muaatMagmusReactor: ParticipantTagImplementation = {
+export const muaatMagmusReactor: ParticipantTagImplementation<MuaatMagmusReactorSettings> = {
     onComputeUnitSnapshots: ({ calculationInput, role, units }: ParticipantOnComputeSnapshotInput) => {
         const settings: MuaatMagmusReactorSettings =
             calculationInput[role].tags[FactionUpgrade.MUAAT_MAGMUS_REACTOR] ?? muaatMagmusReactorDefaultSettings;
@@ -21,5 +21,12 @@ export const muaatMagmusReactor: ParticipantTagImplementation = {
                 unit.combatValue--;
             }
         }
+    },
+    settings: {
+        default: muaatMagmusReactorDefaultSettings,
+        encode: (settings: MuaatMagmusReactorSettings) => settings.warSunsLeavingSupernova.toString(),
+        decode: (str: string) => ({
+            warSunsLeavingSupernova: isNaN(Number(str)) ? 0 : Number(str),
+        }),
     },
 };

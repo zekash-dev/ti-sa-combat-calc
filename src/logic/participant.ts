@@ -167,28 +167,32 @@ export const availableFactionUpgrades: KeyedDictionary<Faction, FactionUpgrade[]
 };
 
 export function getParticipantTagDefaultValue<T extends ParticipantTag>(tag: T): any {
-    return participantTagResources[tag].defaultSettings ?? true;
+    const tagResources = participantTagResources[tag];
+    if (tagResources.implementation && tagResources.implementation.settings) {
+        return tagResources.implementation.settings.default;
+    }
+    return true;
 }
 
 export const factionResources: KeyedDictionary<Faction, FactionResources> = {
-    [Faction.BARONY_OF_LETNEV]: { name: "The Barony of Letnev", color: "#909090" },
-    [Faction.CLAN_OF_SAAR]: { name: "The Clan of Saar", color: "#603C1C" },
-    [Faction.EMIRATES_OF_HACAN]: { name: "The Emirates of Hacan", color: "#F2DA30" },
-    [Faction.FEDERATION_OF_SOL]: { name: "The Federation of Sol", color: "#0061C2" },
-    [Faction.MENTAK_COALITION]: { name: "The Mentak Coalition", color: "#E17E20" },
-    [Faction.NAALU_COLLECTIVE]: { name: "The Naalu Collective", color: "#AF8F60" },
-    [Faction.KROTOAN_VIRUS]: { name: "The Krotoan Virus", color: "#4C181A" },
-    [Faction.HIVES_OF_SARDAKK_NORR]: { name: "The Hives of Sardakk N'orr", color: "#D00002" },
-    [Faction.UNIVERSITIES_OF_JOLNAR]: { name: "The Universities of Jol-Nar", color: "#8F36AC" },
-    [Faction.WINNU_SOVEREIGNTY]: { name: "The Winnu Sovereignty", color: "#6051A4" },
-    [Faction.XXCHA_KINGDOM]: { name: "The Xxcha Kingdom", color: "#388F2E" },
-    [Faction.TRIBES_OF_YSSARIL]: { name: "The Tribes of Yssaril", color: "#0A4201" },
-    [Faction.YIN_BROTHERHOOD]: { name: "The Yin Brotherhood", color: "#FAFAFA" },
-    [Faction.EMBERS_OF_MUAAT]: { name: "The Embers of Muaat", color: "#820C00" },
-    [Faction.GHOSTS_OF_CREUSS]: { name: "The Ghosts of Creuss", color: "#4EA8CA" },
-    [Faction.LIZIX_MINDNET]: { name: "The L1z1x Mindnet", color: "#000CA6" },
-    [Faction.ARBOREC_ECOSYSTEM]: { name: "The Arborec Ecosystem", color: "#857A10" },
-    [Faction.ORDER_OF_THE_LAST]: { name: "The Order of the Last", color: "#107273" },
+    [Faction.BARONY_OF_LETNEV]: { name: "The Barony of Letnev", letter: "l", color: "#909090" },
+    [Faction.CLAN_OF_SAAR]: { name: "The Clan of Saar", letter: "s", color: "#603C1C" },
+    [Faction.EMIRATES_OF_HACAN]: { name: "The Emirates of Hacan", letter: "h", color: "#F2DA30" },
+    [Faction.FEDERATION_OF_SOL]: { name: "The Federation of Sol", letter: "f", color: "#0061C2" },
+    [Faction.MENTAK_COALITION]: { name: "The Mentak Coalition", letter: "m", color: "#E17E20" },
+    [Faction.NAALU_COLLECTIVE]: { name: "The Naalu Collective", letter: "n", color: "#AF8F60" },
+    [Faction.KROTOAN_VIRUS]: { name: "The Krotoan Virus", letter: "v", color: "#4C181A" },
+    [Faction.HIVES_OF_SARDAKK_NORR]: { name: "The Hives of Sardakk N'orr", letter: "i", color: "#D00002" },
+    [Faction.UNIVERSITIES_OF_JOLNAR]: { name: "The Universities of Jol-Nar", letter: "j", color: "#8F36AC" },
+    [Faction.WINNU_SOVEREIGNTY]: { name: "The Winnu Sovereignty", letter: "w", color: "#6051A4" },
+    [Faction.XXCHA_KINGDOM]: { name: "The Xxcha Kingdom", letter: "x", color: "#388F2E" },
+    [Faction.TRIBES_OF_YSSARIL]: { name: "The Tribes of Yssaril", letter: "y", color: "#0A4201" },
+    [Faction.YIN_BROTHERHOOD]: { name: "The Yin Brotherhood", letter: "b", color: "#FAFAFA" },
+    [Faction.EMBERS_OF_MUAAT]: { name: "The Embers of Muaat", letter: "e", color: "#820C00" },
+    [Faction.GHOSTS_OF_CREUSS]: { name: "The Ghosts of Creuss", letter: "c", color: "#4EA8CA" },
+    [Faction.LIZIX_MINDNET]: { name: "The L1z1x Mindnet", letter: "z", color: "#000CA6" },
+    [Faction.ARBOREC_ECOSYSTEM]: { name: "The Arborec Ecosystem", letter: "a", color: "#857A10" },
+    [Faction.ORDER_OF_THE_LAST]: { name: "The Order of the Last", letter: "o", color: "#107273" },
 };
 
 export const technologyColors: KeyedDictionary<TechnologyType, string> = {
@@ -380,7 +384,6 @@ const factionUpgradeResources: KeyedDictionary<FactionUpgrade, ParticipantTagRes
         name: "Adaptable ordnance rigs",
         color: factionResources[Faction.MENTAK_COALITION].color,
         implementation: effects.mentakAdaptableOrdnanceRigs,
-        defaultSettings: effects.mentakAdaptableOrdnanceRigsDefaultSettings,
     },
     [FactionUpgrade.SARDAKK_BERZERKER_GENOME]: {
         name: "Berzerker genome",
@@ -406,7 +409,6 @@ const factionUpgradeResources: KeyedDictionary<FactionUpgrade, ParticipantTagRes
         name: "Magmus reactor",
         color: factionResources[Faction.EMBERS_OF_MUAAT].color,
         implementation: effects.muaatMagmusReactor,
-        defaultSettings: effects.creussDimensionalSplicerDefaultSettings,
     },
     [FactionUpgrade.MUAAT_MAGMA_OBLITERATOR]: {
         name: "Magma obliterator",
@@ -417,7 +419,6 @@ const factionUpgradeResources: KeyedDictionary<FactionUpgrade, ParticipantTagRes
         name: "Dimensional splicer",
         color: factionResources[Faction.GHOSTS_OF_CREUSS].color,
         implementation: effects.creussDimensionalSplicer,
-        defaultSettings: effects.creussDimensionalSplicerDefaultSettings,
     },
     [FactionUpgrade.ORDER_CHRONOS_FIELD]: {
         name: "Chronos field",

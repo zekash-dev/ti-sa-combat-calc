@@ -21,6 +21,9 @@ export const allUnitTypes: UnitType[] = getAllEnumValues<UnitType>(UnitType);
 
 export interface UnitDefinition {
     type: UnitType;
+
+    letter: string;
+
     /**
      * 1-10
      * 1 = hits on all rolls
@@ -97,6 +100,7 @@ export interface Dimensions {
 export const unitDefinitions: KeyedDictionary<UnitType, UnitDefinition> = {
     [UnitType.WarSun]: {
         type: UnitType.WarSun,
+        letter: "w",
         combatValue: 3,
         combatRolls: 3,
         sustainDamage: 2,
@@ -113,6 +117,7 @@ export const unitDefinitions: KeyedDictionary<UnitType, UnitDefinition> = {
     },
     [UnitType.Dreadnought]: {
         type: UnitType.Dreadnought,
+        letter: "n",
         combatValue: 5,
         combatRolls: 2,
         sustainDamage: 1,
@@ -129,6 +134,7 @@ export const unitDefinitions: KeyedDictionary<UnitType, UnitDefinition> = {
     },
     [UnitType.Cruiser]: {
         type: UnitType.Cruiser,
+        letter: "u",
         combatValue: 7,
         combatRolls: 1,
         sustainDamage: 0,
@@ -145,6 +151,7 @@ export const unitDefinitions: KeyedDictionary<UnitType, UnitDefinition> = {
     },
     [UnitType.Destroyer]: {
         type: UnitType.Destroyer,
+        letter: "d",
         combatValue: 9,
         combatRolls: 1,
         sustainDamage: 0,
@@ -161,6 +168,7 @@ export const unitDefinitions: KeyedDictionary<UnitType, UnitDefinition> = {
     },
     [UnitType.Carrier]: {
         type: UnitType.Carrier,
+        letter: "c",
         combatValue: 9,
         combatRolls: 1,
         sustainDamage: 0,
@@ -177,6 +185,7 @@ export const unitDefinitions: KeyedDictionary<UnitType, UnitDefinition> = {
     },
     [UnitType.Fighter]: {
         type: UnitType.Fighter,
+        letter: "f",
         combatValue: 9,
         combatRolls: 1,
         sustainDamage: 0,
@@ -193,6 +202,7 @@ export const unitDefinitions: KeyedDictionary<UnitType, UnitDefinition> = {
     },
     [UnitType.Flagship]: {
         type: UnitType.Flagship,
+        letter: "h",
         combatValue: 9,
         combatRolls: 1,
         sustainDamage: 0,
@@ -209,6 +219,7 @@ export const unitDefinitions: KeyedDictionary<UnitType, UnitDefinition> = {
     },
     [UnitType.Mech]: {
         type: UnitType.Mech,
+        letter: "m",
         combatValue: 6,
         combatRolls: 2,
         sustainDamage: 1,
@@ -225,6 +236,7 @@ export const unitDefinitions: KeyedDictionary<UnitType, UnitDefinition> = {
     },
     [UnitType.GroundForce]: {
         type: UnitType.GroundForce,
+        letter: "g",
         combatValue: 8,
         combatRolls: 1,
         sustainDamage: 0,
@@ -241,6 +253,7 @@ export const unitDefinitions: KeyedDictionary<UnitType, UnitDefinition> = {
     },
     [UnitType.ShockTroop]: {
         type: UnitType.ShockTroop,
+        letter: "t",
         combatValue: 5,
         combatRolls: 1,
         sustainDamage: 0,
@@ -257,6 +270,7 @@ export const unitDefinitions: KeyedDictionary<UnitType, UnitDefinition> = {
     },
     [UnitType.PDS]: {
         type: UnitType.PDS,
+        letter: "p",
         combatValue: 6,
         combatRolls: 0,
         sustainDamage: 0,

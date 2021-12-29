@@ -1,4 +1,4 @@
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle, List, ListItem, Typography } from "@mui/material";
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Typography } from "@mui/material";
 import { OverlayScrollbarsComponent } from "overlayscrollbars-react";
 
 import { Paragraph, Subheading } from "./Common";

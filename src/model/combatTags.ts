@@ -107,6 +107,7 @@ export interface UnitTagResources {
 
 export interface FactionResources {
     name: string;
+    letter: string;
     icon?: JSX.Element;
     color: string;
 }
@@ -116,7 +117,6 @@ export interface ParticipantTagResources {
     icon?: JSX.Element;
     color: string;
     implementation: false | ParticipantTagImplementation;
-    defaultSettings?: any;
 }
 
 export interface TechnologyResources extends ParticipantTagResources {

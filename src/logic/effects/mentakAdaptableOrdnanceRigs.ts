@@ -11,7 +11,7 @@ export interface MentakAdaptableOrdnanceRigsSettings {
     useSustain: boolean;
 }
 
-export const mentakAdaptableOrdnanceRigsDefaultSettings: MentakAdaptableOrdnanceRigsSettings = {
+const mentakAdaptableOrdnanceRigsDefaultSettings: MentakAdaptableOrdnanceRigsSettings = {
     cruisersCarryingGroundForces: 0,
     useSustain: true,
 };
@@ -24,7 +24,7 @@ const sustainStages: CombatStage[] = [
     CombatStage.PreCombat,
 ];
 
-export const mentakAdaptableOrdnanceRigs: ParticipantTagImplementation = {
+export const mentakAdaptableOrdnanceRigs: ParticipantTagImplementation<MentakAdaptableOrdnanceRigsSettings> = {
     preAssignHits: ({ calculationInput, combatState, role, units, hits }) => {
         const settings: MentakAdaptableOrdnanceRigsSettings =
             calculationInput[role].tags[FactionUpgrade.MENTAK_ADAPTABLE_ORDNANCE_RIGS] ?? mentakAdaptableOrdnanceRigsDefaultSettings;
@@ -64,6 +64,22 @@ export const mentakAdaptableOrdnanceRigs: ParticipantTagImplementation = {
                 }
             }
         }
+    },
+    settings: {
+        default: mentakAdaptableOrdnanceRigsDefaultSettings,
+        encode: (settings: MentakAdaptableOrdnanceRigsSettings) =>
+            `${settings.cruisersCarryingGroundForces.toString()}x${settings.useSustain ? "1" : "0"}`,
+        decode: (str: string) => {
+            const split = str.split("x");
+            let count = Number(split[0]);
+            if (isNaN(count)) {
+                count = 0;
+            }
+            return {
+                cruisersCarryingGroundForces: count,
+                useSustain: split[1] === "1",
+            };
+        },
     },
 };
 
