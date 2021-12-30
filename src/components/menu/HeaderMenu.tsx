@@ -1,9 +1,8 @@
-import { QuestionMark, Settings } from "@mui/icons-material";
+import { QuestionAnswer, QuestionMark, Settings } from "@mui/icons-material";
 import { Button, ButtonGroup, Grid, IconButton, Tooltip } from "@mui/material";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
-import { InfoVariant } from "components/graphics";
 import { CombatType } from "model/calculation";
 import { selectCombatType, setCombatType } from "redux/participant/participantSlice";
 import { AboutDialog } from "./AboutDialog";
@@ -72,12 +71,12 @@ export function HeaderMenu() {
                         </Tooltip>
                         <Tooltip placement="bottom" title="FAQ">
                             <IconButton color="primary" onClick={onOpen("faq")}>
-                                <QuestionMark />
+                                <QuestionAnswer />
                             </IconButton>
                         </Tooltip>
                         <Tooltip placement="bottom" title="About">
                             <IconButton color="primary" onClick={onOpen("about")}>
-                                <InfoVariant />
+                                <QuestionMark />
                             </IconButton>
                         </Tooltip>
                     </Grid>

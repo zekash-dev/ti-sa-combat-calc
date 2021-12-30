@@ -1,6 +1,7 @@
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Link, Typography } from "@mui/material";
 import { OverlayScrollbarsComponent } from "overlayscrollbars-react";
 
+import { BuildTimeDisplay } from "./BuildTimeDisplay";
 import { ImageLink, Paragraph } from "./Common";
 
 interface Props {
@@ -41,7 +42,9 @@ export function AboutDialog({ open, onClose }: Props) {
                         </Link>
                         .
                     </Paragraph>
-                    <Paragraph sx={{ marginTop: 4 }}>Made by Zekash.</Paragraph>
+                    <Paragraph sx={{ marginTop: 4 }}>
+                        Version {process.env.REACT_APP_VERSION}, built on <BuildTimeDisplay />. Made by Zekash.
+                    </Paragraph>
                 </DialogContent>
             </OverlayScrollbarsComponent>
             <DialogActions>
