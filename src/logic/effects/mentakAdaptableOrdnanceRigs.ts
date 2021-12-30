@@ -68,9 +68,9 @@ export const mentakAdaptableOrdnanceRigs: ParticipantTagImplementation<MentakAda
     settings: {
         default: mentakAdaptableOrdnanceRigsDefaultSettings,
         encode: (settings: MentakAdaptableOrdnanceRigsSettings) =>
-            `${settings.cruisersCarryingGroundForces.toString()}x${settings.useSustain ? "1" : "0"}`,
+            `${settings.cruisersCarryingGroundForces.toString()}z${settings.useSustain ? "1" : "0"}`,
         decode: (str: string) => {
-            const split = str.split("x");
+            const split = str.split("z");
             let count = Number(split[0]);
             if (isNaN(count)) {
                 count = 0;

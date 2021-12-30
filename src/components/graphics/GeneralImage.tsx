@@ -5,7 +5,7 @@ interface Props {
 }
 
 export const GeneralImage = React.memo(({ style }: Props) => {
-    const path = `${window.location.href}/images/leaders/general.png`;
+    const path = `${process.env.PUBLIC_URL}/images/leaders/general.png`;
 
     return <img src={path} alt="General" style={style} />;
 });

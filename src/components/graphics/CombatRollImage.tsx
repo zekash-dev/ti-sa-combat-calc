@@ -36,7 +36,7 @@ export const CombatRollImage = React.memo(({ combatValue, style }: Props) => {
 });
 
 function getSvgPath(combatValue: number): string {
-    const base = window.location.href;
+    const base = process.env.PUBLIC_URL;
     const subfolder = "images/dice";
     let imageName: string;
     switch (combatValue) {

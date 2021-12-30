@@ -23,7 +23,7 @@ describe("encodeParticipantsState", () => {
                 },
             },
         };
-        const expectedResult = "sx+~m+UJ";
+        const expectedResult = "sk_~m_vJ";
 
         const result: string = encodeParticipantsState(input);
         expect(result).toEqual(expectedResult);
@@ -60,7 +60,7 @@ describe("encodeParticipantsState", () => {
                 },
             },
         };
-        const expectedResult = "sxf+~mu+UJ";
+        const expectedResult = "skf_~mu_vJ";
 
         const result: string = encodeParticipantsState(input);
         expect(result).toEqual(expectedResult);
@@ -93,7 +93,7 @@ describe("encodeParticipantsState", () => {
                 },
             },
         };
-        const expectedResult = "sxf+~m+UJ";
+        const expectedResult = "skf_~m_vJ";
         const expectedDecoded: ParticipantSliceState = {
             ...input,
             participants: {
@@ -141,7 +141,7 @@ describe("encodeParticipantsState", () => {
                 },
             },
         };
-        const expectedResult = "sxn1+~m+UJ";
+        const expectedResult = "skn1_~m_vJ";
 
         const result: string = encodeParticipantsState(input);
         expect(result).toEqual(expectedResult);
@@ -176,7 +176,7 @@ describe("encodeParticipantsState", () => {
                 },
             },
         };
-        const expectedResult = "sxn.rV+~m+UJ";
+        const expectedResult = "skn.BX_~m_vJ";
 
         const result: string = encodeParticipantsState(input);
         expect(result).toEqual(expectedResult);
@@ -224,7 +224,7 @@ describe("encodeParticipantsState", () => {
                 },
             },
         };
-        const expectedResult = "sxf-5+~m+UJ";
+        const expectedResult = "skf-5_~m_vJ";
 
         const result: string = encodeParticipantsState(input);
         expect(result).toEqual(expectedResult);
@@ -279,7 +279,7 @@ describe("encodeParticipantsState", () => {
                 },
             },
         };
-        const expectedResult = "sxn1.rV,n1-2,n-3+~m+UJ";
+        const expectedResult = "skn1.BXxn1-2xn-3_~m_vJ";
 
         const result: string = encodeParticipantsState(input);
         expect(result).toEqual(expectedResult);
@@ -310,7 +310,7 @@ describe("encodeParticipantsState", () => {
                 },
             },
         };
-        const expectedResult = "sc+cG=1~m+UJ";
+        const expectedResult = "sg_3Gy1~m_vJ";
 
         const result: string = encodeParticipantsState(input);
         expect(result).toEqual(expectedResult);

@@ -24,10 +24,10 @@ export function SettingsDialog({ open, onClose }: Props) {
     const dispatch = useDispatch();
     const options: OptionsState = useSelector(selectOptions);
 
-    const onDevModeChanged = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const onBooleanChanged = (key: keyof OptionsState) => (e: React.ChangeEvent<HTMLInputElement>) => {
         dispatch(
             updateOptions({
-                devMode: e.target.checked,
+                [key]: e.target.checked,
             })
         );
     };
@@ -43,8 +43,14 @@ export function SettingsDialog({ open, onClose }: Props) {
                 <DialogContent>
                     <FormGroup>
                         <FormControlLabel
-                            control={<Checkbox checked={options.devMode} onChange={onDevModeChanged} />}
+                            control={<Checkbox checked={options.devMode} onChange={onBooleanChanged("devMode")} />}
                             label="Developer mode"
+                        />
+                    </FormGroup>
+                    <FormGroup>
+                        <FormControlLabel
+                            control={<Checkbox checked={options.useSearchParam} onChange={onBooleanChanged("useSearchParam")} />}
+                            label="Auto-update URL"
                         />
                     </FormGroup>
                 </DialogContent>

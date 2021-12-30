@@ -11,6 +11,7 @@ import { ResultView } from "./results/ResultView";
 import { ParticipantTagEditor } from "./tags/ParticipantTagEditor";
 import { ParticipantBattlefieldRepresentation } from "./units/ParticipantBattlefieldRepresentation";
 import { ParticipantUnitEditor } from "./units/ParticipantUnitEditor";
+import { UrlParamsTrigger } from "./UrlParamsTrigger";
 
 export function Home() {
     const [attackerOpen, setAttackerOpen] = useState<boolean>(false);
@@ -20,6 +21,7 @@ export function Home() {
     return (
         <div>
             <CalculationTrigger />
+            <UrlParamsTrigger />
             <ParticipantTagEditor location="left" role={ParticipantRole.Attacker} open={attackerOpen} onOpenChange={setAttackerOpen} />
             <ParticipantTagEditor location="right" role={ParticipantRole.Defender} open={defenderOpen} onOpenChange={setDefenderOpen} />
             <div style={{ margin: "0 56px" }}>

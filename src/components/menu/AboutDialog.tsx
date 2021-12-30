@@ -54,7 +54,7 @@ export function AboutDialog({ open, onClose }: Props) {
                         marginRight: "auto",
                     }}
                 >
-                    <ImageLink src={`${window.location.href}/images/GitHub-Mark-Light-64px.png`} alt="Github logo" />
+                    <ImageLink src={`${process.env.PUBLIC_URL}/images/GitHub-Mark-Light-64px.png`} alt="Github logo" />
                 </Link>
                 <Button onClick={onClose}>Close</Button>
             </DialogActions>

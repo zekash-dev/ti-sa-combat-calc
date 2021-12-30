@@ -14,7 +14,7 @@ export const FactionImage = React.memo(({ faction, style }: Props) => {
 });
 
 function getImagePath(faction: Faction): string {
-    const base = window.location.href;
+    const base = process.env.PUBLIC_URL;
     const subfolder = "images/factions";
     let imageName: string;
     switch (faction) {

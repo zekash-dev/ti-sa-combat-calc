@@ -6,6 +6,25 @@ import { unitDefinitions, UnitType } from "model/unit";
 import { ParticipantSliceState } from "redux/participant/participantSlice";
 import { factionResources, participantTagResources } from "./participant";
 
+// Notes on encoding:
+// The goal is to create a unique compressed string composed of characters that are valid as URL search parameters.
+// Format: {combatType}{attacker}~{defender}
+// combatType: "s" | "i"
+// attacker: {factionLetter}{units}_{tags}
+// defender: {factionLetter}{units}_{tags}
+// units: {unitLetter}{sustainedHits}y{tags}-{count} joined by "x"
+// tags: {tagString}y{tagValue} joined by "."
+// tagValue is serialized uniquely for tags that require custom settings. "z" is reserved as an internal separator.
+
+// Separator declaration:
+//   "~" separates attacker and defender
+//   "_" separates unit and tag section for each participant
+//   "-" separates unit definition from unit count
+//   "." separates tags
+//   "x" separates units
+//   "y" separates tag string from tag value
+//   "z" is reserved as an internal separator in tag values
+
 export function encodeParticipantsState(state: ParticipantSliceState): string {
     let str = encodeCombatType(state.combatType);
     str += encodeParticipant(state.participants.attacker);
@@ -54,7 +73,7 @@ function decodeCombatType(str: string): CombatType {
 function encodeParticipant(participant: ParticipantInput): string {
     let str = factionResources[participant.faction].letter;
     str += encodeUnits(participant.units);
-    str += "+";
+    str += "_";
     str += encodeTags(participant.tags);
     return str;
 }
@@ -62,8 +81,8 @@ function encodeParticipant(participant: ParticipantInput): string {
 function decodeParticipant(str: string): ParticipantInput {
     const faction: Faction = decodeFaction(str[0]);
     str = str.substring(1);
-    const split: string[] = str.split("+");
-    if (split.length !== 2) throw new Error("Unable to split by +");
+    const split: string[] = str.split("_");
+    if (split.length !== 2) throw new Error("Unable to split by _");
     const units: UnitInput[] = decodeUnits(split[0]);
     const tags: ParticipantInputTags = decodeTags(split[1]);
     return {
@@ -98,12 +117,12 @@ function encodeUnits(units: UnitInput[]): string {
         }
         unitStrings.push(unitStr);
     }
-    return unitStrings.join(",");
+    return unitStrings.join("x");
 }
 
 function decodeUnits(str: string): UnitInput[] {
     const units: UnitInput[] = [];
-    const splits: string[] = str.split(",");
+    const splits: string[] = str.split("x");
     for (let splitStr of splits) {
         if (splitStr.length === 0) continue;
         let unitStr = splitStr;
@@ -132,7 +151,7 @@ function encodeUnit(unit: UnitInput): string {
             const tag: UnitTag = Number(key);
             let tagStr = encodeInteger(tag);
             if (unit.tags[tag] !== true) {
-                tagStr += "=" + unit.tags[tag];
+                tagStr += "y" + unit.tags[tag];
             }
             tagStrings.push(tagStr);
         }
@@ -164,8 +183,8 @@ function decodeUnit(str: string): UnitInput {
         if (splitStr.length === 0) continue;
         let tagStr: string = splitStr;
         let tagValue: any = true;
-        if (splitStr.indexOf("=") > -1) {
-            const valueSplit = splitStr.split("=");
+        if (splitStr.indexOf("y") > -1) {
+            const valueSplit = splitStr.split("y");
             tagStr = valueSplit[0];
             tagValue = valueSplit[1];
         }
@@ -194,7 +213,7 @@ function encodeTags(tags: ParticipantInputTags): string {
             const tagResources = participantTagResources[tag];
             if (tagResources.implementation && tagResources.implementation.settings) {
                 const encodedSettings = tagResources.implementation.settings.encode(tags[tag]);
-                tagStr += "=" + encodedSettings;
+                tagStr += "y" + encodedSettings;
             }
         }
         tagStrings.push(tagStr);
@@ -209,8 +228,8 @@ function decodeTags(str: string): ParticipantInputTags {
         if (splitStr.length === 0) continue;
         let tagStr: string = splitStr;
         let tagValue: any = true;
-        if (splitStr.indexOf("=") > -1) {
-            const valueSplit = splitStr.split("=");
+        if (splitStr.indexOf("y") > -1) {
+            const valueSplit = splitStr.split("y");
             tagStr = valueSplit[0];
             const tag: ParticipantTag = decodeInteger(tagStr);
             const encodedTagValue = valueSplit[1];
@@ -269,9 +288,7 @@ const intCharMap = [
     "t",
     "u",
     "v",
-    "x",
-    "y",
-    "z",
+    // x, y and z are reserved as separator characters.
     "2",
     "3",
     "4",

@@ -240,7 +240,7 @@ export const selectParticipant = (role: ParticipantRole) => (rootState: RootStat
 
 export const selectCalculationInput = createSelector([selectParticipantState], toCalculationInput);
 
-export const selectCompressedState = createSelector([selectParticipantState], encodeParticipantsState);
+export const selectEncodedState = createSelector([selectParticipantState], encodeParticipantsState);
 
 function toCalculationInput(sliceState: ParticipantSliceState): CalculationInput {
     return {

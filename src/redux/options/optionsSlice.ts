@@ -6,10 +6,12 @@ const OPTIONS_STORAGE_KEY = "tisacc_options";
 
 export interface OptionsState {
     devMode: boolean;
+    useSearchParam: boolean;
 }
 
 export const defaultState: OptionsState = {
     devMode: false,
+    useSearchParam: true,
 };
 
 const optionsSlice = createSlice({
