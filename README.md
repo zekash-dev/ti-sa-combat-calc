@@ -8,13 +8,12 @@ The following is a roadmap for planned features in a rough priority order. Feedb
 
 ### 1. Feature requests and improvements
 
-Community feature requests.
+Community feature requests and usability improvements.
 
-1. Hit assignment protocols (for example designating a specific unit to save until last)
-2. Casualty result view (probability of X number of units surviving)
-3. Swap attacker and defender
-4. Pick any faction upgrade as Virus
-5. _&lt;other improvements depending on feedback&gt;_
+1. Casualty result view (probability of X number of units surviving)
+2. Pick any faction upgrade as Virus
+3. More hit assignment protocols?
+4. _&lt;other improvements depending on feedback&gt;_
 
 ### 2. Rare and complicated effects
 

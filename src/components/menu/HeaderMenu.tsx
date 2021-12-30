@@ -1,10 +1,10 @@
-import { QuestionAnswer, QuestionMark, Settings } from "@mui/icons-material";
+import { QuestionAnswer, QuestionMark, Replay, Settings, SwapHoriz } from "@mui/icons-material";
 import { Button, ButtonGroup, Grid, IconButton, Tooltip } from "@mui/material";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 import { CombatType } from "model/calculation";
-import { selectCombatType, setCombatType } from "redux/participant/participantSlice";
+import { resetTagsAndUnits, selectCombatType, setCombatType, switchRoles } from "redux/participant/participantSlice";
 import { AboutDialog } from "./AboutDialog";
 import { FaqDialog } from "./FaqDialog";
 import { SettingsDialog } from "./SettingsDialog";
@@ -17,6 +17,8 @@ export function HeaderMenu() {
     const [currentDialog, setCurrentDialog] = useState<FloatingMenuDialog | undefined>(undefined);
 
     const onChangeCombatType = (combatType: CombatType) => () => dispatch(setCombatType(combatType));
+    const onReset = () => dispatch(resetTagsAndUnits());
+    const onSwitchRoles = () => dispatch(switchRoles());
 
     const onOpen = (dialog: FloatingMenuDialog) => () => setCurrentDialog(dialog);
     const onClose = () => setCurrentDialog(undefined);
@@ -34,7 +36,18 @@ export function HeaderMenu() {
         >
             <Grid item xs={3}>
                 <Grid container sx={{ justifyContent: "flex-start", alignItems: "center", height: "100%" }}>
-                    <Grid item></Grid>
+                    <Grid item>
+                        <Tooltip placement="bottom" title="Reset all units and effects">
+                            <IconButton color="primary" onClick={onReset}>
+                                <Replay />
+                            </IconButton>
+                        </Tooltip>
+                        <Tooltip placement="bottom" title="Switch roles">
+                            <IconButton color="primary" onClick={onSwitchRoles}>
+                                <SwapHoriz />
+                            </IconButton>
+                        </Tooltip>
+                    </Grid>
                 </Grid>
             </Grid>
             <Grid item xs={6}>

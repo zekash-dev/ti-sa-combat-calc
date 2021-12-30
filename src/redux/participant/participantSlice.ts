@@ -1,4 +1,4 @@
-import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { Action, createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 import { getInitialState, getUnitSnapshots } from "logic/calculator";
 import { uniqueFilter } from "logic/common";
@@ -165,6 +165,27 @@ const participantSlice = createSlice({
         importParticipantsState: (state: ParticipantSliceState, action: PayloadAction<ParticipantSliceState>) => {
             return action.payload;
         },
+        resetTagsAndUnits: (state: ParticipantSliceState, action: Action) => {
+            state.participants.attacker.tags = grantDefaultFactionAbilities(
+                state.participants.attacker.tags,
+                state.participants.attacker.faction
+            );
+            state.participants.attacker.units = [];
+            state.participants.defender.tags = grantDefaultFactionAbilities(
+                state.participants.defender.tags,
+                state.participants.defender.faction
+            );
+            state.participants.defender.units = [];
+        },
+        switchRoles: (state: ParticipantSliceState, action: Action) => {
+            return {
+                ...state,
+                participants: {
+                    attacker: state.participants.defender,
+                    defender: state.participants.attacker,
+                },
+            };
+        },
     },
 });
 
@@ -230,6 +251,8 @@ export const {
     unsetUnitTag,
     setUnitSustainedHits,
     importParticipantsState,
+    resetTagsAndUnits,
+    switchRoles,
 } = participantSlice.actions;
 
 export const selectParticipantState = (rootState: RootState) => rootState.participant;

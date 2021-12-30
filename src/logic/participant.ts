@@ -47,10 +47,14 @@ export function grantDefaultFactionAbilities(participantTags: ParticipantInputTa
         delete newTags[oldAbility];
     }
     for (let newAbility of defaultFactionAbilities[faction]) {
-        newTags[newAbility] = getParticipantTagDefaultValue(newAbility);
+        if (participantTagResources[newAbility].implementation !== false) {
+            newTags[newAbility] = getParticipantTagDefaultValue(newAbility);
+        }
     }
     for (let newAbility of defaultFactionTechnologies[faction]) {
-        newTags[newAbility] = getParticipantTagDefaultValue(newAbility);
+        if (participantTagResources[newAbility].implementation !== false) {
+            newTags[newAbility] = getParticipantTagDefaultValue(newAbility);
+        }
     }
     return newTags;
 }
