@@ -1,4 +1,4 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { Action, createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 import { CalculationOutput } from "model/calculation";
 import { RootState } from "redux/store";
@@ -6,21 +6,16 @@ import { RootState } from "redux/store";
 export interface ResultState {
     output: CalculationOutput | null;
     calculating: boolean;
-    calculationKey: string;
+    pending: boolean;
 }
 
 export const initialState: ResultState = {
     output: null,
     calculating: false,
-    calculationKey: "",
+    pending: false,
 };
 
-interface StartCalculationPayload {
-    calculationKey: string;
-}
-
 interface SetResultPayload {
-    calculationKey: string;
     output: CalculationOutput | null;
 }
 
@@ -29,23 +24,26 @@ const resultSlice = createSlice({
     initialState: initialState,
     reducers: {
         setOutput: (state: ResultState, action: PayloadAction<SetResultPayload>) => {
-            const { calculationKey, output: results } = action.payload;
-            if (calculationKey === state.calculationKey) {
-                state.output = results;
+            const { output } = action.payload;
+            if (!state.pending) {
+                state.output = output;
                 state.calculating = false;
             }
         },
-        setCalculating: (state: ResultState, action: PayloadAction<StartCalculationPayload>) => {
-            const { calculationKey } = action.payload;
-            state.calculationKey = calculationKey;
+        setCalculating: (state: ResultState, action: Action) => {
             state.calculating = true;
+            state.pending = false;
+        },
+        setPending: (state: ResultState, action: Action) => {
+            state.pending = true;
         },
     },
 });
 
-export const { setCalculating, setOutput } = resultSlice.actions;
+export const { setCalculating, setPending, setOutput } = resultSlice.actions;
 
 export const selectOutput = (rootState: RootState) => rootState.result.output;
 export const selectCalculating = (rootState: RootState) => rootState.result.calculating;
+export const selectPending = (rootState: RootState) => rootState.result.pending;
 
 export default resultSlice.reducer;
