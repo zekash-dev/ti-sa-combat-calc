@@ -163,6 +163,10 @@ export class UnitState {
         };
     }
 
+    public hasTag(tag: number): boolean {
+        return !!this.tags && this.tags[tag] !== undefined;
+    }
+
     public hasTagValue(tag: number, value: number): boolean {
         return !!this.tags && this.tags[tag] === value;
     }

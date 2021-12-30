@@ -631,8 +631,8 @@ export const unitTagResources: KeyedDictionary<UnitTag, UnitTagResources> = {
         name: "Scientist",
         implementation: effects.scientist,
     },
-    [UnitTag.CERBERUS]: {
-        name: "The Cerberus",
+    [UnitTag.KEEP_ALIVE]: {
+        name: "Keep alive",
         implementation: false,
     },
 };

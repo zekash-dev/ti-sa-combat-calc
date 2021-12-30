@@ -1,4 +1,4 @@
-import { PriorityHigh } from "@mui/icons-material";
+import { Favorite, PriorityHigh } from "@mui/icons-material";
 import { Popover, Tooltip } from "@mui/material";
 import React, { useState } from "react";
 
@@ -20,6 +20,7 @@ export function UnitBattlefieldRepresentation({ unit, faction, role, scale }: Pr
     const [anchorEl, setAnchorEl] = useState<HTMLDivElement | null>(null);
     const hasAdmiral: boolean = !!unit.input.tags && unit.input.tags[UnitTag.ADMIRAL] === true;
     const hasScientist: boolean = !!unit.input.tags && unit.input.tags[UnitTag.SCIENTIST] === true;
+    const keepAlive: boolean = !!unit.input.tags && unit.input.tags[UnitTag.KEEP_ALIVE] === true;
 
     const openPopover = (event: React.MouseEvent<HTMLDivElement>) => {
         setAnchorEl(event.currentTarget);
@@ -57,6 +58,7 @@ export function UnitBattlefieldRepresentation({ unit, faction, role, scale }: Pr
                         ),
                         hasAdmiral && <AdmiralImage key="admiral" />,
                         hasScientist && <ScientistImage key="scientist" />,
+                        keepAlive && <Favorite color="error" />,
                         ...[...Array(unit.input.sustainedHits)].map((v, idx) => <HitCounterImage key={`hit-${idx}`} />),
                     ]}
                 />

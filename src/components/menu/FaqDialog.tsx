@@ -40,14 +40,14 @@ export function FaqDialog({ open, onClose }: Props) {
                     </Paragraph>
                     <Subheading>Hit assignment priority</Subheading>
                     <Paragraph>
-                        Currently, hit assignment priority is very simplified:
+                        Currently, hit assignment priority works as follows:
                         <ol>
                             <li>Assign hits to units that can sustain damage</li>
-                            <li>Assign hits to the unit with the worst combat value</li>
+                            <li>Assign hits to the unit with the worst combat value (except units with "Keep alive" set)</li>
+                            <li>Assign hits to units with "Keep alive" set that can't sustain more hits</li>
                         </ol>
-                        The plan is to implement some ways for the user to modify this priority, such as prioritizing by unit resource value
-                        or assigning a specific unit to keep alive (usually a Carrier). Suggestions for other hit assignment rules are
-                        welcome.
+                        The plan is to implement some ways for the user to modify this priority, such as prioritizing by unit resource
+                        value. Suggestions for other hit assignment rules are welcome.
                     </Paragraph>
                 </DialogContent>
             </OverlayScrollbarsComponent>

@@ -97,7 +97,11 @@ export type ParticipantTag = FactionAbility | FactionUpgrade | Technology | Comm
 export enum UnitTag {
     ADMIRAL = 901,
     SCIENTIST = 902,
-    CERBERUS = 903,
+    /**
+     * Prioritize destroying other units when assigning hits.
+     * The unit will still sustain hits when possible.
+     */
+    KEEP_ALIVE = 903,
 }
 
 export interface UnitTagResources {

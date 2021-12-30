@@ -6,28 +6,17 @@ Combat calculator for Twilight Imperium: Shattered Ascension.
 
 The following is a roadmap for planned features in a rough priority order. Feedback is welcome, either as issues on Github or in the community Discord.
 
-### 1. Common effects
-
-The highest priority is to implement remaining common effects that are relatively easy to implement.
-
-1. L1z1x Flagship
-
-### 2. Feature requests
+### 1. Feature requests and improvements
 
 Community feature requests.
 
 1. Hit assignment protocols (for example designating a specific unit to save until last)
 2. Casualty result view (probability of X number of units surviving)
-3. _&lt;other improvements depending on feedback&gt;_
+3. Swap attacker and defender
+4. Pick any faction upgrade as Virus
+5. _&lt;other improvements depending on feedback&gt;_
 
-### 3. Quality of life improvements
-
-Improvements that increase the usability of the calculator.
-
-1. Swap attacker and defender
-2. Pick any faction upgrade as Virus
-
-### 4. Rare and complicated effects
+### 2. Rare and complicated effects
 
 Effects that come up rarely or are complicated to implement.
 
@@ -45,7 +34,7 @@ Effects that come up rarely or are complicated to implement.
     - Yin
 4. Niche technologies
     - X-89 bacterial weapon
-5. General reroll
+5. General reroll ability
 6. Action cards
 7. Political cards
 

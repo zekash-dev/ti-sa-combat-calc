@@ -613,6 +613,8 @@ function calculateHitPriority(unit: ComputedUnitSnapshot, hitType: HitType, stag
     }
     if (canSustainWithoutDying(unit, stage)) {
         priority += 10;
+    } else if (unit.base.hasTag(UnitTag.KEEP_ALIVE)) {
+        priority -= 20;
     }
     return priority;
 }
