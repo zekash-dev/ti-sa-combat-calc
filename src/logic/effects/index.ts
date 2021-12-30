@@ -30,6 +30,7 @@ export * from "./saarChaosMapping";
 export * from "./sardakkBerzerkerGenome";
 export * from "./sardakkFlagship";
 export * from "./sardakkUnitMod";
+export * from "./scientist";
 export * from "./solAdvancedFleetTactics";
 export * from "./solMark2AdvancedCarriers";
 export * from "./solVersatileCombatTactics";

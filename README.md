@@ -10,8 +10,7 @@ The following is a roadmap for planned features in a rough priority order. Feedb
 
 The highest priority is to implement remaining common effects that are relatively easy to implement.
 
-1. Scientist
-2. L1z1x Flagship
+1. L1z1x Flagship
 
 ### 2. Feature requests
 
@@ -27,8 +26,6 @@ Improvements that increase the usability of the calculator.
 
 1. Swap attacker and defender
 2. Pick any faction upgrade as Virus
-3. Save input states (in-browser storage)
-4. Display application version in "About" page
 
 ### 4. Rare and complicated effects
 

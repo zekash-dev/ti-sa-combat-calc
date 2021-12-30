@@ -5,6 +5,7 @@ import { CombatStage, ParticipantRole, RichUnit } from "model/calculation";
 import { Faction } from "model/combatTags";
 import { FlagshipDefinition, unitDefinitions, UnitType } from "model/unit";
 import { UnitAdmiralInput } from "./UnitAdmiralInput";
+import { UnitScientistInput } from "./UnitScientistInput";
 import { UnitStageStatsView } from "./UnitStageStatsView";
 import { UnitSustainDamageInput } from "./UnitSustainDamageInput";
 
@@ -33,6 +34,7 @@ export function UnitPopover({ unit, faction, role }: Props) {
             })}
             {unit.baseline && <UnitStageStatsView label="Combat" stats={unit.baseline} />}
             <UnitAdmiralInput role={role} unit={unit} />
+            <UnitScientistInput role={role} unit={unit} />
             <UnitSustainDamageInput role={role} unit={unit} />
             {flagshipDefinition?.notes && (
                 <Typography

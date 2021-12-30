@@ -283,6 +283,6 @@ export const unitDefinitions: KeyedDictionary<UnitType, UnitDefinition> = {
         name: "PDS",
         combatantIn: [],
         imageSize: { x: 40, y: 40 },
-        imageBadgeAnchor: { x: 10, y: 10 },
+        imageBadgeAnchor: { x: 0, y: 5 },
     },
 };

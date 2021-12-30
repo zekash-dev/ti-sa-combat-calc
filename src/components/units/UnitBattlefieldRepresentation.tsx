@@ -1,7 +1,7 @@
 import { Popover } from "@mui/material";
 import React, { useState } from "react";
 
-import { AdmiralImage, HitCounterImage, UnitImage } from "components/graphics";
+import { AdmiralImage, HitCounterImage, ScientistImage, UnitImage } from "components/graphics";
 import { ParticipantRole, RichUnit } from "model/calculation";
 import { Faction, UnitTag } from "model/combatTags";
 import { unitDefinitions } from "model/unit";
@@ -17,6 +17,7 @@ interface Props {
 export function UnitBattlefieldRepresentation({ unit, faction, role, scale }: Props) {
     const [anchorEl, setAnchorEl] = useState<HTMLDivElement | null>(null);
     const hasAdmiral: boolean = !!unit.input.tags && unit.input.tags[UnitTag.ADMIRAL] === true;
+    const hasScientist: boolean = !!unit.input.tags && unit.input.tags[UnitTag.SCIENTIST] === true;
 
     const openPopover = (event: React.MouseEvent<HTMLDivElement>) => {
         setAnchorEl(event.currentTarget);
@@ -48,6 +49,7 @@ export function UnitBattlefieldRepresentation({ unit, faction, role, scale }: Pr
                     scale={scale}
                     badges={[
                         hasAdmiral && <AdmiralImage key="admiral" />,
+                        hasScientist && <ScientistImage key="scientist" />,
                         ...[...Array(unit.input.sustainedHits)].map((v, idx) => <HitCounterImage key={`hit-${idx}`} />),
                     ]}
                 />
