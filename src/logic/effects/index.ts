@@ -15,6 +15,7 @@ export * from "./hylarVLaser";
 export * from "./impulsionShields";
 export * from "./jolnarUnitMod";
 export * from "./lizixDreadnoughtMod";
+export * from "./lizixFlagship";
 export * from "./lizixGroundForceMod";
 export * from "./magenDefenseGrid";
 export * from "./maneuveringJets";

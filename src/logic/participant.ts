@@ -601,8 +601,8 @@ export const flagshipDefinitions: KeyedDictionary<Faction, FlagshipDefinition> =
         combatRolls: 3,
         sustainDamage: 2,
         spaceCannon: 1,
+        effect: effects.lizixFlagship,
         notes: "Hits must be taken by non-fighter ships",
-        nyi: true,
     },
     [Faction.ARBOREC_ECOSYSTEM]: {
         ...unitDefinitions[UnitType.Flagship],

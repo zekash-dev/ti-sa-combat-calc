@@ -1,10 +1,12 @@
-import { Popover } from "@mui/material";
+import { PriorityHigh } from "@mui/icons-material";
+import { Popover, Tooltip } from "@mui/material";
 import React, { useState } from "react";
 
 import { AdmiralImage, HitCounterImage, ScientistImage, UnitImage } from "components/graphics";
+import { flagshipDefinitions } from "logic/participant";
 import { ParticipantRole, RichUnit } from "model/calculation";
 import { Faction, UnitTag } from "model/combatTags";
-import { unitDefinitions } from "model/unit";
+import { unitDefinitions, UnitType } from "model/unit";
 import { UnitPopover } from "./UnitPopover";
 
 interface Props {
@@ -48,6 +50,11 @@ export function UnitBattlefieldRepresentation({ unit, faction, role, scale }: Pr
                     role={role}
                     scale={scale}
                     badges={[
+                        unit.input.type === UnitType.Flagship && flagshipDefinitions[faction].nyi === true && (
+                            <Tooltip title="Flagship effect not yet implemented">
+                                <PriorityHigh color="error" />
+                            </Tooltip>
+                        ),
                         hasAdmiral && <AdmiralImage key="admiral" />,
                         hasScientist && <ScientistImage key="scientist" />,
                         ...[...Array(unit.input.sustainedHits)].map((v, idx) => <HitCounterImage key={`hit-${idx}`} />),
