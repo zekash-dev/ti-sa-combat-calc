@@ -45,20 +45,20 @@ export function calculateCombatOutcome(input: CalculationInput): CalculationOutp
     if (process.env.NODE_ENV === "development") {
         console.profile();
     }
-    let activeState: CombatStateProbability | undefined = {
+    const initialState: CombatStateProbability | undefined = {
         state: getInitialState(input),
         probability: 1.0,
     };
     const stateDictionary: CombatStateDictionary = {};
-    const statesByStage: SparseDictionary<CombatStage, CombatStateProbability[]> = {
-        [activeState.state.stage]: [activeState],
-    };
+    const statesByStage: SparseDictionary<CombatStage, CombatStateProbability[]> = {};
     const stateResolutions: CombatStateResolutionDictionary = {};
-    while (activeState !== undefined) {
+    appendCombatStateProbabilities(stateDictionary, [initialState]);
+    addStatesByStage(statesByStage, initialState.probability, [initialState]);
+    let activeState: CombatStateProbability | undefined;
+    while ((activeState = popNextActiveState(stateDictionary, input.combatType)) !== undefined) {
         const nextStates: CombatStateProbability[] = resolveState(activeState, input, stateResolutions);
         appendCombatStateProbabilities(stateDictionary, nextStates);
         addStatesByStage(statesByStage, activeState.probability, nextStates);
-        activeState = popNextActiveState(stateDictionary, input.combatType);
     }
     const output = createCalculationOutput(stateDictionary, statesByStage, input);
     if (process.env.NODE_ENV === "development") {
