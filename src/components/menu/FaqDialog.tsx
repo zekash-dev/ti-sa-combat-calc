@@ -18,7 +18,12 @@ export function FaqDialog({ open, onClose }: Props) {
             </DialogTitle>
             <OverlayScrollbarsComponent>
                 <DialogContent>
-                    <Subheading first>Expected and assigned hits</Subheading>
+                    <Subheading first>What is a Draw?</Subheading>
+                    <Paragraph>
+                        If the combat ends in a draw, it means that all units from both the attacker and defender have been destroyed. Total
+                        destruction!
+                    </Paragraph>
+                    <Subheading>Expected and assigned hits</Subheading>
                     <Paragraph>
                         For each combat stage, the number of expected hits for each participant is printed. Expected hits are an average of
                         all possible outcomes at the beginning of the stage, weighed by probability. Combat outcomes that end before the
