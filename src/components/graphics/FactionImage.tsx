@@ -70,7 +70,7 @@ function getImagePath(faction: Faction): string {
             imageName = "arborec.png";
             break;
         case Faction.ORDER_OF_THE_LAST:
-            imageName = "sol.png"; // Placeholder
+            imageName = "last.png";
             break;
     }
     return `${base}/${subfolder}/${imageName}`;
