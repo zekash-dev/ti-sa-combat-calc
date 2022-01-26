@@ -29,6 +29,21 @@ export function UrlParamsTrigger() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
+    // On query string changes after initation (e.g. history navigation), decode the URL parameter and import the state
+    useEffect(() => {
+        if (q && initiated) {
+            try {
+                const state = decodeParticipantsState(q.trim());
+                dispatch(importParticipantsState(state));
+            } catch (e) {
+                console.error(`Error importing state from string: ${q}`);
+                console.error(e);
+            }
+        }
+        setInitiated(true);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [q, initiated]);
+
     useEffect(() => {
         // Prevent "flicker" to base state URL when initiating
         if (initiated) {
