@@ -197,6 +197,13 @@ export function getUnitSnapshots(
     applyUnitSnapshotParticipantTags(combatState, input, role, stage, unitSnapshots);
     applyUnitSnapshotUnitTags(combatState, input, role, stage, unitSnapshots);
     applyOpponentUnitSnapshotParticipantTags(combatState, input, getOpponentRole(role), stage, unitSnapshots);
+    for (let unit of unitSnapshots) {
+        // Tags can set a unit's rolls to NaN to indicate that it should never get any rolls, regardless of other effects.
+        // Here we convert NaN -> 0 to allow the rest of the calculation to work as expected.
+        if (isNaN(unit.rolls)) {
+            unit.rolls = 0;
+        }
+    }
     adjustCombatRollsForSustainDamage(stage, unitSnapshots);
     return unitSnapshots;
 }

@@ -1,14 +1,15 @@
 import { CombatStage, ParticipantRole } from "model/calculation";
-import { ParticipantTagImplementation, PreAssignHitsInput, PreAssignHitsOutput } from "model/effects";
+import { ParticipantOnComputeSnapshotInput, ParticipantTagImplementation } from "model/effects";
 
 export const agent: ParticipantTagImplementation = {
-    preAssignHits: ({ combatState, role }: PreAssignHitsInput): PreAssignHitsOutput => {
-        // Note: The rules definition says that units don't get to use "Invasion defence".
-        // This implementation is slightly different in that it simply negates all hits from "Invasion defence".
-        // The for that is to prevent any other effect tag (such as scientist) from granting more rolls after this tag has removed all rolls.
-        if (role === ParticipantRole.Attacker && combatState.stage === CombatStage.InvasionDefence) {
-            return { newHits: {} };
+    onComputeOpponentUnitSnapshots: ({ combatState, role, stage, units }: ParticipantOnComputeSnapshotInput) => {
+        // 'role' here indicates the agent owner's role
+        if (role === ParticipantRole.Attacker && stage === CombatStage.InvasionDefence) {
+            for (let unit of units) {
+                // Setting this to NaN prevents any other effects from adding more combat rolls for the unit.
+                // NaN will be changed to 0 after all tags are applied.
+                unit.rolls = NaN;
+            }
         }
-        return {};
     },
 };
