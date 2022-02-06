@@ -12,8 +12,9 @@ Community feature requests and usability improvements.
 
 1. Casualty result view (probability of X number of units surviving)
 2. Pick any faction upgrade as Virus
-3. More hit assignment protocols?
-4. _&lt;other improvements depending on feedback&gt;_
+3. Ion storm and nebula toggles
+4. More hit assignment protocols?
+5. _&lt;other improvements depending on feedback&gt;_
 
 ### 2. Rare and complicated effects
 
