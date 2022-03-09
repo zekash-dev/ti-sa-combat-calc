@@ -1,6 +1,6 @@
 {
     "name": "ti-sa-combat-calc",
-    "version": "1.1.0",
+    "version": "1.1.1",
     "private": true,
     "homepage": "https://www.astralvault.net/games/SA/CombatCalculator",
     "dependencies": {
