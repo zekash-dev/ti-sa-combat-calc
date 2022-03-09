@@ -166,15 +166,9 @@ const participantSlice = createSlice({
             return action.payload;
         },
         resetTagsAndUnits: (state: ParticipantSliceState, action: Action) => {
-            state.participants.attacker.tags = grantDefaultFactionAbilities(
-                state.participants.attacker.tags,
-                state.participants.attacker.faction
-            );
+            state.participants.attacker.tags = grantDefaultFactionAbilities({}, state.participants.attacker.faction);
             state.participants.attacker.units = [];
-            state.participants.defender.tags = grantDefaultFactionAbilities(
-                state.participants.defender.tags,
-                state.participants.defender.faction
-            );
+            state.participants.defender.tags = grantDefaultFactionAbilities({}, state.participants.defender.faction);
             state.participants.defender.units = [];
         },
         switchRoles: (state: ParticipantSliceState, action: Action) => {
