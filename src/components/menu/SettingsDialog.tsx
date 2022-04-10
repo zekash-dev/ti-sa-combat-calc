@@ -1,19 +1,15 @@
-import {
-    Button,
-    Checkbox,
-    Dialog,
-    DialogActions,
-    DialogContent,
-    DialogTitle,
-    FormControlLabel,
-    FormGroup,
-    Typography,
-} from "@mui/material";
+import { Button, Checkbox, Dialog, DialogActions, DialogContent, DialogTitle, FormControlLabel, FormGroup } from "@mui/material";
 import { OverlayScrollbarsComponent } from "overlayscrollbars-react";
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 
-import { OptionsState, selectOptions, updateOptions } from "redux/options/optionsSlice";
+import {
+    OptionsState,
+    selectOptions,
+    selectShowStatisticsSettingState,
+    setShowStatisticsForAllStages,
+    updateOptions,
+} from "redux/options/optionsSlice";
 
 interface Props {
     open: boolean;
@@ -23,6 +19,7 @@ interface Props {
 export function SettingsDialog({ open, onClose }: Props) {
     const dispatch = useDispatch();
     const options: OptionsState = useSelector(selectOptions);
+    const showStatistics: "all" | "none" | "some" = useSelector(selectShowStatisticsSettingState);
 
     const onBooleanChanged = (key: keyof OptionsState) => (e: React.ChangeEvent<HTMLInputElement>) => {
         dispatch(
@@ -32,13 +29,14 @@ export function SettingsDialog({ open, onClose }: Props) {
         );
     };
 
+    const onToggleShowStatistics = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const newValue = showStatistics !== "all";
+        dispatch(setShowStatisticsForAllStages(newValue));
+    };
+
     return (
         <Dialog open={open} onClose={onClose} maxWidth="md">
-            <DialogTitle>
-                <Typography variant="h4" color="text.primary">
-                    Settings
-                </Typography>
-            </DialogTitle>
+            <DialogTitle color="text.primary">Settings</DialogTitle>
             <OverlayScrollbarsComponent>
                 <DialogContent>
                     <FormGroup>
@@ -51,6 +49,18 @@ export function SettingsDialog({ open, onClose }: Props) {
                         <FormControlLabel
                             control={<Checkbox checked={options.useSearchParam} onChange={onBooleanChanged("useSearchParam")} />}
                             label="Auto-update URL"
+                        />
+                    </FormGroup>
+                    <FormGroup>
+                        <FormControlLabel
+                            control={
+                                <Checkbox
+                                    checked={showStatistics === "all"}
+                                    indeterminate={showStatistics === "some"}
+                                    onChange={onToggleShowStatistics}
+                                />
+                            }
+                            label="Show output statistics"
                         />
                     </FormGroup>
                 </DialogContent>

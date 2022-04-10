@@ -1,4 +1,4 @@
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Link, Typography } from "@mui/material";
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Link } from "@mui/material";
 import { OverlayScrollbarsComponent } from "overlayscrollbars-react";
 
 import { BuildTimeDisplay } from "./BuildTimeDisplay";
@@ -12,11 +12,7 @@ interface Props {
 export function AboutDialog({ open, onClose }: Props) {
     return (
         <Dialog open={open} onClose={onClose} maxWidth="md">
-            <DialogTitle>
-                <Typography variant="h4" color="text.primary">
-                    About
-                </Typography>
-            </DialogTitle>
+            <DialogTitle color="text.primary">About</DialogTitle>
             <OverlayScrollbarsComponent>
                 <DialogContent>
                     <Paragraph>

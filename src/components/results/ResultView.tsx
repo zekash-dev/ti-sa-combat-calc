@@ -1,35 +1,53 @@
 import { ExpandMore } from "@mui/icons-material";
-import { Accordion, AccordionDetails, AccordionSummary, Typography } from "@mui/material";
+import { Accordion, AccordionDetails, AccordionSummary, Button, Typography } from "@mui/material";
 import { useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
-import { CalculationOutput, ParticipantInput, ParticipantRole } from "model/calculation";
+import { CalculationInput, CalculationOutput, CombatStage, ParticipantInput, ParticipantRole } from "model/calculation";
 import { KeyedDictionary } from "model/common";
-import { selectParticipants } from "redux/participant/participantSlice";
+import { selectShowStatisticsForStage, setShowStatisticsForStage } from "redux/options/optionsSlice";
+import { selectCalculationInput, selectParticipants } from "redux/participant/participantSlice";
 import { selectOutput } from "redux/result/resultSlice";
+import { CasualtiesView } from "./CasualtiesView";
 import { CombatStageResultView } from "./CombatStageResultView";
 import { ResultPercentageBars } from "./ResultPercentageBars";
 import { ResultPercentageLabels } from "./ResultPercentageLabels";
 
 export function ResultView() {
+    const dispatch = useDispatch();
     const [expanded, setExpanded] = useState(true);
+    const input: CalculationInput = useSelector(selectCalculationInput);
     const output: CalculationOutput | null = useSelector(selectOutput);
     const participants: KeyedDictionary<ParticipantRole, ParticipantInput> = useSelector(selectParticipants);
+    const showStatistics = useSelector(selectShowStatisticsForStage(CombatStage.RoundN));
+
+    const toggleShowStatistics = (e: React.MouseEvent<HTMLButtonElement>) => {
+        e.stopPropagation();
+        const nextValue: boolean = !showStatistics;
+        dispatch(setShowStatisticsForStage(CombatStage.RoundN, nextValue));
+        if (nextValue && !expanded) {
+            setExpanded(true);
+        }
+    };
 
     if (!output) return null;
 
     return (
         <>
-            <CombatStageResultView output={output} participants={participants} />
+            <CombatStageResultView input={input} output={output} participants={participants} />
             <Accordion expanded={expanded} disableGutters onChange={() => setExpanded((prev) => !prev)}>
                 <AccordionSummary expandIcon={<ExpandMore />}>
                     <Typography variant="h6" color="text.primary">
                         Final results
                     </Typography>
+                    <Button sx={{ marginLeft: "auto" }} variant="text" onClick={toggleShowStatistics}>
+                        {showStatistics ? "Hide statistics" : "Show statistics"}
+                    </Button>
                 </AccordionSummary>
                 <AccordionDetails sx={{ padding: 0 }}>
                     <ResultPercentageLabels victorProbabilities={output.victorProbabilities} />
                     <ResultPercentageBars victorProbabilities={output.victorProbabilities} participants={participants} />
+                    {showStatistics && <CasualtiesView input={input} statistics={output.statistics} participants={participants} />}
                 </AccordionDetails>
             </Accordion>
         </>

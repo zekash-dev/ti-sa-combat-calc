@@ -9,6 +9,7 @@ import {
     ParticipantInputTags,
     ParticipantRole,
     RichUnit,
+    UnitInput,
 } from "model/calculation";
 import { CombatState, ComputedUnitSnapshot } from "model/combatState";
 import {
@@ -95,8 +96,11 @@ export const unitSizes: KeyedDictionary<UnitType, number> = Object.fromEntries(
     allUnitTypes.map((type: UnitType) => [type, unitDefinitions[type].imageSize.x * unitDefinitions[type].imageSize.y])
 ) as KeyedDictionary<UnitType, number>;
 
-export function unitSizeComparer(a: RichUnit, b: RichUnit): number {
+export function richUnitSizeComparer(a: RichUnit, b: RichUnit): number {
     return unitSizes[b.input.type] - unitSizes[a.input.type];
+}
+export function unitInputSizeComparer(a: UnitInput, b: UnitInput): number {
+    return unitSizes[b.type] - unitSizes[a.type];
 }
 
 export function getOpponentRole(role: ParticipantRole): ParticipantRole {

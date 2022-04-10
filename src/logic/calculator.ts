@@ -1,4 +1,4 @@
-import { clamp, max, round, sum } from "lodash";
+import { clamp, isEqual, max, round, sum } from "lodash";
 
 import {
     CalculationInput,
@@ -17,6 +17,8 @@ import {
     ParticipantInput,
     ParticipantRole,
     UnitInput,
+    SurvivingUnitsStatistics,
+    CalculationOutputStatistics,
 } from "model/calculation";
 import {
     CombatState,
@@ -609,6 +611,9 @@ export function unitIsCombatant(unitType: UnitType, combatType: CombatType): boo
 
 function calculateHitPriority(unit: ComputedUnitSnapshot, hitType: HitType, stage: CombatStage): number {
     let priority: number = unit.combatValue;
+    if (unit.base.hasTag(UnitTag.ADMIRAL)) {
+        priority -= 0.5;
+    }
     if (hitType === HitType.AssignToNonFighterFirst && unit.type === UnitType.Fighter) {
         priority -= 100;
     }
@@ -807,7 +812,10 @@ function createCalculationOutput(
         victorProbabilities: victorProbabilities,
         finalStates: resultStatesOutput,
         stages: createCombatStageOutputs(statesByStage, input),
-        // statesByStage: statesByStageOutput,
+        statistics: {
+            [ParticipantRole.Attacker]: calculateOutputStatistics(ParticipantRole.Attacker, resultStatesOutput, input),
+            [ParticipantRole.Defender]: calculateOutputStatistics(ParticipantRole.Defender, resultStatesOutput, input),
+        },
     };
 }
 
@@ -851,6 +859,7 @@ function createCombatStageOutputs(
                 ParticipantRole.Attacker,
                 beforeStates,
                 afterStates,
+                afterStatesOutput,
                 input,
                 stage
             ),
@@ -858,6 +867,7 @@ function createCombatStageOutputs(
                 ParticipantRole.Defender,
                 beforeStates,
                 afterStates,
+                afterStatesOutput,
                 input,
                 stage
             ),
@@ -885,6 +895,7 @@ function calculateCombatStageParticipantStatistics(
     role: ParticipantRole,
     beforeStates: CombatStateProbability[],
     afterStates: CombatStateProbability[],
+    afterStatesOutput: CombatStateProbabilityOutput[],
     input: CalculationInput,
     stage: CombatStage
 ): CombatStageParticipantStatistics {
@@ -899,8 +910,7 @@ function calculateCombatStageParticipantStatistics(
         expectedHits += expHits * stateProbability.probability;
 
         const opponentUnits: ComputedUnitSnapshot[] = getUnitSnapshots(stateProbability.state, input, opponent, stage);
-        const health: number =
-            sum(opponentUnits.filter((u) => unitIsCombatant(u.type, input.combatType)).map(getUnitHealth)) * stateProbability.probability;
+        const health: number = getTotalUnitHealth(opponentUnits, input.combatType) * stateProbability.probability;
         opponentHealthBefore += health;
         if (determineVictor(stateProbability.state, input.combatType) === opponent) {
             opponentHealthAfter += health;
@@ -908,13 +918,48 @@ function calculateCombatStageParticipantStatistics(
     }
     for (let stateProbability of afterStates) {
         const opponentUnits: ComputedUnitSnapshot[] = getUnitSnapshots(stateProbability.state, input, opponent, stage);
-        opponentHealthAfter +=
-            sum(opponentUnits.filter((u) => unitIsCombatant(u.type, input.combatType)).map(getUnitHealth)) * stateProbability.probability;
+        opponentHealthAfter += getTotalUnitHealth(opponentUnits, input.combatType) * stateProbability.probability;
     }
     return {
         expectedHits: expectedHits / totalProbabilityBefore,
         assignedHits: (opponentHealthBefore - opponentHealthAfter) / totalProbabilityBefore,
+        survivingUnitProbabilities: getSurvivingUnitsStatistics(afterStatesOutput, role, input.combatType),
     };
+}
+
+function calculateOutputStatistics(
+    role: ParticipantRole,
+    afterStatesOutput: CombatStateProbabilityOutput[],
+    input: CalculationInput
+): CalculationOutputStatistics {
+    return {
+        survivingUnitProbabilities: getSurvivingUnitsStatistics(afterStatesOutput, role, input.combatType),
+    };
+}
+
+function getSurvivingUnitsStatistics(
+    stateProbabilities: CombatStateProbabilityOutput[],
+    participant: ParticipantRole,
+    combatType: CombatType
+): SurvivingUnitsStatistics[] {
+    const unitProbabilities: SurvivingUnitsStatistics[] = [];
+
+    for (let stateProbability of stateProbabilities) {
+        const units: UnitInput[] = stateProbability.state[participant].units;
+        const existingEntry: SurvivingUnitsStatistics | undefined = unitProbabilities.find((u) => isEqual(u.units, units));
+        if (existingEntry) {
+            existingEntry.probability += stateProbability.probability;
+        } else {
+            const newEntry: SurvivingUnitsStatistics = {
+                units,
+                totalHealth: getTotalUnitInputHealth(units, combatType),
+                sustainedHits: sum(stateProbability.state[participant].units.map((u) => u.sustainedHits)),
+                probability: stateProbability.probability,
+            };
+            unitProbabilities.push(newEntry);
+        }
+    }
+    return unitProbabilities.sort(unitHealthComparer(combatType));
 }
 
 function getUnitExpectedHits(unit: ComputedUnitSnapshot): number {
@@ -924,8 +969,30 @@ function getUnitExpectedHits(unit: ComputedUnitSnapshot): number {
     );
 }
 
+export function getTotalUnitHealth(units: ComputedUnitSnapshot[], combatType: CombatType) {
+    return sum(units.filter((u) => unitIsCombatant(u.type, combatType)).map(getUnitHealth));
+}
+
+export function getTotalUnitInputHealth(units: UnitInput[], combatType: CombatType): number {
+    return sum(
+        units.filter((u) => unitIsCombatant(u.type, combatType)).map((u) => unitDefinitions[u.type].sustainDamage - u.sustainedHits + 1)
+    );
+}
+
 function getUnitHealth(unit: ComputedUnitSnapshot): number {
     return unit.sustainDamage - unit.sustainedHits + 1;
+}
+
+function unitHealthComparer(combatType: CombatType): (a: SurvivingUnitsStatistics, b: SurvivingUnitsStatistics) => number {
+    return (a: SurvivingUnitsStatistics, b: SurvivingUnitsStatistics): number => {
+        const unitCountA: number = a.units.length;
+        const unitCountB: number = b.units.length;
+        if (unitCountA !== unitCountB) return unitCountB - unitCountA;
+
+        const unitHealthA: number = getTotalUnitInputHealth(a.units, combatType);
+        const unitHealthB: number = getTotalUnitInputHealth(b.units, combatType);
+        return unitHealthB - unitHealthA;
+    };
 }
 
 export function getVictorProbabilities(

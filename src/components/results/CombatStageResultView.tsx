@@ -1,10 +1,12 @@
 import { ExpandMore } from "@mui/icons-material";
-import { Accordion, AccordionDetails, AccordionSummary, Tooltip, Typography } from "@mui/material";
+import { Accordion, AccordionDetails, AccordionSummary, Button, Tooltip, Typography } from "@mui/material";
 import { round } from "lodash";
 import { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 
 import { combatStageResources } from "logic/participant";
 import {
+    CalculationInput,
     CalculationOutput,
     CombatStage,
     CombatStageOutput,
@@ -13,38 +15,52 @@ import {
     ParticipantRole,
 } from "model/calculation";
 import { KeyedDictionary } from "model/common";
+import { selectShowStatisticsForStage, setShowStatisticsForStage } from "redux/options/optionsSlice";
+import { CasualtiesView } from "./CasualtiesView";
 import { ResultPercentageBars } from "./ResultPercentageBars";
 import { ResultPercentageLabels } from "./ResultPercentageLabels";
 
 interface CombatStageResultViewProps {
+    input: CalculationInput;
     output: CalculationOutput;
     participants: KeyedDictionary<ParticipantRole, ParticipantInput>;
 }
 
-export function CombatStageResultView({ output, participants }: CombatStageResultViewProps) {
+export function CombatStageResultView({ input, output, participants }: CombatStageResultViewProps) {
     return (
         <>
-            <CombatStageView output={output} participants={participants} stage={CombatStage.SpaceMines} />
-            <CombatStageView output={output} participants={participants} stage={CombatStage.Bombardment} />
-            <CombatStageView output={output} participants={participants} stage={CombatStage.SpaceCannon} />
-            <CombatStageView output={output} participants={participants} stage={CombatStage.InvasionDefence} />
-            <CombatStageView output={output} participants={participants} stage={CombatStage.StartOfBattle} />
-            <CombatStageView output={output} participants={participants} stage={CombatStage.AntiFighterBarrage} />
-            <CombatStageView output={output} participants={participants} stage={CombatStage.PreCombat} />
-            <CombatStageView output={output} participants={participants} stage={CombatStage.Round1} />
+            <CombatStageView input={input} output={output} participants={participants} stage={CombatStage.SpaceMines} />
+            <CombatStageView input={input} output={output} participants={participants} stage={CombatStage.Bombardment} />
+            <CombatStageView input={input} output={output} participants={participants} stage={CombatStage.SpaceCannon} />
+            <CombatStageView input={input} output={output} participants={participants} stage={CombatStage.InvasionDefence} />
+            <CombatStageView input={input} output={output} participants={participants} stage={CombatStage.StartOfBattle} />
+            <CombatStageView input={input} output={output} participants={participants} stage={CombatStage.AntiFighterBarrage} />
+            <CombatStageView input={input} output={output} participants={participants} stage={CombatStage.PreCombat} />
+            <CombatStageView input={input} output={output} participants={participants} stage={CombatStage.Round1} />
         </>
     );
 }
 
 interface CombatStageViewProps {
+    input: CalculationInput;
     output: CalculationOutput;
     participants: KeyedDictionary<ParticipantRole, ParticipantInput>;
     stage: CombatStage;
 }
 
-function CombatStageView(props: CombatStageViewProps) {
+function CombatStageView({ input, output, participants, stage }: CombatStageViewProps) {
+    const dispatch = useDispatch();
     const [expanded, setExpanded] = useState(false);
-    const { output, participants, stage } = props;
+    const showStatistics = useSelector(selectShowStatisticsForStage(stage));
+
+    const toggleShowStatistics = (e: React.MouseEvent<HTMLButtonElement>) => {
+        e.stopPropagation();
+        const nextValue: boolean = !showStatistics;
+        dispatch(setShowStatisticsForStage(stage, nextValue));
+        if (nextValue && !expanded) {
+            setExpanded(true);
+        }
+    };
     const stageOutput: CombatStageOutput | undefined = output.stages[stage];
     if (!stageOutput) return null;
     return (
@@ -55,10 +71,14 @@ function CombatStageView(props: CombatStageViewProps) {
                 </Typography>
                 <ParticipantHitsDisplay label="Attacker" participant={stageOutput.statistics.attacker} />
                 <ParticipantHitsDisplay label="Defender" participant={stageOutput.statistics.defender} />
+                <Button sx={{ marginLeft: "auto" }} variant="text" onClick={toggleShowStatistics}>
+                    {showStatistics ? "Hide statistics" : "Show statistics"}
+                </Button>
             </AccordionSummary>
             <AccordionDetails sx={{ padding: 0 }}>
                 <ResultPercentageLabels victorProbabilities={stageOutput.victorProbabilities} small />
                 <ResultPercentageBars victorProbabilities={stageOutput.victorProbabilities} participants={participants} small />
+                {showStatistics && <CasualtiesView input={input} statistics={stageOutput.statistics} participants={participants} />}
             </AccordionDetails>
         </Accordion>
     );

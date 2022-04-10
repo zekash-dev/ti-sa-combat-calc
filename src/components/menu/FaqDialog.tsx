@@ -1,4 +1,4 @@
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Typography } from "@mui/material";
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle } from "@mui/material";
 import { OverlayScrollbarsComponent } from "overlayscrollbars-react";
 
 import { Paragraph, Subheading } from "./Common";
@@ -11,11 +11,7 @@ interface Props {
 export function FaqDialog({ open, onClose }: Props) {
     return (
         <Dialog open={open} onClose={onClose} maxWidth="md">
-            <DialogTitle>
-                <Typography variant="h4" color="text.primary">
-                    FAQ
-                </Typography>
-            </DialogTitle>
+            <DialogTitle color="text.primary">FAQ</DialogTitle>
             <OverlayScrollbarsComponent>
                 <DialogContent>
                     <Subheading first>What is a Draw?</Subheading>

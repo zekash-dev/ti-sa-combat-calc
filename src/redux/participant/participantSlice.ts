@@ -3,7 +3,7 @@ import { Action, createSelector, createSlice, PayloadAction } from "@reduxjs/too
 import { getInitialState, getUnitSnapshots } from "logic/calculator";
 import { uniqueFilter } from "logic/common";
 import { encodeParticipantsState } from "logic/compression";
-import { getSelectableUnitTypes, grantDefaultFactionAbilities, unitSizeComparer } from "logic/participant";
+import { getSelectableUnitTypes, grantDefaultFactionAbilities, richUnitSizeComparer } from "logic/participant";
 import {
     CalculationInput,
     CombatStage,
@@ -326,7 +326,7 @@ function createRichUnits(calculationInput: CalculationInput, role: ParticipantRo
         });
     }
 
-    richUnits.sort(unitSizeComparer);
+    richUnits.sort(richUnitSizeComparer);
     return richUnits;
 }
 

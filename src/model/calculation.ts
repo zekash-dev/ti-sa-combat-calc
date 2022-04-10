@@ -67,6 +67,7 @@ export interface CalculationOutput {
     victorProbabilities: KeyedDictionary<CombatVictor, number>;
     finalStates: CombatStateProbabilityOutput[];
     stages: SparseDictionary<CombatStage, CombatStageOutput>;
+    statistics: KeyedDictionary<ParticipantRole, CalculationOutputStatistics>;
 }
 
 export interface CombatStateProbabilityOutput {
@@ -90,7 +91,7 @@ export interface CombatStageOutput {
 /**
  * Statistics for a participant in a single combat stage.
  */
-export interface CombatStageParticipantStatistics {
+export interface CombatStageParticipantStatistics extends StatisticsBase {
     /**
      * Expected hits based on the participant's units.
      */
@@ -101,6 +102,23 @@ export interface CombatStageParticipantStatistics {
      * This can differ from _expectedHits_ if all hits can't be assigned, or if the opponent uses abilities to cancel hits.
      */
     assignedHits: number;
+}
+
+export interface CalculationOutputStatistics extends StatisticsBase {}
+
+export interface StatisticsBase {
+    /**
+     * Statistics for surviving units for the participant.
+     * The probability of all entries in the array shall sum to 1.0.
+     */
+    survivingUnitProbabilities: SurvivingUnitsStatistics[];
+}
+
+export interface SurvivingUnitsStatistics {
+    units: UnitInput[];
+    probability: number;
+    totalHealth: number;
+    sustainedHits: number;
 }
 
 export interface ParticipantInput {
