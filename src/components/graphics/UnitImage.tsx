@@ -29,7 +29,8 @@ export const UnitImage = React.memo(({ unitType, faction, role, scale, badges }:
         <div
             style={{
                 position: "relative",
-                visibility: loaded ? "visible" : "hidden",
+                visibility: loaded ? "inherit" : "hidden",
+                overflow: "hidden",
             }}
         >
             <SvgLoader path={path} onSVGReady={handleLoaded}>

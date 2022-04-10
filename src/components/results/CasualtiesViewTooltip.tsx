@@ -1,6 +1,6 @@
-import { Popover, PopoverPosition, Typography } from "@mui/material";
-import { Box } from "@mui/system";
+import { Fade, Paper, PopoverPosition, Popper, Typography } from "@mui/material";
 import { round } from "lodash";
+import { useEffect, useState } from "react";
 
 import { UnitInputImage } from "components/units/UnitInputImage";
 import { unitInputSizeComparer } from "logic/participant";
@@ -14,6 +14,10 @@ import {
 } from "model/calculation";
 import { KeyedDictionary } from "model/common";
 
+type VirtualElement = {
+    getBoundingClientRect: () => DOMRect;
+    contextElement?: Element;
+};
 export interface TooltipContext {
     open: boolean;
     position: PopoverPosition;
@@ -35,36 +39,54 @@ interface CasualtiesViewTooltipProps {
     tooltipContext: TooltipContext;
 }
 
+function createVirtualElement(x: number, y: number): VirtualElement {
+    return {
+        getBoundingClientRect: () => new DOMRect(x, y, 0, 0),
+    };
+}
 export function CasualtiesViewTooltip(props: CasualtiesViewTooltipProps) {
     const { participants, participant, survivingUnitsStatistics, tooltipContext } = props;
     const participantInput: ParticipantInput = participants[participant];
+    const [stickyDataIndex, setStickyDataIndex] = useState<number>(tooltipContext.dataIndex);
 
-    const survivingUnits: SurvivingUnitsStatistics | undefined = survivingUnitsStatistics[tooltipContext.dataIndex];
+    const survivingUnits: SurvivingUnitsStatistics | undefined = survivingUnitsStatistics[stickyDataIndex];
     const sortedUnits: UnitInput[] = [...(survivingUnits?.units ?? [])].sort(unitInputSizeComparer);
+
+    const [anchorEl, setAnchorEl] = useState<VirtualElement | null>(null);
+
+    useEffect(() => {
+        if (tooltipContext.position !== defaultTooltipContext.position) {
+            setAnchorEl(createVirtualElement(tooltipContext.position.left, tooltipContext.position.top));
+        }
+    }, [setAnchorEl, tooltipContext.position]);
+    useEffect(() => {
+        // Retain the previous data index to prevent flickers when fading out the popper
+        if (tooltipContext.dataIndex !== defaultTooltipContext.dataIndex) {
+            setStickyDataIndex(tooltipContext.dataIndex);
+        }
+    }, [setStickyDataIndex, tooltipContext.dataIndex]);
+
     return (
-        <Popover
+        <Popper
             open={tooltipContext.open}
-            sx={{
-                pointerEvents: "none",
-            }}
-            anchorReference="anchorPosition"
-            anchorPosition={tooltipContext.position}
-            anchorOrigin={{
-                vertical: "top",
-                horizontal: "left",
-            }}
-            transformOrigin={{
-                vertical: "top",
-                horizontal: participant === ParticipantRole.Attacker ? "left" : "right",
-            }}
-            disableScrollLock
+            anchorEl={anchorEl}
+            placement={participant === ParticipantRole.Attacker ? "right" : "left"}
+            transition
         >
-            {survivingUnits && (
-                <Box sx={{ p: 2, width: "100%", overflow: "visible" }}>
-                    <Typography variant="body1">
-                        {round(survivingUnits.probability * 100, 2)}%: {survivingUnits.units.length} surviving units
-                    </Typography>
-                    <Box sx={{ maxWidth: 300 }}>
+            {({ TransitionProps }) => (
+                <Fade {...TransitionProps} timeout={350}>
+                    <Paper
+                        elevation={3}
+                        sx={{
+                            p: 2,
+                            maxWidth: 300,
+                            backgroundImage: "linear-gradient(rgba(255, 255, 255, 0.10), rgba(255, 255, 255, 0.10))",
+                        }}
+                    >
+                        <Typography variant="body1" sx={{ paddingBottom: "3px", fontSize: "1.1em" }}>
+                            {survivingUnits &&
+                                `${round(survivingUnits.probability * 100, 2)}%: ${survivingUnits.units.length} surviving units`}
+                        </Typography>
                         {sortedUnits.map((unit: UnitInput, idx: number) => (
                             <UnitInputImage
                                 key={`${unit.type}-${idx}`}
@@ -74,9 +96,9 @@ export function CasualtiesViewTooltip(props: CasualtiesViewTooltipProps) {
                                 scale={1.0}
                             />
                         ))}
-                    </Box>
-                </Box>
+                    </Paper>
+                </Fade>
             )}
-        </Popover>
+        </Popper>
     );
 }
