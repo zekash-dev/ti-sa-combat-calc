@@ -61,6 +61,7 @@ export interface CalculationInput {
     combatType: CombatType;
     [ParticipantRole.Attacker]: ParticipantInput;
     [ParticipantRole.Defender]: ParticipantInput;
+    tags: ParticipantInputTags; // Global tags that apply to the combat
 }
 
 export interface CalculationOutput {

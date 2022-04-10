@@ -219,7 +219,7 @@ function applyUnitSnapshotParticipantTags(
 ) {
     const participant: ParticipantState = combatState[role];
     const participantInput: ParticipantInput = calculationInput[role];
-    const tagValues: ParticipantTagValueAndState[] = getParticipantTagValues(participantInput, participant);
+    const tagValues: ParticipantTagValueAndState[] = getParticipantTagValues(calculationInput, participantInput, participant);
     const effectInput: ParticipantOnComputeSnapshotInput = {
         calculationInput,
         combatState,
@@ -246,7 +246,7 @@ function applyOpponentUnitSnapshotParticipantTags(
 ) {
     const opponentState: ParticipantState = combatState[opponentRole];
     const opponentInput: ParticipantInput = calculationInput[opponentRole];
-    const opponentTagValues: ParticipantTagValueAndState[] = getParticipantTagValues(opponentInput, opponentState);
+    const opponentTagValues: ParticipantTagValueAndState[] = getParticipantTagValues(calculationInput, opponentInput, opponentState);
     const effectInput: ParticipantOnComputeSnapshotInput = {
         calculationInput,
         combatState,
@@ -294,12 +294,30 @@ interface ParticipantTagValueAndState {
     inputValue: any;
     state: number | undefined;
 }
-function getParticipantTagValues(input: ParticipantInput, state: ParticipantState): ParticipantTagValueAndState[] {
+
+function getParticipantTagValues(
+    calculationInput: CalculationInput,
+    participantInput: ParticipantInput,
+    state: ParticipantState
+): ParticipantTagValueAndState[] {
     const values: ParticipantTagValueAndState[] = [];
-    for (let tagStr of Object.keys(input.tags)) {
+
+    for (let tagStr of Object.keys(calculationInput.tags)) {
+        const tag: ParticipantTag = Number(tagStr);
+        const tagInputValue: any = calculationInput.tags[tag];
+        const tagState = state.tags[tag];
+        values.push({
+            tag,
+            implementation: participantTagResources[tag].implementation,
+            inputValue: tagInputValue,
+            state: tagState,
+        });
+    }
+
+    for (let tagStr of Object.keys(participantInput.tags)) {
         const tag: ParticipantTag = Number(tagStr);
         if (tag === FlagshipTag.FLAGSHIP) continue; // Flagship has custom handling, see below.
-        const tagInputValue: any = input.tags[tag];
+        const tagInputValue: any = participantInput.tags[tag];
         const tagState = state.tags[tag];
         values.push({
             tag,
@@ -310,9 +328,9 @@ function getParticipantTagValues(input: ParticipantInput, state: ParticipantStat
     }
     // Add the flagship effect if the flagship is part of the fleet and has a special effect.
     if (state.units.some((u) => u.type === UnitType.Flagship)) {
-        const flagshipEffect: ParticipantTagImplementation | undefined = flagshipDefinitions[input.faction].effect;
+        const flagshipEffect: ParticipantTagImplementation | undefined = flagshipDefinitions[participantInput.faction].effect;
         if (flagshipEffect) {
-            const tagInputValue: any = input.tags[FlagshipTag.FLAGSHIP];
+            const tagInputValue: any = participantInput.tags[FlagshipTag.FLAGSHIP];
             const tagState = state.tags[FlagshipTag.FLAGSHIP];
             values.push({
                 tag: FlagshipTag.FLAGSHIP,
@@ -470,7 +488,7 @@ function applyPreAssignHitTags(
     let modifiedUnits: ComputedUnitSnapshot[] = units;
     const participant: ParticipantState = combatState[role];
     const participantInput: ParticipantInput = calculationInput[role];
-    const tagValues: ParticipantTagValueAndState[] = getParticipantTagValues(participantInput, participant);
+    const tagValues: ParticipantTagValueAndState[] = getParticipantTagValues(calculationInput, participantInput, participant);
     for (let { tag, implementation, state } of tagValues) {
         if (!!implementation && !!implementation.preAssignHits) {
             const effectInput: PreAssignHitsInput = {
@@ -512,7 +530,7 @@ function applyOpponentPreAssignHitTags(
     let modifiedUnits: ComputedUnitSnapshot[] = units;
     const opponent: ParticipantState = combatState[opponentRole];
     const opponentInput: ParticipantInput = calculationInput[opponentRole];
-    const opponentTagValues: ParticipantTagValueAndState[] = getParticipantTagValues(opponentInput, opponent);
+    const opponentTagValues: ParticipantTagValueAndState[] = getParticipantTagValues(calculationInput, opponentInput, opponent);
     for (let { tag, implementation, state } of opponentTagValues) {
         if (!!implementation && !!implementation.preAssignOpponentHits) {
             const effectInput: PreAssignHitsInput = {
@@ -611,21 +629,31 @@ export function unitIsCombatant(unitType: UnitType, combatType: CombatType): boo
 
 function calculateHitPriority(unit: ComputedUnitSnapshot, hitType: HitType, stage: CombatStage): number {
     let priority: number = unit.combatValue;
-    if (unit.base.hasTag(UnitTag.ADMIRAL)) {
-        priority -= 0.5;
-    }
     if (hitType === HitType.AssignToNonFighterFirst && unit.type === UnitType.Fighter) {
+        // Fighters can't be assigned AssignToNonFighterFirst hits
         priority -= 100;
     }
     if (stage === CombatStage.Bombardment && unit.type === UnitType.Mech) {
-        priority -= 100;
+        // Mechs must take Bombardment hits first
+        priority += 100;
     }
     if (combatRoundStages.includes(stage) && unit.type === UnitType.ShockTroop) {
-        priority -= 100;
+        // Shock troops must take hits first in normal combat rounds
+        priority += 100;
+    }
+    if (unit.rolls === 0) {
+        // Units unable to perform combat rolls (i.e. fighters in an Ion Storm) should be prioritized first when assigning hits
+        priority += 10;
+    }
+    if (unit.base.hasTag(UnitTag.ADMIRAL)) {
+        // If an unit has an admiral, it should not be assigned hits before other units with the same combat value
+        priority -= 0.5;
     }
     if (canSustainWithoutDying(unit, stage)) {
+        // Units that can sustain hits should be assigned hits first
         priority += 10;
     } else if (unit.base.hasTag(UnitTag.KEEP_ALIVE)) {
+        // Units with the KEEP_ALIVE tag that can't sustain any more hits should not be assigned hits before other units, if possible.
         priority -= 20;
     }
     return priority;

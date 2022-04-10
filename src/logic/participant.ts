@@ -13,6 +13,7 @@ import {
 } from "model/calculation";
 import { CombatState, ComputedUnitSnapshot } from "model/combatState";
 import {
+    CombatTag,
     CommonParticipantTag,
     ConstantTag,
     Faction,
@@ -85,6 +86,7 @@ function getUnitTypesWithCombatRollsInStage(calculationInput: CalculationInput, 
             ...calculationInput.defender,
             units: [],
         },
+        tags: calculationInput.tags,
     };
     input[role].units = allUnitTypes.map((uType) => ({ type: uType, sustainedHits: 0 }));
     const combatState: CombatState = getInitialState(input);
@@ -453,11 +455,25 @@ const commonParticipantTagResources: KeyedDictionary<CommonParticipantTag, Parti
     },
 };
 
+const combatTagResources: KeyedDictionary<CombatTag, ParticipantTagResources> = {
+    [CombatTag.NEBULA]: {
+        name: "Nebula",
+        color: "white",
+        implementation: effects.nebula,
+    },
+    [CombatTag.ION_STORM]: {
+        name: "Ion storm",
+        color: "white",
+        implementation: effects.ionStorm,
+    },
+};
+
 export const participantTagResources: KeyedDictionary<ParticipantTag, ParticipantTagResources> = {
     ...factionAbilityResources,
     ...factionUpgradeResources,
     ...technologyResources,
     ...commonParticipantTagResources,
+    ...combatTagResources,
     // Flagship here is just a placeholder, to be replaced by faction-specific flagship implementations.
     [FlagshipTag.FLAGSHIP]: {
         name: "Flagship",

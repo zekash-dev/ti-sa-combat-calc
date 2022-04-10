@@ -10,6 +10,7 @@ import {
     combatStagesByCombatType,
     CombatType,
     ParticipantInput,
+    ParticipantInputTags,
     ParticipantRole,
     RichParticipant,
     RichParticipantsInput,
@@ -26,6 +27,7 @@ import { RootState } from "redux/store";
 export interface ParticipantSliceState {
     combatType: CombatType;
     participants: KeyedDictionary<ParticipantRole, ParticipantInput>;
+    tags: ParticipantInputTags;
 }
 
 export const initialState: ParticipantSliceState = {
@@ -42,6 +44,7 @@ export const initialState: ParticipantSliceState = {
             tags: grantDefaultFactionAbilities({}, Faction.WINNU_SOVEREIGNTY),
         },
     },
+    tags: {},
 };
 
 interface SetFactionPayload {
@@ -49,13 +52,22 @@ interface SetFactionPayload {
     faction: Faction;
 }
 
-interface SetTagPayload {
+interface SetCombatTagPayload {
+    key: ParticipantTag;
+    value: any;
+}
+
+interface SetParticipantTagPayload {
     role: ParticipantRole;
     key: ParticipantTag;
     value: any;
 }
 
-interface UnsetTagPayload {
+interface UnsetCombatTagPayload {
+    key: ParticipantTag;
+}
+
+interface UnsetParticipantTagPayload {
     role: ParticipantRole;
     key: ParticipantTag;
 }
@@ -102,13 +114,23 @@ const participantSlice = createSlice({
             state.participants[role].faction = faction;
             state.participants[role].tags = grantDefaultFactionAbilities(state.participants[role].tags, faction);
         },
-        setParticipantTag: (state: ParticipantSliceState, action: PayloadAction<SetTagPayload>) => {
+        setCombatTag: (state: ParticipantSliceState, action: PayloadAction<SetCombatTagPayload>) => {
+            const { key, value } = action.payload;
+            if (typeof key === "number") {
+                state.tags[key as ParticipantTag] = value;
+            }
+        },
+        unsetCombatTag: (state: ParticipantSliceState, action: PayloadAction<UnsetCombatTagPayload>) => {
+            const { key } = action.payload;
+            delete state.tags[key];
+        },
+        setParticipantTag: (state: ParticipantSliceState, action: PayloadAction<SetParticipantTagPayload>) => {
             const { role, key, value } = action.payload;
             if (typeof key === "number") {
                 state.participants[role].tags[key as ParticipantTag] = value;
             }
         },
-        unsetParticipantTag: (state: ParticipantSliceState, action: PayloadAction<UnsetTagPayload>) => {
+        unsetParticipantTag: (state: ParticipantSliceState, action: PayloadAction<UnsetParticipantTagPayload>) => {
             const { role, key } = action.payload;
             delete state.participants[role].tags[key];
         },
@@ -234,6 +256,8 @@ function determineRemovalIndex(units: UnitInput[], unitType: UnitType): number {
 export const {
     setCombatType,
     setFaction,
+    setCombatTag,
+    unsetCombatTag,
     setParticipantTag,
     unsetParticipantTag,
     clearParticipantUnits,
@@ -254,6 +278,7 @@ export const selectCombatType = (rootState: RootState): CombatType => rootState.
 export const selectParticipants = (rootState: RootState): KeyedDictionary<ParticipantRole, ParticipantInput> =>
     rootState.participant.participants;
 export const selectParticipant = (role: ParticipantRole) => (rootState: RootState) => rootState.participant.participants[role];
+export const selectCombatTags = (rootState: RootState): ParticipantInputTags => rootState.participant.tags;
 
 export const selectCalculationInput = createSelector([selectParticipantState], toCalculationInput);
 
@@ -264,6 +289,7 @@ function toCalculationInput(sliceState: ParticipantSliceState): CalculationInput
         combatType: sliceState.combatType,
         attacker: sliceState.participants.attacker,
         defender: sliceState.participants.defender,
+        tags: sliceState.tags,
     };
 }
 

@@ -1,6 +1,7 @@
 export * from "./AdmiralImage";
 export * from "./AgentImage";
 export * from "./CombatRollImage";
+export * from "./CombatTagImage";
 export * from "./CommonParticipantTagImage";
 export * from "./FactionImage";
 export * from "./GeneralImage";

@@ -8,7 +8,7 @@ import { factionResources, participantTagResources } from "./participant";
 
 // Notes on encoding:
 // The goal is to create a unique compressed string composed of characters that are valid as URL search parameters.
-// Format: {combatType}{attacker}~{defender}
+// Format: {combatType}{attacker}~{defender}~{tags}
 // combatType: "s" | "i"
 // attacker: {factionLetter}{units}_{tags}
 // defender: {factionLetter}{units}_{tags}
@@ -30,6 +30,10 @@ export function encodeParticipantsState(state: ParticipantSliceState): string {
     str += encodeParticipant(state.participants.attacker);
     str += "~";
     str += encodeParticipant(state.participants.defender);
+    if (Object.keys(state.tags).length > 0) {
+        str += "~";
+        str += encodeTags(state.tags);
+    }
     return str;
 }
 
@@ -37,9 +41,13 @@ export function decodeParticipantsState(str: string): ParticipantSliceState {
     const combatType = decodeCombatType(str[0]);
     str = str.substring(1);
     const split: string[] = str.split("~");
-    if (split.length !== 2) throw new Error("Unable to split by ~");
+    if (split.length < 2) throw new Error("Unable to split by ~");
     const attacker: ParticipantInput = decodeParticipant(split[0]);
     const defender: ParticipantInput = decodeParticipant(split[1]);
+    let tags: ParticipantInputTags = {};
+    if (split.length > 2) {
+        tags = decodeTags(split[2]);
+    }
 
     return {
         combatType,
@@ -47,6 +55,7 @@ export function decodeParticipantsState(str: string): ParticipantSliceState {
             attacker,
             defender,
         },
+        tags,
     };
 }
 

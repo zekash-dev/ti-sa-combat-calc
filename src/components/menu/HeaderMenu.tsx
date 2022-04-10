@@ -3,7 +3,9 @@ import { Button, ButtonGroup, Grid, IconButton, Tooltip } from "@mui/material";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
+import { CombatTagButton } from "components/tags/CombatTagButton";
 import { CombatType } from "model/calculation";
+import { CombatTag } from "model/combatTags";
 import { resetTagsAndUnits, selectCombatType, setCombatType, switchRoles } from "redux/participant/participantSlice";
 import { AboutDialog } from "./AboutDialog";
 import { FaqDialog } from "./FaqDialog";
@@ -34,7 +36,7 @@ export function HeaderMenu() {
                 borderBottomRightRadius: 10,
             }}
         >
-            <Grid item xs={3}>
+            <Grid item xs={5}>
                 <Grid container sx={{ justifyContent: "flex-start", alignItems: "center", height: "100%" }}>
                     <Grid item>
                         <Tooltip placement="bottom" title="Reset all units and effects">
@@ -50,7 +52,7 @@ export function HeaderMenu() {
                     </Grid>
                 </Grid>
             </Grid>
-            <Grid item xs={6}>
+            <Grid item xs={2}>
                 <Grid container sx={{ justifyContent: "center", alignItems: "center", height: "100%" }}>
                     <Grid item>
                         <ButtonGroup>
@@ -74,9 +76,13 @@ export function HeaderMenu() {
                     </Grid>
                 </Grid>
             </Grid>
-            <Grid item xs={3}>
-                <Grid container sx={{ justifyContent: "flex-end", alignItems: "center", height: "100%" }}>
-                    <Grid item>
+            <Grid item xs={5}>
+                <Grid container sx={{ height: "100%" }}>
+                    <Grid item sx={{ marginLeft: 4 }}>
+                        <CombatTagButton tag={CombatTag.ION_STORM} />
+                        <CombatTagButton tag={CombatTag.NEBULA} />
+                    </Grid>
+                    <Grid item sx={{ marginLeft: "auto" }}>
                         <Tooltip placement="bottom" title="Settings">
                             <IconButton color="primary" onClick={onOpen("settings")}>
                                 <Settings />
