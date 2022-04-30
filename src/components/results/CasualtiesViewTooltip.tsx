@@ -1,4 +1,5 @@
 import { Fade, Paper, PopoverPosition, Popper, Typography } from "@mui/material";
+import { useDebounce } from "hooks/useDebounce";
 import { round } from "lodash";
 import { useEffect, useState } from "react";
 
@@ -52,11 +53,18 @@ export function CasualtiesViewTooltip(props: CasualtiesViewTooltipProps) {
     const survivingUnits: SurvivingUnitsStatistics | undefined = survivingUnitsStatistics[stickyDataIndex];
     const sortedUnits: UnitInput[] = [...(survivingUnits?.units ?? [])].sort(unitInputSizeComparer);
 
-    const [anchorEl, setAnchorEl] = useState<VirtualElement | null>(null);
+    const [anchorEl, setAnchorEl] = useState<VirtualElement>(createVirtualElement(0, 0));
+
+    const visible: boolean = useDebounce(tooltipContext.open, 50);
 
     useEffect(() => {
         if (tooltipContext.position !== defaultTooltipContext.position) {
             setAnchorEl(createVirtualElement(tooltipContext.position.left, tooltipContext.position.top));
+
+            // Reposition the popper after rendering to make sure it's positioned correctly
+            setTimeout(() => {
+                setAnchorEl(createVirtualElement(tooltipContext.position.left, tooltipContext.position.top));
+            }, 50);
         }
     }, [setAnchorEl, tooltipContext.position]);
     useEffect(() => {
@@ -81,6 +89,7 @@ export function CasualtiesViewTooltip(props: CasualtiesViewTooltipProps) {
                             p: 2,
                             maxWidth: 300,
                             backgroundImage: "linear-gradient(rgba(255, 255, 255, 0.10), rgba(255, 255, 255, 0.10))",
+                            visibility: visible ? "visible" : "hidden",
                         }}
                     >
                         <Typography variant="body2" sx={{ color: "text.secondary" }}>

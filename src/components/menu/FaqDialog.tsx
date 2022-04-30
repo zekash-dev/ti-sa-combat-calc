@@ -40,13 +40,13 @@ export function FaqDialog({ open, onClose }: Props) {
                         Effects such as Impulsion shields and Berzerker genome can also cause the expected hits and assigned hits to differ.
                     </Paragraph>
                     <Subheading>Hit assignment priority</Subheading>
+                    <Paragraph>Currently, hit assignment priority works as follows:</Paragraph>
+                    <ol>
+                        <li>Assign hits to units that can sustain damage</li>
+                        <li>Assign hits to the unit with the worst combat value (except units with "Keep alive" set)</li>
+                        <li>Assign hits to units with "Keep alive" set that can't sustain more hits</li>
+                    </ol>
                     <Paragraph>
-                        Currently, hit assignment priority works as follows:
-                        <ol>
-                            <li>Assign hits to units that can sustain damage</li>
-                            <li>Assign hits to the unit with the worst combat value (except units with "Keep alive" set)</li>
-                            <li>Assign hits to units with "Keep alive" set that can't sustain more hits</li>
-                        </ol>
                         The plan is to implement some ways for the user to modify this priority, such as prioritizing by unit resource
                         value. Suggestions for other hit assignment rules are welcome.
                     </Paragraph>
