@@ -12,7 +12,7 @@ interface Props {
 export const CombatRollImage = React.memo(({ combatValue, style }: Props) => {
     const [loaded, setLoaded] = React.useState(false);
     const handleLoaded = () => setLoaded(true);
-    const clampedCombatValue = clamp(combatValue, 1, 10);
+    const clampedCombatValue = clamp(combatValue, 1, 11);
     const path: string = getSvgPath(clampedCombatValue);
     const baseColor: string = diceColors[clampedCombatValue] ?? diceColors[10];
     const textColor: string = getTextColor(clampedCombatValue);
@@ -40,6 +40,9 @@ function getSvgPath(combatValue: number): string {
     const subfolder = "images/dice";
     let imageName: string;
     switch (combatValue) {
+        case 11:
+            imageName = "d10-nil.svg";
+            break;
         case 10:
             imageName = "d10-10.svg";
             break;
@@ -71,7 +74,7 @@ function getSvgPath(combatValue: number): string {
             imageName = "d10-1.svg";
             break;
         default:
-            imageName = "d10-10.svg";
+            imageName = "d10-nil.svg";
             break;
     }
     return `${base}/${subfolder}/${imageName}`;
@@ -88,6 +91,7 @@ const diceColors: KeyedDictionary<number, string> = {
     8: "#F4641D",
     9: "#DA1918",
     10: "#713B17",
+    11: "#666666",
 };
 
 function getTextColor(combatValue: number): string {
