@@ -1,3 +1,4 @@
+import { min } from "lodash";
 import React from "react";
 import { SvgLoader, SvgProxy } from "react-svgmt";
 
@@ -45,7 +46,10 @@ export const UnitImage = React.memo(({ unitType, faction, role, scale, badges }:
                     .filter((badge: JSX.Element | false): badge is JSX.Element => !!badge)
                     .map((badge: JSX.Element) =>
                         React.cloneElement(badge, {
-                            style: { float: role === ParticipantRole.Attacker ? "left" : "right", width: "min(30px, 50%)" },
+                            style: {
+                                float: role === ParticipantRole.Attacker ? "left" : "right",
+                                width: `min(${min([30, (2 * scale * unitDef.imageSize.x) / badges.length])}px, 50%)`,
+                            },
                         })
                     )}
             </BadgeContainer>

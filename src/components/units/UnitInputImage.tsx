@@ -47,7 +47,9 @@ export function UnitInputImage({ unit, faction, role, scale, style, onClick }: P
                     hasAdmiral && <AdmiralImage key="admiral" />,
                     hasScientist && <ScientistImage key="scientist" />,
                     keepAlive && <Favorite key="keep-alive" color="error" />,
-                    ...[...Array(unit.sustainedHits)].map((v, idx) => <HitCounterImage key={`hit-${idx}`} />),
+                    ...[...Array(unit.sustainedHits + (unit.usedPlanetaryShields ?? 0))].map((v, idx) => (
+                        <HitCounterImage key={`hit-${idx}`} />
+                    )),
                 ]}
             />
         </div>

@@ -144,6 +144,10 @@ export type ParticipantInputTags = SparseDictionary<ParticipantTag, any>;
 export interface UnitInput {
     type: UnitType;
     sustainedHits: number;
+    /**
+     * This is currently only used to display used planetary shields in the casualty view.
+     */
+    usedPlanetaryShields?: number;
     tags?: UnitInputTags; // Leaders present on ships/PDS, AC's affecting a specific unit
 }
 export type UnitInputTags = SparseDictionary<UnitTag, any>;

@@ -1056,7 +1056,7 @@ function getSurvivingUnitsStatistics(
             const newEntry: SurvivingUnitsStatistics = {
                 units,
                 totalHealth: getTotalUnitInputHealth(units, combatType),
-                sustainedHits: sum(stateProbability.state[participant].units.map((u) => u.sustainedHits)),
+                sustainedHits: sum(stateProbability.state[participant].units.map((u) => u.sustainedHits + (u.usedPlanetaryShields ?? 0))),
                 probability: stateProbability.probability,
                 probabilityThisOrBetter: 0,
                 probabilityThisOrWorse: 0,

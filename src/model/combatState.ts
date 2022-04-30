@@ -1,7 +1,7 @@
 import { Dictionary } from "lodash";
 
 import { CalculationInput, CombatStage, CombatStateOutput, HitType, ParticipantInput, ParticipantRole, UnitInput } from "./calculation";
-import { ParticipantTag, UnitTag } from "./combatTags";
+import { ConstantTag, ParticipantTag, UnitTag } from "./combatTags";
 import { UnitType } from "./unit";
 
 /**
@@ -159,6 +159,7 @@ export class UnitState {
         return {
             type: this.type,
             sustainedHits: this.sustainedHits,
+            usedPlanetaryShields: this.tags ? this.tags[ConstantTag.PLANETARY_SHIELD] : undefined,
             tags: this.tags,
         };
     }
