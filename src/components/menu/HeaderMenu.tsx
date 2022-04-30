@@ -50,6 +50,10 @@ export function HeaderMenu() {
                             </IconButton>
                         </Tooltip>
                     </Grid>
+                    <Grid item sx={{ marginLeft: 4 }}>
+                        <CombatTagButton tag={CombatTag.ION_STORM} />
+                        <CombatTagButton tag={CombatTag.NEBULA} />
+                    </Grid>
                 </Grid>
             </Grid>
             <Grid item xs={2}>
@@ -78,10 +82,6 @@ export function HeaderMenu() {
             </Grid>
             <Grid item xs={5}>
                 <Grid container sx={{ height: "100%" }}>
-                    <Grid item sx={{ marginLeft: 4 }}>
-                        <CombatTagButton tag={CombatTag.ION_STORM} />
-                        <CombatTagButton tag={CombatTag.NEBULA} />
-                    </Grid>
                     <Grid item sx={{ marginLeft: "auto" }}>
                         <Tooltip placement="bottom" title="Settings">
                             <IconButton color="primary" onClick={onOpen("settings")}>
