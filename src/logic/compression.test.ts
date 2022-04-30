@@ -22,6 +22,7 @@ describe("encodeParticipantsState", () => {
                     },
                 },
             },
+            tags: {},
         };
         const expectedResult = "sk_~m_vJ";
 
@@ -59,6 +60,7 @@ describe("encodeParticipantsState", () => {
                     },
                 },
             },
+            tags: {},
         };
         const expectedResult = "skf_~mu_vJ";
 
@@ -92,6 +94,7 @@ describe("encodeParticipantsState", () => {
                     },
                 },
             },
+            tags: {},
         };
         const expectedResult = "skf_~m_vJ";
         const expectedDecoded: ParticipantSliceState = {
@@ -140,6 +143,7 @@ describe("encodeParticipantsState", () => {
                     },
                 },
             },
+            tags: {},
         };
         const expectedResult = "skn1_~m_vJ";
 
@@ -175,6 +179,7 @@ describe("encodeParticipantsState", () => {
                     },
                 },
             },
+            tags: {},
         };
         const expectedResult = "skn.BX_~m_vJ";
 
@@ -223,6 +228,7 @@ describe("encodeParticipantsState", () => {
                     },
                 },
             },
+            tags: {},
         };
         const expectedResult = "skf-5_~m_vJ";
 
@@ -278,6 +284,7 @@ describe("encodeParticipantsState", () => {
                     },
                 },
             },
+            tags: {},
         };
         const expectedResult = "skn1.BXxn1-2xn-3_~m_vJ";
 
@@ -309,6 +316,7 @@ describe("encodeParticipantsState", () => {
                     },
                 },
             },
+            tags: {},
         };
         const expectedResult = "sg_3Gy1~m_vJ";
 

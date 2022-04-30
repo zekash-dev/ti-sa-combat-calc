@@ -179,9 +179,24 @@ export enum HitTypeFlags {
     NotCombatRoll = 0b01000000,
 }
 
+export const HIT_TYPE_AND_FLAGS_BITMASK = 0b0011111111;
+
 export interface HitsProbabilityOutcome {
     hits: SparseDictionary<HitType, number>;
     probability: number;
+}
+
+export interface HitsProbabilityIntermediateOutcome {
+    /**
+     * Key: masked hit type, including unit combat strength
+     */
+    hits: SparseDictionary<number, HitCount>;
+    probability: number;
+}
+
+export interface HitCount {
+    hits: number;
+    rolls: number;
 }
 
 export interface RichParticipantsInput {

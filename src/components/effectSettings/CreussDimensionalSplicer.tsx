@@ -1,4 +1,4 @@
-import { Switch, TableCell, TableRow, Typography } from "@mui/material";
+import { Switch, TableBody, TableCell, TableRow, Typography } from "@mui/material";
 
 import { UnstyledSmallTable } from "components/common";
 import { CreussDimensionalSplicerSettings } from "logic/effects";
@@ -16,14 +16,16 @@ export function CreussDimensionalSplicer({
     };
     return (
         <UnstyledSmallTable>
-            <TableRow>
-                <TableCell>
-                    <Typography>Wormhole present</Typography>
-                </TableCell>
-                <TableCell sx={{ textAlign: "center" }}>
-                    <Switch disableRipple size="small" checked={settings.wormholePresent} onChange={onToggleWormholePresent} />
-                </TableCell>
-            </TableRow>
+            <TableBody>
+                <TableRow>
+                    <TableCell>
+                        <Typography>Wormhole present</Typography>
+                    </TableCell>
+                    <TableCell sx={{ textAlign: "center" }}>
+                        <Switch disableRipple size="small" checked={settings.wormholePresent} onChange={onToggleWormholePresent} />
+                    </TableCell>
+                </TableRow>
+            </TableBody>
         </UnstyledSmallTable>
     );
 }

@@ -1,4 +1,4 @@
-import { CalculationInput, CombatStage, HitType, ParticipantRole } from "./calculation";
+import { CalculationInput, CombatStage, HitsProbabilityIntermediateOutcome, HitType, ParticipantRole } from "./calculation";
 import { CombatState, ComputedUnitSnapshot } from "./combatState";
 import { SparseDictionary } from "./common";
 
@@ -24,6 +24,18 @@ export interface PreAssignHitsOutput {
     newUnits?: ComputedUnitSnapshot[];
     newTagState?: number | undefined;
     // newCombatState?: CombatState | undefined;
+}
+
+export interface OnCalculateHitsInput {
+    calculationInput: CalculationInput;
+    combatState: CombatState;
+    role: ParticipantRole;
+    outcome: HitsProbabilityIntermediateOutcome;
+    tagState: number | undefined;
+}
+
+export interface OnCalculateHitsOutput {
+    newOutcomes?: HitsProbabilityIntermediateOutcome[];
 }
 
 export interface ParticipantTagSettings<T> {
@@ -61,6 +73,11 @@ export interface ParticipantTagImplementation<T = any> {
      * 'role' in the input describes the tag owner's role, not the opponent's role.
      */
     preAssignOpponentHits?: (input: PreAssignHitsInput) => PreAssignHitsOutput;
+
+    /**
+     * Called when calculating hits, for each possible outcome of combat rolls.
+     */
+    onCalculateHits?: (input: OnCalculateHitsInput) => OnCalculateHitsOutput;
 
     /**
      * Custom settings for the tag

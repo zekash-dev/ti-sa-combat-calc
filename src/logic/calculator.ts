@@ -3,6 +3,7 @@ import { clamp, isEqual, max, round, sum } from "lodash";
 import {
     CalculationInput,
     CalculationOutput,
+    CalculationOutputStatistics,
     combatRoundStages,
     CombatStage,
     CombatStageOutput,
@@ -11,14 +12,15 @@ import {
     CombatStateProbabilityOutput,
     CombatType,
     CombatVictor,
+    HIT_TYPE_AND_FLAGS_BITMASK,
     HIT_TYPE_BITMASK,
+    HitsProbabilityIntermediateOutcome,
     HitsProbabilityOutcome,
     HitType,
     ParticipantInput,
     ParticipantRole,
-    UnitInput,
     SurvivingUnitsStatistics,
-    CalculationOutputStatistics,
+    UnitInput,
 } from "model/calculation";
 import {
     CombatState,
@@ -33,13 +35,14 @@ import {
 import { ConstantTag, FlagshipTag, ParticipantTag, UnitTag, UnitTagResources } from "model/combatTags";
 import { KeyedDictionary, SparseDictionary } from "model/common";
 import {
+    OnCalculateHitsInput,
     ParticipantOnComputeSnapshotInput,
     ParticipantTagImplementation,
     PreAssignHitsInput,
     UnitOnComputeSnapshotInput,
 } from "model/effects";
 import { UnitDefinition, unitDefinitions, UnitType } from "model/unit";
-import { equalsZero } from "./common";
+import { equalsZero, leftShiftWithMask, rightShiftWithMask } from "./common";
 import { flagshipDefinitions, getOpponentRole, participantTagResources, unitTagResources } from "./participant";
 
 export function calculateCombatOutcome(input: CalculationInput): CalculationOutput | null {
@@ -137,8 +140,8 @@ function resolveCombatStage(state: CombatState, input: CalculationInput): Combat
     const attackerUnits: ComputedUnitSnapshot[] = getUnitSnapshots(state, input, ParticipantRole.Attacker, state.stage);
     const defenderUnits: ComputedUnitSnapshot[] = getUnitSnapshots(state, input, ParticipantRole.Defender, state.stage);
 
-    const attackerHitOutcomes: HitsProbabilityOutcome[] = calculateHits(attackerUnits);
-    const defenderHitOutcomes: HitsProbabilityOutcome[] = calculateHits(defenderUnits);
+    const attackerHitOutcomes: HitsProbabilityOutcome[] = calculateHits(state, input, ParticipantRole.Attacker, attackerUnits);
+    const defenderHitOutcomes: HitsProbabilityOutcome[] = calculateHits(state, input, ParticipantRole.Defender, defenderUnits);
 
     for (let att = 0; att < attackerHitOutcomes.length; att++) {
         for (let def = 0; def < defenderHitOutcomes.length; def++) {
@@ -392,33 +395,44 @@ function adjustCombatRollsForSustainDamage(stage: CombatStage, units: ComputedUn
     }
 }
 
-function calculateHits(units: ComputedUnitSnapshot[]): HitsProbabilityOutcome[] {
-    const hits: SparseDictionary<HitType, number[]> = {};
+function calculateHits(
+    combatState: CombatState,
+    calculationInput: CalculationInput,
+    role: ParticipantRole,
+    units: ComputedUnitSnapshot[]
+): HitsProbabilityOutcome[] {
+    const hits: SparseDictionary<number, number[]> = {};
     // let hitChances: number[] = [1.0]; // Initial probability: 100% chance for 0 hits.
     for (let unit of units) {
         const hitProbability: number = getUnitHitProbability(unit.combatValue);
         const rolls: number = unit.rolls;
+        const maskedHitType: number = maskHitType(unit.hitType, unit.combatValue);
         for (let i = 0; i < rolls; i++) {
             // Initial probability: 100% chance for 0 hits.
-            hits[unit.hitType] = addHitChance(hits[unit.hitType] ?? [1.0], hitProbability);
+            hits[maskedHitType] = addHitChance(hits[maskedHitType] ?? [1.0], hitProbability);
         }
         for (let nonStandardRoll of unit.nonStandardRolls) {
-            const modifiedHitProbability: number = getUnitHitProbability(unit.combatValue + nonStandardRoll.valueMod);
-            hits[unit.hitType] = addHitChance(hits[unit.hitType] ?? [1.0], modifiedHitProbability);
+            const nonStandardCombatValue: number = unit.combatValue + nonStandardRoll.valueMod;
+            const nonStandardHitType: number = maskHitType(unit.hitType, nonStandardCombatValue);
+            const modifiedHitProbability: number = getUnitHitProbability(nonStandardCombatValue);
+            hits[nonStandardHitType] = addHitChance(hits[nonStandardHitType] ?? [1.0], modifiedHitProbability);
         }
     }
 
-    let outcomes: HitsProbabilityOutcome[] = [{ hits: {}, probability: 1.0 }];
+    let outcomes: HitsProbabilityIntermediateOutcome[] = [{ hits: {}, probability: 1.0 }];
     for (let hitTypeStr of Object.keys(hits)) {
-        const hitType: HitType = Number(hitTypeStr);
-        const probabilities: number[] = hits[hitType]!;
+        const maskedHitType: HitType = Number(hitTypeStr);
+        const probabilities: number[] = hits[maskedHitType]!;
         outcomes = outcomes
-            .map((prev: HitsProbabilityOutcome) =>
+            .map((prev: HitsProbabilityIntermediateOutcome) =>
                 probabilities.map(
-                    (p: number, idx): HitsProbabilityOutcome => ({
+                    (p: number, idx): HitsProbabilityIntermediateOutcome => ({
                         hits: {
                             ...prev.hits,
-                            [hitType]: idx,
+                            [maskedHitType]: {
+                                hits: idx,
+                                rolls: probabilities.length - 1,
+                            },
                         },
                         probability: prev.probability * p,
                     })
@@ -427,11 +441,72 @@ function calculateHits(units: ComputedUnitSnapshot[]): HitsProbabilityOutcome[] 
             .flatMap((arr) => arr);
     }
 
-    return outcomes;
+    outcomes = applyOnCalculateHitsTags(combatState, calculationInput, role, outcomes);
+
+    return outcomes.map(toHitProbabilityOutcome);
 }
 
-function getUnitHitProbability(combatValue: number): number {
+function toHitProbabilityOutcome(intermediateOutcome: HitsProbabilityIntermediateOutcome): HitsProbabilityOutcome {
+    return {
+        probability: intermediateOutcome.probability,
+        hits: Object.fromEntries(
+            Object.keys(intermediateOutcome.hits).map((k: string) => {
+                const key: number = Number(k);
+                return [key, intermediateOutcome.hits[key]?.hits];
+            })
+        ),
+    };
+}
+
+export function maskHitType(hitType: HitType, combatValue: number): number {
+    let maskedCombatValue: number = leftShiftWithMask(combatValue, HIT_TYPE_AND_FLAGS_BITMASK);
+    return hitType | maskedCombatValue;
+}
+
+export function unmaskHitType(maskedHitType: number): { hitType: HitType; combatValue: number } {
+    let hitType: HitType = maskedHitType & HIT_TYPE_BITMASK;
+    let combatValue: number = rightShiftWithMask(maskedHitType, HIT_TYPE_AND_FLAGS_BITMASK);
+    return { hitType, combatValue };
+}
+
+export function getUnitHitProbability(combatValue: number): number {
     return clamp((11 - combatValue) / 10, 0.0, 1.0);
+}
+
+function applyOnCalculateHitsTags(
+    combatState: CombatState,
+    calculationInput: CalculationInput,
+    role: ParticipantRole,
+    outcomes: HitsProbabilityIntermediateOutcome[]
+): HitsProbabilityIntermediateOutcome[] {
+    let newOutcomes: HitsProbabilityIntermediateOutcome[] = outcomes;
+
+    const participant: ParticipantState = combatState[role];
+    const participantInput: ParticipantInput = calculationInput[role];
+    const tagValues: ParticipantTagValueAndState[] = getParticipantTagValues(calculationInput, participantInput, participant);
+
+    for (let { implementation, state } of tagValues) {
+        if (!!implementation && !!implementation.onCalculateHits) {
+            const outcomesForTag: HitsProbabilityIntermediateOutcome[] = [];
+            for (let outcome of newOutcomes) {
+                const effectInput: OnCalculateHitsInput = {
+                    calculationInput,
+                    combatState,
+                    role,
+                    outcome,
+                    tagState: state,
+                };
+                const { newOutcomes } = implementation.onCalculateHits(effectInput);
+                if (newOutcomes) {
+                    outcomesForTag.push(...newOutcomes);
+                } else {
+                    outcomesForTag.push(outcome);
+                }
+            }
+            newOutcomes = outcomesForTag;
+        }
+    }
+    return newOutcomes;
 }
 
 function addHitChance(hitChances: number[], hitProbability: number): number[] {
@@ -598,7 +673,7 @@ export function determineHitTarget(
     let maxPrioIndex: number = -1;
     let maxPrioValue: number = NaN;
     for (let i = 0; i < units.length; i++) {
-        if (!canAssignHitToUnit(units[i], hitType, input.combatType)) continue;
+        if (!canAssignHitToUnit(units[i].base, hitType, input.combatType)) continue;
         const prio = calculateHitPriority(units[i], hitType, combatState.stage);
         if (isNaN(maxPrioValue) || prio > maxPrioValue) {
             maxPrioIndex = i;
@@ -608,7 +683,7 @@ export function determineHitTarget(
     return maxPrioIndex;
 }
 
-function canAssignHitToUnit(unit: ComputedUnitSnapshot, hitType: HitType, combatType: CombatType): boolean {
+export function canAssignHitToUnit(unit: UnitState, hitType: HitType, combatType: CombatType): boolean {
     if (!unitIsCombatant(unit.type, combatType)) return false;
 
     switch (hitType & HIT_TYPE_BITMASK) {
