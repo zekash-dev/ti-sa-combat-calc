@@ -117,7 +117,18 @@ export interface StatisticsBase {
 
 export interface SurvivingUnitsStatistics {
     units: UnitInput[];
+    /**
+     * Probability for this exact outcome.
+     */
     probability: number;
+    /**
+     * Aggregated probability for this outcome or a better outcome (more surviving units).
+     */
+    probabilityThisOrBetter: number;
+    /**
+     * Aggregated probability for this outcome or a worse outcome (fewer surviving units).
+     */
+    probabilityThisOrWorse: number;
     totalHealth: number;
     sustainedHits: number;
 }

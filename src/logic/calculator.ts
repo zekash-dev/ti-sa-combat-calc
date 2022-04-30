@@ -983,11 +983,22 @@ function getSurvivingUnitsStatistics(
                 totalHealth: getTotalUnitInputHealth(units, combatType),
                 sustainedHits: sum(stateProbability.state[participant].units.map((u) => u.sustainedHits)),
                 probability: stateProbability.probability,
+                probabilityThisOrBetter: 0,
+                probabilityThisOrWorse: 0,
             };
             unitProbabilities.push(newEntry);
         }
     }
-    return unitProbabilities.sort(unitHealthComparer(combatType));
+    unitProbabilities.sort(unitHealthComparer(combatType));
+
+    let aggregatedProbability: number = 0;
+    for (let unitProbability of unitProbabilities) {
+        unitProbability.probabilityThisOrWorse = 1.0 - aggregatedProbability;
+        aggregatedProbability += unitProbability.probability;
+        unitProbability.probabilityThisOrBetter = aggregatedProbability;
+    }
+
+    return unitProbabilities;
 }
 
 function getUnitExpectedHits(unit: ComputedUnitSnapshot): number {

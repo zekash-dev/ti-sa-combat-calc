@@ -83,9 +83,15 @@ export function CasualtiesViewTooltip(props: CasualtiesViewTooltipProps) {
                             backgroundImage: "linear-gradient(rgba(255, 255, 255, 0.10), rgba(255, 255, 255, 0.10))",
                         }}
                     >
-                        <Typography variant="body1" sx={{ paddingBottom: "3px", fontSize: "1.1em" }}>
+                        <Typography variant="body2" sx={{ color: "text.secondary" }}>
+                            {survivingUnits && `Σ ${round(survivingUnits.probabilityThisOrBetter * 100, 2)}%: this or better`}
+                        </Typography>
+                        <Typography variant="body1" sx={{ fontSize: "1.1em", fontWeight: "bold" }}>
                             {survivingUnits &&
                                 `${round(survivingUnits.probability * 100, 2)}%: ${survivingUnits.units.length} surviving units`}
+                        </Typography>
+                        <Typography variant="body2" sx={{ color: "text.secondary" }}>
+                            {survivingUnits && `Σ ${round(survivingUnits.probabilityThisOrWorse * 100, 2)}%: this or worse`}
                         </Typography>
                         {sortedUnits.map((unit: UnitInput, idx: number) => (
                             <UnitInputImage
