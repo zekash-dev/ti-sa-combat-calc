@@ -66,16 +66,21 @@ export function getSelectableUnitTypes(calculationInput: CalculationInput, role:
         .filter((def) => def.combatantIn.includes(calculationInput.combatType))
         .map((def) => def.type);
     if (calculationInput.combatType === CombatType.SpaceBattle) {
-        unitTypes = union(unitTypes, getUnitTypesWithCombatRollsInStage(calculationInput, role, CombatStage.SpaceCannon));
+        unitTypes = union(unitTypes, getUnitTypesWithCombatRelevanceInStage(calculationInput, role, CombatStage.SpaceCannon));
     }
     if (calculationInput.combatType === CombatType.InvasionCombat) {
-        unitTypes = union(unitTypes, getUnitTypesWithCombatRollsInStage(calculationInput, role, CombatStage.Bombardment));
-        unitTypes = union(unitTypes, getUnitTypesWithCombatRollsInStage(calculationInput, role, CombatStage.InvasionDefence));
+        unitTypes = union(unitTypes, getUnitTypesWithCombatRelevanceInStage(calculationInput, role, CombatStage.Bombardment));
+        unitTypes = union(unitTypes, getUnitTypesWithCombatRelevanceInStage(calculationInput, role, CombatStage.InvasionDefence));
     }
     return unitTypes;
 }
 
-function getUnitTypesWithCombatRollsInStage(calculationInput: CalculationInput, role: ParticipantRole, stage: CombatStage): UnitType[] {
+/**
+ * Returns units that in the given stage either:
+ * 1. Has combat rolls
+ * 2. Has planetary shields
+ */
+function getUnitTypesWithCombatRelevanceInStage(calculationInput: CalculationInput, role: ParticipantRole, stage: CombatStage): UnitType[] {
     const input: CalculationInput = {
         combatType: calculationInput.combatType,
         attacker: {
@@ -91,7 +96,7 @@ function getUnitTypesWithCombatRollsInStage(calculationInput: CalculationInput, 
     input[role].units = allUnitTypes.map((uType) => ({ type: uType, sustainedHits: 0 }));
     const combatState: CombatState = getInitialState(input);
     const snapshots: ComputedUnitSnapshot[] = getUnitSnapshots(combatState, input, role, stage);
-    return snapshots.filter((unit) => unit.rolls > 0).map((unit) => unit.type);
+    return snapshots.filter((unit) => unit.rolls > 0 || unit.planetaryShield > 0).map((unit) => unit.type);
 }
 
 export const unitSizes: KeyedDictionary<UnitType, number> = Object.fromEntries(
