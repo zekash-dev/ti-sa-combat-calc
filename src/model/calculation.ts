@@ -43,6 +43,15 @@ export const combatStagesByCombatType: KeyedDictionary<CombatType, CombatStage[]
     ],
 };
 
+export const duringSpaceBattlesStages: CombatStage[] = [
+    CombatStage.StartOfBattle,
+    CombatStage.AntiFighterBarrage,
+    CombatStage.PreCombat,
+    CombatStage.Round1,
+    CombatStage.Round2,
+    CombatStage.RoundN,
+];
+
 export const combatRoundStages: CombatStage[] = [CombatStage.Round1, CombatStage.Round2, CombatStage.RoundN];
 
 export interface CombatStageResources {
