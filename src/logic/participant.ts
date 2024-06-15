@@ -524,7 +524,7 @@ export const flagshipDefinitions: KeyedDictionary<Faction, FlagshipDefinition> =
     [Faction.FEDERATION_OF_SOL]: {
         ...unitDefinitions[UnitType.Flagship],
         flagshipName: "Genesis I",
-        combatValue: 5,
+        combatValue: 7,
         combatRolls: 2,
         sustainDamage: 2,
     },
