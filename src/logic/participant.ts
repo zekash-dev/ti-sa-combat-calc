@@ -92,6 +92,9 @@ function getUnitTypesWithCombatRelevanceInStage(calculationInput: CalculationInp
             units: [],
         },
         tags: calculationInput.tags,
+        settings: {
+            simplificationTarget: undefined,
+        },
     };
     input[role].units = allUnitTypes.map((uType) => ({ type: uType, sustainedHits: 0 }));
     const combatState: CombatState = getInitialState(input);

@@ -11,12 +11,16 @@ export interface OptionsState {
     devMode: boolean;
     useSearchParam: boolean;
     showStatistics: SparseDictionary<CombatStage, boolean>;
+    useSimplification: boolean;
+    simplificationTarget: number;
 }
 
 export const defaultState: OptionsState = {
     devMode: false,
     useSearchParam: true,
     showStatistics: {},
+    useSimplification: true,
+    simplificationTarget: 5,
 };
 
 const optionsSlice = createSlice({

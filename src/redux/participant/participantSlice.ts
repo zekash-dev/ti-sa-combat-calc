@@ -22,6 +22,7 @@ import { CombatState, ComputedUnitSnapshot, UnitSnapshotTag } from "model/combat
 import { Faction, ParticipantTag, UnitTag } from "model/combatTags";
 import { KeyedDictionary, SparseDictionary } from "model/common";
 import { UnitType } from "model/unit";
+import { OptionsState, selectOptions, defaultState as defaultOptionsState } from "redux/options/optionsSlice";
 import { RootState } from "redux/store";
 
 export interface ParticipantSliceState {
@@ -206,7 +207,7 @@ const participantSlice = createSlice({
 });
 
 function filterBySelectableUnitTypes(state: ParticipantSliceState, role: ParticipantRole): UnitInput[] {
-    const calculationInput: CalculationInput = toCalculationInput(state);
+    const calculationInput: CalculationInput = toCalculationInput(state, defaultOptionsState);
     const selectableUnitTypes: UnitType[] = getSelectableUnitTypes(calculationInput, role);
     return state.participants[role].units.filter((u: UnitInput) => selectableUnitTypes.includes(u.type));
 }
@@ -280,16 +281,19 @@ export const selectParticipants = (rootState: RootState): KeyedDictionary<Partic
 export const selectParticipant = (role: ParticipantRole) => (rootState: RootState) => rootState.participant.participants[role];
 export const selectCombatTags = (rootState: RootState): ParticipantInputTags => rootState.participant.tags;
 
-export const selectCalculationInput = createSelector([selectParticipantState], toCalculationInput);
+export const selectCalculationInput = createSelector([selectParticipantState, selectOptions], toCalculationInput);
 
 export const selectEncodedState = createSelector([selectParticipantState], encodeParticipantsState);
 
-function toCalculationInput(sliceState: ParticipantSliceState): CalculationInput {
+function toCalculationInput(sliceState: ParticipantSliceState, optionsState: OptionsState): CalculationInput {
     return {
         combatType: sliceState.combatType,
         attacker: sliceState.participants.attacker,
         defender: sliceState.participants.defender,
         tags: sliceState.tags,
+        settings: {
+            simplificationTarget: optionsState.useSimplification ? optionsState.simplificationTarget : undefined,
+        },
     };
 }
 

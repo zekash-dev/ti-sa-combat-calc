@@ -1,7 +1,8 @@
-import { clamp, isEqual, max, round, sum } from "lodash";
+import { clamp, isEqual, max, range, round, sum } from "lodash";
 
 import {
     CalculationInput,
+    CalculationInputSettings,
     CalculationOutput,
     CalculationOutputStatistics,
     combatRoundStages,
@@ -20,6 +21,7 @@ import {
     ParticipantInput,
     ParticipantRole,
     SurvivingUnitsStatistics,
+    TrackedValues,
     UnitInput,
 } from "model/calculation";
 import {
@@ -44,6 +46,7 @@ import {
 import { UnitDefinition, unitDefinitions, UnitType } from "model/unit";
 import { equalsZero, leftShiftWithMask, rightShiftWithMask } from "./common";
 import { flagshipDefinitions, getOpponentRole, participantTagResources, unitTagResources } from "./participant";
+import { reduceValues, ValuesAndProbabilities } from "./probability";
 
 export function calculateCombatOutcome(input: CalculationInput): CalculationOutput | null {
     if (input.attacker.units.length === 0 && input.defender.units.length === 0) return null;
@@ -60,16 +63,26 @@ export function calculateCombatOutcome(input: CalculationInput): CalculationOutp
     appendCombatStateProbabilities(stateDictionary, [initialState]);
     addStatesByStage(statesByStage, initialState.probability, [initialState]);
     let activeState: CombatStateProbability | undefined;
+    const totalTrackedValues: TrackedValues = defaultTrackedValues();
     while ((activeState = popNextActiveState(stateDictionary, input.combatType)) !== undefined) {
-        const nextStates: CombatStateProbability[] = resolveState(activeState, input, stateResolutions);
+        const { nextStates, trackedValues } = resolveState(activeState, input, stateResolutions);
         appendCombatStateProbabilities(stateDictionary, nextStates);
         addStatesByStage(statesByStage, activeState.probability, nextStates);
+        mergeTrackedValues(totalTrackedValues, trackedValues);
     }
-    const output = createCalculationOutput(stateDictionary, statesByStage, input);
+    const output = createCalculationOutput(stateDictionary, statesByStage, input, totalTrackedValues);
     if (process.env.NODE_ENV === "development") {
         console.profileEnd();
     }
     return output;
+}
+
+function mergeTrackedValues(target: TrackedValues, source: TrackedValues) {
+    if (source.maxPotentialBranches !== undefined) {
+        if (target.maxPotentialBranches === undefined || source.maxPotentialBranches > target.maxPotentialBranches) {
+            target.maxPotentialBranches = source.maxPotentialBranches;
+        }
+    }
 }
 
 export function getInitialState(input: CalculationInput): CombatState {
@@ -97,28 +110,40 @@ export function getNextStage(combatType: CombatType, stage: CombatStage): Combat
     return combatStagesByCombatType[combatType][currentIndex + 1];
 }
 
+interface ResolveStateOutput {
+    nextStates: CombatStateProbability[];
+    trackedValues: TrackedValues;
+}
+
 function resolveState(
     currentState: CombatStateProbability,
     input: CalculationInput,
     stateResolutions: CombatStateResolutionDictionary
-): CombatStateProbability[] {
+): ResolveStateOutput {
     let nextStates: CombatStateProbability[];
+    let trackedValues: TrackedValues;
     const memoizedResolutions: CombatStateProbability[] | undefined = getMemoizedResolutions(currentState.state, stateResolutions);
     if (memoizedResolutions) {
         nextStates = memoizedResolutions;
+        trackedValues = defaultTrackedValues();
     } else {
-        nextStates = computeNextStates(currentState, input);
+        ({ nextStates, trackedValues } = computeNextStates(currentState, input));
         addMemoizedResolutions(currentState.state, nextStates, stateResolutions);
     }
     nextStates = nextStates.map((sp: CombatStateProbability) => ({
         state: sp.state,
         probability: sp.probability * currentState.probability,
     }));
-    return nextStates;
+    return { nextStates, trackedValues };
 }
 
-function computeNextStates(currentState: CombatStateProbability, input: CalculationInput): CombatStateProbability[] {
-    let nextStates: CombatStateProbability[] = resolveCombatStage(currentState.state, input);
+interface ComputeNextStatesOutput {
+    nextStates: CombatStateProbability[];
+    trackedValues: TrackedValues;
+}
+
+function computeNextStates(currentState: CombatStateProbability, input: CalculationInput): ComputeNextStatesOutput {
+    let { nextStates, trackedValues } = resolveCombatStage(currentState.state, input);
 
     const identicalStateIdx: number = nextStates.findIndex((sp) => CombatState.compare(sp.state, currentState.state) === 0);
     if (identicalStateIdx !== -1) {
@@ -131,22 +156,27 @@ function computeNextStates(currentState: CombatStateProbability, input: Calculat
             probability: sp.probability * totalProbability,
         }));
     }
-    return nextStates;
+    return { nextStates, trackedValues };
 }
 
-function resolveCombatStage(state: CombatState, input: CalculationInput): CombatStateProbability[] {
+interface ResolveCombatStageOutput {
+    nextStates: CombatStateProbability[];
+    trackedValues: TrackedValues;
+}
+
+function resolveCombatStage(state: CombatState, input: CalculationInput): ResolveCombatStageOutput {
     const nextStates: CombatStateProbability[] = [];
 
     const attackerUnits: ComputedUnitSnapshot[] = getUnitSnapshots(state, input, ParticipantRole.Attacker, state.stage);
     const defenderUnits: ComputedUnitSnapshot[] = getUnitSnapshots(state, input, ParticipantRole.Defender, state.stage);
 
-    const attackerHitOutcomes: HitsProbabilityOutcome[] = calculateHits(state, input, ParticipantRole.Attacker, attackerUnits);
-    const defenderHitOutcomes: HitsProbabilityOutcome[] = calculateHits(state, input, ParticipantRole.Defender, defenderUnits);
+    const { outcomes: defenderOutcomes, maxBranches: defenderMax } = calculateHits(state, input, ParticipantRole.Defender, defenderUnits);
+    const { outcomes: attackerOutcomes, maxBranches: attackerMax } = calculateHits(state, input, ParticipantRole.Attacker, attackerUnits);
 
-    for (let att = 0; att < attackerHitOutcomes.length; att++) {
-        for (let def = 0; def < defenderHitOutcomes.length; def++) {
-            const attackerHits: HitsProbabilityOutcome = attackerHitOutcomes[att];
-            const defenderHits: HitsProbabilityOutcome = defenderHitOutcomes[def];
+    for (let att = 0; att < attackerOutcomes.length; att++) {
+        for (let def = 0; def < defenderOutcomes.length; def++) {
+            const attackerHits: HitsProbabilityOutcome = attackerOutcomes[att];
+            const defenderHits: HitsProbabilityOutcome = defenderOutcomes[def];
             const probability: number = attackerHits.probability * defenderHits.probability;
 
             let nextState: CombatState = state;
@@ -164,7 +194,12 @@ function resolveCombatStage(state: CombatState, input: CalculationInput): Combat
             }
         }
     }
-    return nextStates;
+    return {
+        nextStates,
+        trackedValues: {
+            maxPotentialBranches: max([defenderMax, attackerMax]),
+        },
+    };
 }
 
 function findIdenticalCombatState(stateProbabilities: CombatStateProbability[], state: CombatState): CombatStateProbability | undefined {
@@ -395,12 +430,17 @@ function adjustCombatRollsForSustainDamage(stage: CombatStage, units: ComputedUn
     }
 }
 
+interface CalculateHitsOutput {
+    outcomes: HitsProbabilityOutcome[];
+    maxBranches: number | undefined;
+}
+
 function calculateHits(
     combatState: CombatState,
     calculationInput: CalculationInput,
     role: ParticipantRole,
     units: ComputedUnitSnapshot[]
-): HitsProbabilityOutcome[] {
+): CalculateHitsOutput {
     const hits: SparseDictionary<number, number[]> = {};
     // let hitChances: number[] = [1.0]; // Initial probability: 100% chance for 0 hits.
     for (let unit of units) {
@@ -418,6 +458,9 @@ function calculateHits(
             hits[nonStandardHitType] = addHitChance(hits[nonStandardHitType] ?? [1.0], modifiedHitProbability);
         }
     }
+
+    const maxBranches: number | undefined = max(Object.values(hits).map((h) => h?.length ?? 0));
+    simplifyHitProbabilities(hits, calculationInput.settings);
 
     let outcomes: HitsProbabilityIntermediateOutcome[] = [{ hits: {}, probability: 1.0 }];
     for (let hitTypeStr of Object.keys(hits)) {
@@ -438,12 +481,37 @@ function calculateHits(
                     })
                 )
             )
-            .flatMap((arr) => arr);
+            .flatMap((arr) => arr)
+            .filter((outcome) => outcome.probability > 0);
     }
 
     outcomes = applyOnCalculateHitsTags(combatState, calculationInput, role, outcomes);
 
-    return outcomes.map(toHitProbabilityOutcome);
+    return {
+        outcomes: outcomes.map(toHitProbabilityOutcome),
+        maxBranches,
+    };
+}
+
+function simplifyHitProbabilities(hits: SparseDictionary<number, number[]>, settings: CalculationInputSettings) {
+    if (settings.simplificationTarget === undefined) return;
+    if (settings.simplificationTarget < 2) return;
+
+    for (const probabilities of Object.values(hits)) {
+        if (probabilities === undefined) continue;
+        if (probabilities.length <= settings.simplificationTarget) continue;
+
+        const vsAndPs: ValuesAndProbabilities = {
+            values: range(0, probabilities.length),
+            probabilities: probabilities,
+        };
+        const newVsAndPs: ValuesAndProbabilities = reduceValues(vsAndPs, settings.simplificationTarget);
+
+        for (let i = 0; i < probabilities.length; i++) {
+            const newI = newVsAndPs.values.indexOf(i);
+            probabilities[i] = newI === -1 ? 0 : newVsAndPs.probabilities[newI];
+        }
+    }
 }
 
 function toHitProbabilityOutcome(intermediateOutcome: HitsProbabilityIntermediateOutcome): HitsProbabilityOutcome {
@@ -905,7 +973,8 @@ function addMemoizedResolutions(state: CombatState, nextStates: CombatStateProba
 function createCalculationOutput(
     stateDictionary: CombatStateDictionary,
     statesByStage: SparseDictionary<CombatStage, CombatStateProbability[]>,
-    input: CalculationInput
+    input: CalculationInput,
+    trackedValues: TrackedValues
 ): CalculationOutput {
     const resultStates: CombatStateProbability[] = Object.values(stateDictionary).flat();
     const resultStatesOutput: CombatStateProbabilityOutput[] = toCombatStateProbabilityOutputs(resultStates, input);
@@ -919,6 +988,8 @@ function createCalculationOutput(
             [ParticipantRole.Attacker]: calculateOutputStatistics(ParticipantRole.Attacker, resultStatesOutput, input),
             [ParticipantRole.Defender]: calculateOutputStatistics(ParticipantRole.Defender, resultStatesOutput, input),
         },
+        settings: input.settings,
+        trackedValues: trackedValues,
     };
 }
 
@@ -1135,5 +1206,11 @@ export function mergeVictorProbabilities(
         attacker: first.attacker + second.attacker,
         defender: first.defender + second.defender,
         draw: first.draw + second.draw,
+    };
+}
+
+function defaultTrackedValues(): TrackedValues {
+    return {
+        maxPotentialBranches: undefined,
     };
 }

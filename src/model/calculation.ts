@@ -71,6 +71,11 @@ export interface CalculationInput {
     [ParticipantRole.Attacker]: ParticipantInput;
     [ParticipantRole.Defender]: ParticipantInput;
     tags: ParticipantInputTags; // Global tags that apply to the combat
+    settings: CalculationInputSettings;
+}
+
+export interface CalculationInputSettings {
+    simplificationTarget: number | undefined;
 }
 
 export interface CalculationOutput {
@@ -78,6 +83,8 @@ export interface CalculationOutput {
     finalStates: CombatStateProbabilityOutput[];
     stages: SparseDictionary<CombatStage, CombatStageOutput>;
     statistics: KeyedDictionary<ParticipantRole, CalculationOutputStatistics>;
+    settings: CalculationInputSettings;
+    trackedValues: TrackedValues;
 }
 
 export interface CombatStateProbabilityOutput {
@@ -255,4 +262,8 @@ export interface UnitStageStats {
     rolls: number[];
     hitType: HitType;
     sustainDamage: number;
+}
+
+export interface TrackedValues {
+    maxPotentialBranches: number | undefined;
 }

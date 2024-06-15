@@ -3,7 +3,15 @@ import { Accordion, AccordionDetails, AccordionSummary, Button, Typography } fro
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
-import { CalculationInput, CalculationOutput, CombatStage, ParticipantInput, ParticipantRole } from "model/calculation";
+import {
+    CalculationInput,
+    CalculationInputSettings,
+    CalculationOutput,
+    CombatStage,
+    ParticipantInput,
+    ParticipantRole,
+    TrackedValues,
+} from "model/calculation";
 import { KeyedDictionary } from "model/common";
 import { selectShowStatisticsForStage, setShowStatisticsForStage } from "redux/options/optionsSlice";
 import { selectCalculationInput, selectParticipants } from "redux/participant/participantSlice";
@@ -37,9 +45,10 @@ export function ResultView() {
             <CombatStageResultView input={input} output={output} participants={participants} />
             <Accordion expanded={expanded} disableGutters onChange={() => setExpanded((prev) => !prev)}>
                 <AccordionSummary expandIcon={<ExpandMore />}>
-                    <Typography variant="h6" color="text.primary">
+                    <Typography variant="h6" color="text.primary" sx={{ minWidth: "400px" }}>
                         Final results
                     </Typography>
+                    <TrackedValuesDisplay settings={output.settings} trackedValues={output.trackedValues} />
                     <Button sx={{ marginLeft: "auto" }} variant="text" onClick={toggleShowStatistics}>
                         {showStatistics ? "Hide statistics" : "Show statistics"}
                     </Button>
@@ -52,4 +61,21 @@ export function ResultView() {
             </Accordion>
         </>
     );
+}
+
+interface TrackedValuesDisplayProps {
+    settings: CalculationInputSettings;
+    trackedValues: TrackedValues;
+}
+
+function TrackedValuesDisplay({ settings, trackedValues }: TrackedValuesDisplayProps) {
+    if (settings.simplificationTarget === undefined) return null;
+    if (trackedValues.maxPotentialBranches === undefined) return null;
+
+    let simplificationText: string = `Simplification: ${trackedValues.maxPotentialBranches} ➔ ${settings.simplificationTarget} branches`;
+    if (trackedValues.maxPotentialBranches <= settings.simplificationTarget) {
+        simplificationText += " (no simplification required)";
+    }
+
+    return <Typography sx={{ color: "text.secondary" }}>{simplificationText}</Typography>;
 }

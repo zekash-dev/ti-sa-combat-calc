@@ -63,6 +63,7 @@ function CombatStageView({ input, output, participants, stage }: CombatStageView
     };
     const stageOutput: CombatStageOutput | undefined = output.stages[stage];
     if (!stageOutput) return null;
+
     return (
         <Accordion expanded={expanded} disableGutters onChange={() => setExpanded((prev) => !prev)}>
             <AccordionSummary expandIcon={<ExpandMore />}>
@@ -83,6 +84,7 @@ function CombatStageView({ input, output, participants, stage }: CombatStageView
         </Accordion>
     );
 }
+
 interface ParticipantHitsDisplayProps {
     label: string;
     participant: CombatStageParticipantStatistics;

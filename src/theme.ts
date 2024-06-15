@@ -12,7 +12,7 @@ export const theme: Theme = createTheme({
         background: {},
         text: {
             primary: "#ffffff",
-            secondary: "#888",
+            secondary: "#aaaaaa",
         },
     },
     typography: {
