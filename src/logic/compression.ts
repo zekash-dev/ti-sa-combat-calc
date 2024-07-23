@@ -4,7 +4,7 @@ import { CombatType, ParticipantInput, ParticipantInputTags, UnitInput, UnitInpu
 import { Faction, ParticipantTag, UnitTag } from "model/combatTags";
 import { unitDefinitions, UnitType } from "model/unit";
 import { ParticipantSliceState } from "redux/participant/participantSlice";
-import { factionResources, participantTagResources } from "./participant";
+import { factionResources, participantTagResources, unitTagResources } from "./participant";
 
 // Notes on encoding:
 // The goal is to create a unique compressed string composed of characters that are valid as URL search parameters.
@@ -160,7 +160,11 @@ function encodeUnit(unit: UnitInput): string {
             const tag: UnitTag = Number(key);
             let tagStr = encodeInteger(tag);
             if (unit.tags[tag] !== true) {
-                tagStr += "y" + unit.tags[tag];
+                const tagResources = unitTagResources[tag];
+                if (tagResources.implementation && tagResources.implementation.settings) {
+                    const encodedSettings = tagResources.implementation.settings.encode(unit.tags[tag]);
+                    tagStr += "y" + encodedSettings;
+                }
             }
             tagStrings.push(tagStr);
         }
@@ -195,8 +199,15 @@ function decodeUnit(str: string): UnitInput {
         if (splitStr.indexOf("y") > -1) {
             const valueSplit = splitStr.split("y");
             tagStr = valueSplit[0];
-            tagValue = valueSplit[1];
+            const tag: UnitTag = decodeInteger(tagStr);
+            const encodedTagValue = valueSplit[1];
+            const tagResources = unitTagResources[tag];
+            if (tagResources.implementation && tagResources.implementation.settings) {
+                const decodedSettings: any = tagResources.implementation.settings.decode(encodedTagValue);
+                tagValue = decodedSettings;
+            }
         }
+
         const tag: UnitTag = decodeInteger(tagStr);
         tags[tag] = tagValue;
     }

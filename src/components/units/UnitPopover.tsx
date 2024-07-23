@@ -9,6 +9,8 @@ import { UnitKeepAliveInput } from "./UnitKeepAliveInput";
 import { UnitScientistInput } from "./UnitScientistInput";
 import { UnitStageStatsView } from "./UnitStageStatsView";
 import { UnitSustainDamageInput } from "./UnitSustainDamageInput";
+import { UnitCombatValueModInput } from "./UnitCombatValueModInput";
+import { UnitCombatRollsModInput } from "./UnitCombatRollsModInput";
 
 interface Props {
     unit: RichUnit;
@@ -38,6 +40,8 @@ export function UnitPopover({ unit, faction, role }: Props) {
             <UnitScientistInput role={role} unit={unit} />
             <UnitSustainDamageInput role={role} unit={unit} />
             <UnitKeepAliveInput role={role} unit={unit} />
+            <UnitCombatValueModInput role={role} unit={unit} />
+            <UnitCombatRollsModInput role={role} unit={unit} />
             {flagshipDefinition?.notes && (
                 <Typography
                     variant="body2"

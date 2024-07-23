@@ -108,6 +108,8 @@ export enum UnitTag {
      * The unit will still sustain hits when possible.
      */
     KEEP_ALIVE = 903,
+    COMBAT_VALUE_MOD = 904,
+    COMBAT_DICE_MOD = 905,
 }
 
 export interface UnitTagResources {

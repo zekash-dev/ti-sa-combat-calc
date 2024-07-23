@@ -672,6 +672,14 @@ export const unitTagResources: KeyedDictionary<UnitTag, UnitTagResources> = {
         name: "Keep alive",
         implementation: false,
     },
+    [UnitTag.COMBAT_VALUE_MOD]: {
+        name: "Combat roll mod",
+        implementation: effects.unitCombatValueMod,
+    },
+    [UnitTag.COMBAT_DICE_MOD]: {
+        name: "Combat dice mod",
+        implementation: effects.unitCombatDiceMod,
+    },
 };
 
 export const combatStageResources: KeyedDictionary<CombatStage, CombatStageResources> = {

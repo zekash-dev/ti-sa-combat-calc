@@ -10,4 +10,5 @@ export * from "./HitCounterImage";
 export * from "./icons";
 export * from "./ScientistImage";
 export * from "./TechnologyTypeImage";
+export * from "./UnitCustomModImage";
 export * from "./UnitImage";

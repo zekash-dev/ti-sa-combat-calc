@@ -1,5 +1,5 @@
 import { min } from "lodash";
-import React from "react";
+import React, { useCallback } from "react";
 import { SvgLoader, SvgProxy } from "react-svgmt";
 
 import { factionResources } from "logic/participant";
@@ -7,13 +7,20 @@ import { toBrighterHue, toDarkerHue } from "logic/styling";
 import { ParticipantRole } from "model/calculation";
 import { Faction } from "model/combatTags";
 import { Dimensions, UnitDefinition, unitDefinitions, UnitType } from "model/unit";
+import { Tooltip } from "@mui/material";
 
 interface Props {
     unitType: UnitType;
     faction: Faction;
     role: ParticipantRole;
     scale: number;
-    badges: (JSX.Element | false)[];
+    badges: (JSX.Element | BadgeWithTooltip | false)[];
+}
+
+interface BadgeWithTooltip {
+    key: string;
+    element: JSX.Element;
+    tooltip: string;
 }
 
 export const UnitImage = React.memo(({ unitType, faction, role, scale, badges }: Props) => {
@@ -24,6 +31,18 @@ export const UnitImage = React.memo(({ unitType, faction, role, scale, badges }:
     const darkColor: string = toDarkerHue(baseColor, 0.3);
     const brightColor: string = toBrighterHue(baseColor, 0.05);
     const unitDef: UnitDefinition = unitDefinitions[unitType];
+
+    const createBadgeContent = useCallback(
+        (element: JSX.Element): React.ReactElement => {
+            return React.cloneElement(element, {
+                style: {
+                    float: role === ParticipantRole.Attacker ? "left" : "right",
+                    width: `min(${min([30, (2 * scale * unitDef.imageSize.x) / badges.length])}px, 50%)`,
+                },
+            });
+        },
+        [badges.length, role, scale, unitDef.imageSize.x]
+    );
 
     // Let the image load before showing it, to prevent flickers while the SvgProxys are being handled
     return (
@@ -43,19 +62,25 @@ export const UnitImage = React.memo(({ unitType, faction, role, scale, badges }:
             </SvgLoader>
             <BadgeContainer role={role} scale={scale} anchor={unitDef.imageBadgeAnchor}>
                 {badges
-                    .filter((badge: JSX.Element | false): badge is JSX.Element => !!badge)
-                    .map((badge: JSX.Element) =>
-                        React.cloneElement(badge, {
-                            style: {
-                                float: role === ParticipantRole.Attacker ? "left" : "right",
-                                width: `min(${min([30, (2 * scale * unitDef.imageSize.x) / badges.length])}px, 50%)`,
-                            },
-                        })
-                    )}
+                    .filter((badge: JSX.Element | BadgeWithTooltip | false): badge is JSX.Element | BadgeWithTooltip => !!badge)
+                    .map((badge: JSX.Element | BadgeWithTooltip) => {
+                        if (isBadgeWithTooltip(badge)) {
+                            return (
+                                <Tooltip key={badge.key} title={badge.tooltip}>
+                                    <span>{createBadgeContent(badge.element)}</span>
+                                </Tooltip>
+                            );
+                        }
+                        return createBadgeContent(badge);
+                    })}
             </BadgeContainer>
         </div>
     );
 });
+
+function isBadgeWithTooltip(badgeDef: JSX.Element | BadgeWithTooltip): badgeDef is BadgeWithTooltip {
+    return typeof (badgeDef as any).tooltip === "string";
+}
 
 function getSvgPath(unitType: UnitType): string {
     const base = process.env.PUBLIC_URL;

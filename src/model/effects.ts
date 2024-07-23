@@ -93,9 +93,20 @@ export interface UnitOnComputeSnapshotInput {
     unit: ComputedUnitSnapshot;
 }
 
-export interface UnitTagImplementation {
+export interface UnitTagImplementation<T = any> {
     /**
      * Called when computing snapshots for the unit.
      */
     onComputeUnitSnapshot?: (input: UnitOnComputeSnapshotInput) => void;
+
+    /**
+     * Custom settings for the tag
+     */
+    settings?: UnitTagSettings<T>;
+}
+
+export interface UnitTagSettings<T> {
+    default: T;
+    encode: (settings: T) => string;
+    decode: (str: string) => T;
 }
