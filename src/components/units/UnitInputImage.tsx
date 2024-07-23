@@ -53,7 +53,7 @@ export function UnitInputImage({ unit, faction, role, scale, style, onClick }: P
                     )),
                     customModType !== undefined && {
                         key: "custom-mods",
-                        tooltip: "Unit has custom settings",
+                        tooltip: "Unit has modified combat values",
                         element: <UnitCustomModImage modType={customModType} />,
                     },
                 ]}

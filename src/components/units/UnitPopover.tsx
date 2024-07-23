@@ -1,4 +1,4 @@
-import { Box, Typography } from "@mui/material";
+import { Box, Divider, Typography } from "@mui/material";
 
 import { combatStageResources, flagshipDefinitions } from "logic/participant";
 import { CombatStage, ParticipantRole, RichUnit } from "model/calculation";
@@ -11,6 +11,7 @@ import { UnitStageStatsView } from "./UnitStageStatsView";
 import { UnitSustainDamageInput } from "./UnitSustainDamageInput";
 import { UnitCombatValueModInput } from "./UnitCombatValueModInput";
 import { UnitCombatRollsModInput } from "./UnitCombatRollsModInput";
+import { UnitPopoverActionButtons } from "./UnitPopoverActionButtons";
 
 interface Props {
     unit: RichUnit;
@@ -23,14 +24,20 @@ export function UnitPopover({ unit, faction, role }: Props) {
         unit.input.type === UnitType.Flagship ? flagshipDefinitions[faction] : undefined;
     return (
         <Box sx={{ p: 1 }}>
-            <Typography variant="body1" sx={{ fontWeight: "bold" }}>
-                {unitDefinitions[unit.input.type].name}
-            </Typography>
-            {flagshipDefinition && (
-                <Typography variant="body2" sx={{ fontStyle: "italic" }}>
-                    {flagshipDefinition.flagshipName}
-                </Typography>
-            )}
+            <Box display="flex">
+                <Box flexGrow={1}>
+                    <Typography variant="body1" sx={{ fontWeight: "bold" }}>
+                        {unitDefinitions[unit.input.type].name}
+                    </Typography>
+                    {flagshipDefinition && (
+                        <Typography variant="body2" sx={{ fontStyle: "italic" }}>
+                            {flagshipDefinition.flagshipName}
+                        </Typography>
+                    )}
+                </Box>
+                <UnitPopoverActionButtons role={role} unit={unit} />
+            </Box>
+
             {Object.keys(unit.byStage).map((stageKey: string) => {
                 const stage: CombatStage = Number(stageKey);
                 return <UnitStageStatsView key={stage} label={combatStageResources[stage].shortName} stats={unit.byStage[stage]!} />;
@@ -40,8 +47,6 @@ export function UnitPopover({ unit, faction, role }: Props) {
             <UnitScientistInput role={role} unit={unit} />
             <UnitSustainDamageInput role={role} unit={unit} />
             <UnitKeepAliveInput role={role} unit={unit} />
-            <UnitCombatValueModInput role={role} unit={unit} />
-            <UnitCombatRollsModInput role={role} unit={unit} />
             {flagshipDefinition?.notes && (
                 <Typography
                     variant="body2"
@@ -54,6 +59,9 @@ export function UnitPopover({ unit, faction, role }: Props) {
                     {flagshipDefinition.notes}
                 </Typography>
             )}
+            <Divider sx={{ mt: 1, mr: -1, mb: 1, ml: -1 }} />
+            <UnitCombatValueModInput role={role} unit={unit} />
+            <UnitCombatRollsModInput role={role} unit={unit} />
         </Box>
     );
 }

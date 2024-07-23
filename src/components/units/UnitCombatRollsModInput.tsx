@@ -1,5 +1,5 @@
 import { Add, Remove } from "@mui/icons-material";
-import { Box, IconButton, Typography } from "@mui/material";
+import { Box, IconButton, Tooltip, Typography } from "@mui/material";
 import { useDispatch } from "react-redux";
 
 import { ParticipantRole, RichUnit } from "model/calculation";
@@ -63,19 +63,25 @@ export function UnitCombatRollsModInput({ role, unit }: Props) {
             <IconButton size="small" onClick={handleDecrement}>
                 <Remove sx={{ width: 20, height: 20 }} />
             </IconButton>
-            <Box
-                sx={{
-                    borderRadius: 1,
-                    backgroundColor: getBackgroundColor(currentValue),
-                    p: "0 4px",
-                    m: "2px 0",
-                    width: "39px",
-                    fontFamily: "Consolas",
-                    textAlign: "center",
-                }}
+            <Tooltip
+                title="Modify the number of combat rolls performed in normal combat rounds"
+                placement="right"
+                PopperProps={{ modifiers: [{ name: "offset", options: { offset: [0, 30] } }] }}
             >
-                {currentValueDisplay}
-            </Box>
+                <Box
+                    sx={{
+                        borderRadius: 1,
+                        backgroundColor: getBackgroundColor(currentValue),
+                        p: "0 4px",
+                        m: "2px 0",
+                        width: "39px",
+                        fontFamily: "Consolas",
+                        textAlign: "center",
+                    }}
+                >
+                    {currentValueDisplay}
+                </Box>
+            </Tooltip>
             <IconButton size="small" onClick={handleIncrement}>
                 <Add sx={{ width: 20, height: 20 }} />
             </IconButton>

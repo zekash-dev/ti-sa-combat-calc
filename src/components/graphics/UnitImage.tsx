@@ -37,7 +37,10 @@ export const UnitImage = React.memo(({ unitType, faction, role, scale, badges }:
             return React.cloneElement(element, {
                 style: {
                     float: role === ParticipantRole.Attacker ? "left" : "right",
-                    width: `min(${min([30, (2 * scale * unitDef.imageSize.x) / badges.length])}px, 50%)`,
+                    width: `min(${min([30, (2 * scale * unitDef.imageSize.x) / badges.length])}px, calc(50% - 5px))`,
+                    height: "unset",
+                    marginTop: "5px",
+                    marginRight: "5px",
                 },
             });
         },
@@ -67,7 +70,7 @@ export const UnitImage = React.memo(({ unitType, faction, role, scale, badges }:
                         if (isBadgeWithTooltip(badge)) {
                             return (
                                 <Tooltip key={badge.key} title={badge.tooltip}>
-                                    <span>{createBadgeContent(badge.element)}</span>
+                                    {createBadgeContent(badge.element)}
                                 </Tooltip>
                             );
                         }

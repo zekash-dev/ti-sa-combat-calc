@@ -1,26 +1,24 @@
 import { Edit } from "@mui/icons-material";
-import { Box } from "@mui/material";
+import { omit } from "lodash";
 import React from "react";
 
 interface Props {
     modType: "positive" | "negative";
+    style?: React.CSSProperties | undefined;
 }
 
-export const UnitCustomModImage = React.memo(({ modType }: Props) => {
+export const UnitCustomModImage = React.forwardRef<SVGSVGElement, Props>(function UnitCustomModImageFW(props, ref) {
+    const spreadProps = omit(props, "modType");
+    //  Spread the props to the underlying DOM element to let this component exist in a tooltip.
     return (
-        <Box
+        <Edit
+            ref={ref}
+            {...spreadProps}
+            fontSize="small"
             sx={{
-                display: "inline-block",
-                width: "24px",
-                height: "24px",
-                mt: "3px",
-                ml: "3px",
-                p: "2px",
-                borderRadius: "50%",
-                backgroundColor: modType === "positive" ? "#31B32B" : "#F4641D",
+                borderRadius: "30%",
+                backgroundColor: props.modType === "positive" ? "#31B32B" : "#F4641D",
             }}
-        >
-            <Edit fontSize="small" />
-        </Box>
+        />
     );
 });

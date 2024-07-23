@@ -177,7 +177,7 @@ function DrawerContent({ role, open }: DrawerContentProps) {
                     open={open}
                     onChange={handleTagChanged}
                 />
-                <ParticipantCombatValueModEditor role={role} />
+                <ParticipantCombatValueModEditor open={open} role={role} />
             </List>
             <SelectFactionDialog
                 open={factionDialogOpen}

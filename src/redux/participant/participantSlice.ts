@@ -1,4 +1,5 @@
 import { Action, createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { cloneDeep } from "lodash";
 
 import { getInitialState, getUnitSnapshots } from "logic/calculator";
 import { uniqueFilter } from "logic/common";
@@ -101,6 +102,11 @@ interface SetUnitSustainedHitsPayload {
     sustainedHits: number;
 }
 
+interface UnitInstanceReference {
+    role: ParticipantRole;
+    unitIndex: number;
+}
+
 const participantSlice = createSlice({
     name: "participant",
     initialState: initialState,
@@ -159,6 +165,17 @@ const participantSlice = createSlice({
                 removeUnits(state.participants[role], unit, currentCount - count);
             }
         },
+        createUnitDuplicate: (state: ParticipantSliceState, action: PayloadAction<UnitInstanceReference>) => {
+            const { role, unitIndex } = action.payload;
+            const unit: UnitInput | undefined = state.participants[role].units[unitIndex];
+            if (unit) {
+                state.participants[role].units.push(cloneDeep(unit));
+            }
+        },
+        removeUnit: (state: ParticipantSliceState, action: PayloadAction<UnitInstanceReference>) => {
+            const { role, unitIndex } = action.payload;
+            state.participants[role].units.splice(unitIndex, 1);
+        },
         setUnitTag: (state: ParticipantSliceState, action: PayloadAction<SetUnitTagPayload>) => {
             const { role, unitIndex, tag, value } = action.payload;
             const unit: UnitInput | undefined = state.participants[role].units[unitIndex];
@@ -176,6 +193,14 @@ const participantSlice = createSlice({
                 if (unit.tags) {
                     delete unit.tags[tag];
                 }
+            }
+        },
+        resetUnitModifications: (state: ParticipantSliceState, action: PayloadAction<UnitInstanceReference>) => {
+            const { role, unitIndex } = action.payload;
+            const unit: UnitInput | undefined = state.participants[role].units[unitIndex];
+            if (unit) {
+                unit.tags = undefined;
+                unit.sustainedHits = 0;
             }
         },
         setUnitSustainedHits: (state: ParticipantSliceState, action: PayloadAction<SetUnitSustainedHitsPayload>) => {
@@ -266,8 +291,11 @@ export const {
     incrementUnitCount,
     decrementUnitCount,
     setUnitCount,
+    createUnitDuplicate,
+    removeUnit,
     setUnitTag,
     unsetUnitTag,
+    resetUnitModifications,
     setUnitSustainedHits,
     importParticipantsState,
     resetTagsAndUnits,
