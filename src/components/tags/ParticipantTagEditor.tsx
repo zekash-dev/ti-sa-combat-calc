@@ -23,6 +23,7 @@ import { ParticipantTagListItem } from "./ParticipantTagListItem";
 import { SelectFactionDialog } from "./SelectFactionDialog";
 import { TagStarIcon } from "./TagStarIcon";
 import { TechnologyIcon } from "./TechnologyIcon";
+import { ParticipantCombatValueModEditor } from "./ParticipantCombatValueModEditor";
 
 interface Props {
     location: "left" | "right";
@@ -176,6 +177,7 @@ function DrawerContent({ role, open }: DrawerContentProps) {
                     open={open}
                     onChange={handleTagChanged}
                 />
+                <ParticipantCombatValueModEditor role={role} />
             </List>
             <SelectFactionDialog
                 open={factionDialogOpen}

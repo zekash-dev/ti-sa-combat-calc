@@ -461,6 +461,11 @@ const commonParticipantTagResources: KeyedDictionary<CommonParticipantTag, Parti
         color: "white",
         implementation: effects.agent,
     },
+    [CommonParticipantTag.COMBAT_VALUE_MOD]: {
+        name: "Combat value mod",
+        color: "white",
+        implementation: effects.participantCombatValueMod,
+    },
 };
 
 const combatTagResources: KeyedDictionary<CombatTag, ParticipantTagResources> = {

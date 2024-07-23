@@ -26,6 +26,9 @@ function getImagePath(tag: CommonParticipantTag): string {
         case CommonParticipantTag.AGENT:
             imageName = "leaders/agent.png";
             break;
+        default:
+            console.warn(`No image found for tag ${tag}`);
+            return "";
     }
     return `${base}/${subfolder}/${imageName}`;
 }

@@ -80,6 +80,7 @@ export enum CommonParticipantTag {
     HIGH_ALERT_TOKEN = 501,
     GENERAL = 502,
     AGENT = 503,
+    COMBAT_VALUE_MOD = 504,
 }
 
 export enum FlagshipTag {

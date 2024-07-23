@@ -28,6 +28,7 @@ export * from "./muaatMagmusReactor";
 export * from "./naaluFighterMod";
 export * from "./naaluFlagship";
 export * from "./nebula";
+export * from "./participantCombatValueMod";
 export * from "./planetaryShield";
 export * from "./saarChaosMapping";
 export * from "./sardakkBerzerkerGenome";
