@@ -222,57 +222,67 @@ export const technologyColors: KeyedDictionary<TechnologyType, string> = {
 
 export const technologyResources: KeyedDictionary<Technology, TechnologyResources> = {
     [Technology.HYLAR_V_LASER]: {
-        name: "Hylar V laser",
+        name: "Hylar V Laser",
+        description: "Cruisers and Destroyers receive +1 to combat rolls (except those granted by other red Technologies).",
         shortName: "HYL",
         color: technologyColors[TechnologyType.RED],
         type: TechnologyType.RED,
         implementation: effects.hylarVLaser,
     },
     [Technology.IMPULSION_SHIELDS]: {
-        name: "Impulsion shields",
+        name: "Impulsion Shields",
+        description: "Ignore one hit from combat rolls (or Space Mines).",
         shortName: "IMP",
         color: technologyColors[TechnologyType.RED],
         type: TechnologyType.RED,
         implementation: effects.impulsionShields,
     },
     [Technology.AUTOMATED_TURRETS]: {
-        name: "Automated turrets",
+        name: "Automated Turrets",
+        description: "During Anti-Fighter Barrage, Destroyers receive one extra combat die and +2 to their rolls.",
         shortName: "AUT",
         color: technologyColors[TechnologyType.RED],
         type: TechnologyType.RED,
         implementation: effects.automatedTurrets,
     },
     [Technology.WAR_SUN]: {
-        name: "War sun",
+        name: "War Sun",
+        description: "War Suns receive +2 combat dice during bombardment.",
         shortName: "WSN",
-
         color: technologyColors[TechnologyType.RED],
         type: TechnologyType.RED,
         implementation: effects.warSun,
     },
     [Technology.GRAVITON_NETAGOR]: {
-        name: "Graviton negator",
+        name: "Graviton Negator",
+        description: ["Receive +1 to all Bombardment rolls.", "Fighters and Cruisers receive Bombardment (x1)."],
         shortName: "GRN",
         color: technologyColors[TechnologyType.RED],
         type: TechnologyType.RED,
         implementation: effects.gravitonNegator,
     },
     [Technology.MAGEN_DEFENSE_GRID]: {
-        name: "Magen defense grid",
+        name: "Magen Defense Grid",
+        description: [
+            "+1 to combat rolls of PDS and ground units defending planets containing your PDS.",
+            "Planetary Shields not used during Bombardment may now instead be used to cancel a hit during combat rounds of Invasion Combat.",
+        ],
         shortName: "MAG",
         color: technologyColors[TechnologyType.RED],
         type: TechnologyType.RED,
         implementation: effects.magenDefenseGrid,
     },
     [Technology.ASSAULT_CANNONS]: {
-        name: "Assault cannons",
+        name: "Assault Cannons",
+        description: "Dreadnoughts and Cruisers receive Pre-combat shot (x1).",
         shortName: "ASC",
         color: technologyColors[TechnologyType.RED],
         type: TechnologyType.RED,
         implementation: effects.assaultCannons,
     },
     [Technology.GRAVITON_LASER_SYSTEM]: {
-        name: "Graviton laser system",
+        name: "Graviton Laser System",
+        description: "One of your PDS (Space Cannon) gains one extra combat roll.",
         shortName: "GLS",
         color: technologyColors[TechnologyType.YELLOW],
         type: TechnologyType.YELLOW,
@@ -280,6 +290,7 @@ export const technologyResources: KeyedDictionary<Technology, TechnologyResource
     },
     [Technology.CYBERNETICS]: {
         name: "Cybernetics",
+        description: "Fighters receive +1 to combat rolls.",
         shortName: "CYB",
         color: technologyColors[TechnologyType.GREEN],
         type: TechnologyType.GREEN,
@@ -287,6 +298,7 @@ export const technologyResources: KeyedDictionary<Technology, TechnologyResource
     },
     [Technology.GEN_SYNTHESIS]: {
         name: "Gen synthesis",
+        description: "Ground Forces (and Shock Troops) receive +1 to Combat Rolls.",
         shortName: "GEN",
         color: technologyColors[TechnologyType.GREEN],
         type: TechnologyType.GREEN,
@@ -294,6 +306,7 @@ export const technologyResources: KeyedDictionary<Technology, TechnologyResource
     },
     [Technology.X89_BACTERIAL_WEAPON]: {
         name: "X-89 bacterial weapon",
+        description: "This technology is not yet implemented.",
         shortName: "X89",
         color: technologyColors[TechnologyType.GREEN],
         type: TechnologyType.GREEN,
@@ -301,6 +314,7 @@ export const technologyResources: KeyedDictionary<Technology, TechnologyResource
     },
     [Technology.ADVANCED_FIGHTERS]: {
         name: "Advanced fighters",
+        description: "Fighters receive +1 to combat rolls.",
         shortName: "ADF",
         color: technologyColors[TechnologyType.BLUE],
         type: TechnologyType.BLUE,
@@ -308,6 +322,7 @@ export const technologyResources: KeyedDictionary<Technology, TechnologyResource
     },
     [Technology.MANEUVERING_JETS]: {
         name: "Maneuvering jets",
+        description: "Space Cannon and Space Mine rolls against your ships receive -1.",
         shortName: "MNJ",
         color: technologyColors[TechnologyType.BLUE],
         type: TechnologyType.BLUE,
@@ -316,57 +331,72 @@ export const technologyResources: KeyedDictionary<Technology, TechnologyResource
 };
 const factionAbilityResources: KeyedDictionary<FactionAbility, ParticipantTagResources> = {
     [FactionAbility.MENTAK_PRECOMBAT_SHOTS]: {
-        name: "Pre-combat shots",
+        name: "Ambush",
+        description: "Grant Pre-combat shot (x1) to up to 2 of your ships that are Cruisers or Destroyers.",
         color: factionResources[Faction.MENTAK_COALITION].color,
         implementation: effects.mentakPreCombatShots,
     },
     [FactionAbility.NAALU_FIGHTER_MOD]: {
-        name: "Fighters +1",
+        name: "Graceful",
+        description: "Your fighters receive +1 to all combat rolls.",
         color: factionResources[Faction.NAALU_COLLECTIVE].color,
         implementation: effects.naaluFighterMod,
     },
     [FactionAbility.SARDAKK_UNIT_MOD]: {
-        name: "All units +1",
+        name: "Ferocious",
+        description: "Your units receive +1 to all combat rolls.",
         color: factionResources[Faction.HIVES_OF_SARDAKK_NORR].color,
         implementation: effects.sardakkUnitMod,
     },
     [FactionAbility.JOLNAR_UNIT_MOD]: {
-        name: "All units -1",
+        name: "Fragile",
+        description: "Your units receive -1 to all combat rolls.",
         color: factionResources[Faction.UNIVERSITIES_OF_JOLNAR].color,
         implementation: effects.jolnarUnitMod,
     },
     [FactionAbility.JOLNAR_REROLL]: {
-        name: "Reroll enemy rolls",
+        name: "Discerning",
+        description: "This ability is not yet implemented.",
         color: factionResources[Faction.UNIVERSITIES_OF_JOLNAR].color,
         implementation: false,
     },
     [FactionAbility.XXCHA_ROUND1_MOD]: {
-        name: "Round 1: Enemy units -1",
+        name: "Resilient",
+        description:
+            "When you are the defender in a Space Battle or Invasion Combat, enemy combat rolls receive -1 in the first combat round.",
         color: factionResources[Faction.XXCHA_KINGDOM].color,
         implementation: effects.xxchaRound1Mod,
     },
     [FactionAbility.YIN_ROUND2_SACRIFICE]: {
-        name: "Round 2: Sacrifice unit",
+        name: "Sacrifice",
+        description: "This ability is not yet implemented.",
         color: factionResources[Faction.YIN_BROTHERHOOD].color,
         implementation: false,
     },
     [FactionAbility.YIN_INVASION_CONVERSION]: {
-        name: "Convert ground force",
+        name: "Indoctrination",
+        description: "This ability is not yet implemented.",
         color: factionResources[Faction.YIN_BROTHERHOOD].color,
         implementation: false,
     },
     [FactionAbility.LIZIX_DREADNOUGHT_MOD]: {
-        name: "Dreadnoughts +1",
+        name: "Tyrant Class",
+        description: "Your Dreadnoughts receive +1 to all combat rolls.",
         color: factionResources[Faction.LIZIX_MINDNET].color,
         implementation: effects.lizixDreadnoughtMod,
     },
     [FactionAbility.LIZIX_GROUND_FORCE_MOD]: {
-        name: "Ground forces +1 (+2 with MU)",
+        name: "Augmented",
+        description: [
+            "Your Gound Forces and Shock Troops receive +1 to all combat rolls.",
+            "When accompanying mechs as the attacker, they instead receive +2.",
+        ],
         color: factionResources[Faction.LIZIX_MINDNET].color,
         implementation: effects.lizixGroundForceMod,
     },
     [FactionAbility.ARBOREC_GROUND_FORCE_MOD]: {
-        name: "Ground forces -1",
+        name: "Deep Roots",
+        description: "Your Ground Forces (and Shock Troops) receive -1 to all combat rolls.",
         color: factionResources[Faction.ARBOREC_ECOSYSTEM].color,
         implementation: effects.arborecGroundForceMod,
     },
@@ -374,72 +404,96 @@ const factionAbilityResources: KeyedDictionary<FactionAbility, ParticipantTagRes
 
 const factionUpgradeResources: KeyedDictionary<FactionUpgrade, ParticipantTagResources> = {
     [FactionUpgrade.LETNEV_SAIMOC_INFUSED_HULLS]: {
-        name: "Saimoc-infused hulls",
+        name: "Saimoc-Infused Hulls",
+        description: "This ability is not yet implemented.",
         color: factionResources[Faction.BARONY_OF_LETNEV].color,
         implementation: false,
     },
     [FactionUpgrade.SAAR_CHAOS_MAPPING]: {
-        name: "Chaos mapping",
+        name: "Chaos Mapping",
+        description: "All pre-combat rolls receive -1 against you.",
         color: factionResources[Faction.CLAN_OF_SAAR].color,
         implementation: effects.saarChaosMapping,
     },
     [FactionUpgrade.SOL_ADVANCED_FLEET_TACTICS]: {
-        name: "Advanced fleet tactics",
+        name: "Advanced Fleet Tactics",
+        description: [
+            "During each combat round of Space Battles, up to three Fighters and one Carrier receive +2 to combat rolls.",
+            "No more than half of your Fighters (round up) may be lost to Anti-Fighter Barrage.",
+        ],
         color: factionResources[Faction.FEDERATION_OF_SOL].color,
         implementation: effects.solAdvancedFleetTactics,
     },
     [FactionUpgrade.SOL_MARK2_ADVANCED_CARRIERS]: {
-        name: "Mark II advanced carriers",
+        name: "Mark II Advanced Carriers",
+        description: "Your Carriers gain Sustain Damage (x1).",
         color: factionResources[Faction.FEDERATION_OF_SOL].color,
         implementation: effects.solMark2AdvancedCarriers,
     },
     [FactionUpgrade.SOL_VERSATILE_COMBAT_TACTICS]: {
-        name: "Versatile combat tactics",
+        name: "Versatile Combat Tactics",
+        description: [
+            "Your Ground Forces (and Shock Troops) gain +2 to combat rolls in combat rounds where you have fewer combat dice than the opponent.",
+            "During enemy Bombardment, half of your Ground Forces (round up) are immune.",
+        ],
         color: factionResources[Faction.FEDERATION_OF_SOL].color,
         implementation: effects.solVersatileCombatTactics,
     },
     [FactionUpgrade.MENTAK_ADAPTABLE_ORDNANCE_RIGS]: {
-        name: "Adaptable ordnance rigs",
+        name: "Adaptable Ordnance Rigs",
+        description: [
+            "Your Cruisers gain Capacity (1 Ground Force).",
+            "During your actions, Cruisers not using this Capacity may either sustain damage outside of combat rounds, or make an extra combat roll in the first combat round of Space Battles.",
+        ],
         color: factionResources[Faction.MENTAK_COALITION].color,
         implementation: effects.mentakAdaptableOrdnanceRigs,
     },
     [FactionUpgrade.SARDAKK_BERZERKER_GENOME]: {
-        name: "Berzerker genome",
+        name: "Berzerker Genome",
+        description: "In any combat round in which you score at least one hit, automatically inflict an extra hit on the opponent.",
         color: factionResources[Faction.HIVES_OF_SARDAKK_NORR].color,
         implementation: effects.sardakkBerzerkerGenome,
     },
     [FactionUpgrade.XXCHA_ARCHON_ENERGY_SHELL]: {
-        name: "Archon energy shells",
+        name: "Archon Energy Shells",
+        description: "As the defender in Space Combat or Invasion Combat, you may negate two hits.",
         color: factionResources[Faction.XXCHA_KINGDOM].color,
         implementation: effects.xxchaArchonEnergyShell,
     },
     [FactionUpgrade.YIN_BLADE_OF_ZEAL]: {
-        name: "Blade of zeal",
+        name: "Blade of Zeal",
+        description: "This ability is not yet implemented.",
         color: factionResources[Faction.YIN_BROTHERHOOD].color,
         implementation: false,
     },
     [FactionUpgrade.YIN_SUBLIMINAL_COMMAND]: {
-        name: "Subliminal command",
+        name: "Subliminal Command",
+        description: "This ability is not yet implemented.",
         color: factionResources[Faction.YIN_BROTHERHOOD].color,
         implementation: false,
     },
     [FactionUpgrade.MUAAT_MAGMUS_REACTOR]: {
-        name: "Magmus reactor",
+        name: "Magmus Reactor",
+        description: "Your War Suns gain +1 to all combat rolls during actions in which they are leaving a Supernova.",
         color: factionResources[Faction.EMBERS_OF_MUAAT].color,
         implementation: effects.muaatMagmusReactor,
     },
     [FactionUpgrade.MUAAT_MAGMA_OBLITERATOR]: {
-        name: "Magma obliterator",
+        name: "Magma Obliterator",
+        description: "One of your War Sun gains Bombardment (x2).",
         color: factionResources[Faction.EMBERS_OF_MUAAT].color,
         implementation: effects.muaatMagmaObliterator,
     },
     [FactionUpgrade.CREUSS_DIMENSIONAL_SPLICER]: {
-        name: "Dimensional splicer",
+        name: "Dimensional Splicer",
+        description:
+            "At the start of a Space Battle in a system containing a wormhole, inflict one hit to the opposing fleet which the opponent may not assign to Fighters.",
         color: factionResources[Faction.GHOSTS_OF_CREUSS].color,
         implementation: effects.creussDimensionalSplicer,
     },
     [FactionUpgrade.ORDER_CHRONOS_FIELD]: {
-        name: "Chronos field",
+        name: "Chronos Field",
+        description: "This ability is not yet implemented.",
         color: factionResources[Faction.ORDER_OF_THE_LAST].color,
         implementation: false,
     },
@@ -447,22 +501,29 @@ const factionUpgradeResources: KeyedDictionary<FactionUpgrade, ParticipantTagRes
 
 const commonParticipantTagResources: KeyedDictionary<CommonParticipantTag, ParticipantTagResources> = {
     [CommonParticipantTag.HIGH_ALERT_TOKEN]: {
-        name: "High alert token",
+        name: "High Alert Token",
+        description: "Your units receive +1 to all combat rolls.",
         color: "white",
         implementation: effects.highAlertToken,
     },
     [CommonParticipantTag.GENERAL]: {
         name: "General",
+        description: [
+            "During Invasion Combat, your ground units receive +1 to combat rolls.",
+            "In each combat round of Invasion Combat, you may reroll 2 friendly combat rolls (or the same roll twice).",
+        ],
         color: "white",
         implementation: effects.general,
     },
     [CommonParticipantTag.AGENT]: {
         name: "Agent",
+        description: "PDS (Invasion Defence) do not fire on your units.",
         color: "white",
         implementation: effects.agent,
     },
     [CommonParticipantTag.COMBAT_VALUE_MOD]: {
-        name: "Combat value mod",
+        name: "Combat Value Mod",
+        description: "Manually modify the combat value of all units.",
         color: "white",
         implementation: effects.participantCombatValueMod,
     },
@@ -471,11 +532,13 @@ const commonParticipantTagResources: KeyedDictionary<CommonParticipantTag, Parti
 const combatTagResources: KeyedDictionary<CombatTag, ParticipantTagResources> = {
     [CombatTag.NEBULA]: {
         name: "Nebula",
+        description: "During Space Battle, defending units receive +1 to all combat rolls.",
         color: "white",
         implementation: effects.nebula,
     },
     [CombatTag.ION_STORM]: {
-        name: "Ion storm",
+        name: "Ion Storm",
+        description: ["Fighters may not perform combat rolls.", "Space Cannon may not fire."],
         color: "white",
         implementation: effects.ionStorm,
     },
@@ -490,11 +553,13 @@ export const participantTagResources: KeyedDictionary<ParticipantTag, Participan
     // Flagship here is just a placeholder, to be replaced by faction-specific flagship implementations.
     [FlagshipTag.FLAGSHIP]: {
         name: "Flagship",
+        description: "",
         color: "white",
         implementation: false,
     },
     [ConstantTag.PLANETARY_SHIELD]: {
-        name: "Planetary shield",
+        name: "Planetary Shield",
+        description: "",
         color: "white",
         implementation: effects.planetaryShield,
     },

@@ -1,5 +1,5 @@
 import { CheckBox, CheckBoxOutlineBlank, SubdirectoryArrowRight } from "@mui/icons-material";
-import { ListItem, ListItemIcon, ListItemText, Tooltip, Typography } from "@mui/material";
+import { ListItem, ListItemButton, ListItemIcon, ListItemText, Typography } from "@mui/material";
 import { useCallback } from "react";
 
 import { participantTagSettingsUi } from "components/effectSettings";
@@ -8,6 +8,7 @@ import { ParticipantInput } from "model/calculation";
 import { ParticipantTag, ParticipantTagResources } from "model/combatTags";
 import { ParticipantTagCustomSettingsUiProps } from "model/effects";
 import { ParticipantTagBadge } from "./ParticipantTagBadge";
+import { ParticipantTagTooltip } from "./ParticipantTagTooltip";
 
 interface Props {
     participant: ParticipantInput;
@@ -48,30 +49,26 @@ export function ParticipantTagListItem({ participant, tag, icon, iconBadge, open
     );
 
     let listItem: JSX.Element = (
-        <ListItem button disabled={!tagResources.implementation} disableRipple onClick={onToggle} disableGutters>
-            {iconElement}
-            {open && (
-                <>
-                    <ListItemText>
-                        <Typography variant="body1" sx={{ overflow: "hidden", textOverflow: "ellipsis" }}>
-                            {tagTitle}
-                        </Typography>
-                    </ListItemText>
-                    {!!tagResources.implementation && (
-                        <ListItemIcon>{selected ? <CheckBox color="primary" /> : <CheckBoxOutlineBlank color="disabled" />}</ListItemIcon>
-                    )}
-                </>
-            )}
-        </ListItem>
+        <ParticipantTagTooltip tag={tagResources} placement="right">
+            <ListItemButton disabled={!tagResources.implementation} disableRipple onClick={onToggle} disableGutters>
+                {iconElement}
+                {open && (
+                    <>
+                        <ListItemText>
+                            <Typography variant="body1" sx={{ overflow: "hidden", textOverflow: "ellipsis" }}>
+                                {tagTitle}
+                            </Typography>
+                        </ListItemText>
+                        {!!tagResources.implementation && (
+                            <ListItemIcon>
+                                {selected ? <CheckBox color="primary" /> : <CheckBoxOutlineBlank color="disabled" />}
+                            </ListItemIcon>
+                        )}
+                    </>
+                )}
+            </ListItemButton>
+        </ParticipantTagTooltip>
     );
-
-    if (!open) {
-        listItem = (
-            <Tooltip title={tagTitle} placement="right">
-                <span>{listItem}</span>
-            </Tooltip>
-        );
-    }
 
     if (SettingsUi && open && selected) {
         listItem = (

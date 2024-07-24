@@ -49,7 +49,11 @@ export function ParticipantCombatValueModEditor({ role, open }: Props) {
                     <IconButton onClick={handleDecrement}>
                         <Remove />
                     </IconButton>
-                    <Tooltip title={`Combat roll modifier for all ${role} units`}>
+                    <Tooltip
+                        title={`Combat roll modifier for all ${role} units.`}
+                        placement="right"
+                        PopperProps={{ modifiers: [{ name: "offset", options: { offset: [0, 55] } }] }}
+                    >
                         <Box
                             sx={{
                                 borderRadius: 1,
@@ -82,7 +86,7 @@ export function ParticipantCombatValueModEditor({ role, open }: Props) {
                     pr: 1,
                 }}
             >
-                <Tooltip title={`Combat roll modifier for all ${role} units`} placement="right">
+                <Tooltip title={`Combat roll modifier for all ${role} units.`} placement="right">
                     <Box
                         sx={{
                             borderRadius: 1,

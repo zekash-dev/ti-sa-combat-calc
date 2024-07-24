@@ -48,4 +48,13 @@ export const theme: Theme = createTheme({
             textTransform: "uppercase",
         },
     },
+    components: {
+        MuiTooltip: {
+            styleOverrides: {
+                tooltip: {
+                    fontSize: "0.875em",
+                },
+            },
+        },
+    },
 });

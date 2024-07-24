@@ -126,6 +126,7 @@ export interface FactionResources {
 
 export interface ParticipantTagResources {
     name: string;
+    description: string | string[];
     icon?: JSX.Element;
     color: string;
     implementation: false | ParticipantTagImplementation;
