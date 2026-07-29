@@ -1,4 +1,4 @@
-import { CombatStage } from "model/calculation";
+import { CombatStage, CombatType } from "model/calculation";
 import { ComputedUnitSnapshot } from "model/combatState";
 import { Technology } from "model/combatTags";
 import { ParticipantOnComputeSnapshotInput, ParticipantTagImplementation } from "model/effects";
@@ -8,7 +8,7 @@ const applicableUnitTypes: UnitType[] = [UnitType.Dreadnought, UnitType.Cruiser]
 
 export const assaultCannons: ParticipantTagImplementation = {
     onComputeUnitSnapshots: ({ calculationInput, role, stage, units }: ParticipantOnComputeSnapshotInput) => {
-        if (stage === CombatStage.PreCombat) {
+        if (calculationInput.combatType === CombatType.SpaceBattle && stage === CombatStage.PreCombat) {
             const hasHylar: boolean = calculationInput[role].tags[Technology.HYLAR_V_LASER] !== undefined;
             for (let unit of units.filter((u: ComputedUnitSnapshot) => applicableUnitTypes.includes(u.type))) {
                 if (hasHylar && unit.type === UnitType.Cruiser) {
