@@ -1,5 +1,5 @@
 import { Favorite } from "@mui/icons-material";
-import { Box, IconButton, Typography } from "@mui/material";
+import { Box, IconButton, Tooltip, Typography } from "@mui/material";
 import { useDispatch } from "react-redux";
 
 import { ParticipantRole, RichUnit } from "model/calculation";
@@ -23,7 +23,7 @@ export function UnitKeepAliveInput({ role, unit }: Props) {
                     role: role,
                     unitIndex: unit.unitIndex,
                     tag: UnitTag.KEEP_ALIVE,
-                })
+                }),
             );
         } else {
             dispatch(
@@ -32,7 +32,7 @@ export function UnitKeepAliveInput({ role, unit }: Props) {
                     unitIndex: unit.unitIndex,
                     tag: UnitTag.KEEP_ALIVE,
                     value: true,
-                })
+                }),
             );
         }
     };
@@ -41,17 +41,19 @@ export function UnitKeepAliveInput({ role, unit }: Props) {
             <Typography variant="body2" sx={{ display: "inline", marginRight: 1 }}>
                 Keep alive
             </Typography>
-            <IconButton size="small" onClick={toggleKeepAlive}>
-                <Favorite
-                    color="error"
-                    style={{
-                        width: 20,
-                        height: 20,
-                        filter: hasKeepAlive ? undefined : "grayscale(0.8)",
-                        opacity: hasKeepAlive ? undefined : "0.7",
-                    }}
-                />
-            </IconButton>
+            <Tooltip title="Assign hits to this unit last" placement="right">
+                <IconButton size="small" onClick={toggleKeepAlive}>
+                    <Favorite
+                        color="error"
+                        style={{
+                            width: 20,
+                            height: 20,
+                            filter: hasKeepAlive ? undefined : "grayscale(0.8)",
+                            opacity: hasKeepAlive ? undefined : "0.7",
+                        }}
+                    />
+                </IconButton>
+            </Tooltip>
         </Box>
     );
 }

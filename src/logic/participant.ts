@@ -748,6 +748,10 @@ export const unitTagResources: KeyedDictionary<UnitTag, UnitTagResources> = {
         name: "Combat dice mod",
         implementation: effects.unitCombatDiceMod,
     },
+    [UnitTag.SUSTAIN_DAMAGE_MOD]: {
+        name: "Sustain damage mod",
+        implementation: effects.unitSustainDamageMod,
+    },
 };
 
 export const combatStageResources: KeyedDictionary<CombatStage, CombatStageResources> = {

@@ -1,4 +1,4 @@
-import { Box, IconButton, Typography } from "@mui/material";
+import { Box, IconButton, Tooltip, Typography } from "@mui/material";
 import { useDispatch } from "react-redux";
 
 import { AdmiralImage } from "components/graphics";
@@ -25,7 +25,7 @@ export function UnitAdmiralInput({ role, unit }: Props) {
                     role: role,
                     unitIndex: unit.unitIndex,
                     tag: UnitTag.ADMIRAL,
-                })
+                }),
             );
         } else {
             dispatch(
@@ -34,7 +34,7 @@ export function UnitAdmiralInput({ role, unit }: Props) {
                     unitIndex: unit.unitIndex,
                     tag: UnitTag.ADMIRAL,
                     value: true,
-                })
+                }),
             );
         }
     };
@@ -43,20 +43,22 @@ export function UnitAdmiralInput({ role, unit }: Props) {
             <Typography variant="body2" sx={{ display: "inline", marginRight: 1 }}>
                 Admiral
             </Typography>
-            <IconButton size="small" onClick={toggleAdmiral}>
-                <AdmiralImage
-                    style={{
-                        width: 20,
-                        height: 20,
-                        filter: hasAdmiral ? undefined : "grayscale(0.8)",
-                        opacity: hasAdmiral ? undefined : "0.7",
-                        borderRadius: "50%",
-                        borderStyle: "solid",
-                        borderWidth: "2px",
-                        borderColor: hasAdmiral ? "#DDDDDD" : "transparent",
-                    }}
-                />
-            </IconButton>
+            <Tooltip title="The ship is carrying an admiral" placement="right">
+                <IconButton size="small" onClick={toggleAdmiral}>
+                    <AdmiralImage
+                        style={{
+                            width: 20,
+                            height: 20,
+                            filter: hasAdmiral ? undefined : "grayscale(0.8)",
+                            opacity: hasAdmiral ? undefined : "0.7",
+                            borderRadius: "50%",
+                            borderStyle: "solid",
+                            borderWidth: "2px",
+                            borderColor: hasAdmiral ? "#DDDDDD" : "transparent",
+                        }}
+                    />
+                </IconButton>
+            </Tooltip>
         </Box>
     );
 }

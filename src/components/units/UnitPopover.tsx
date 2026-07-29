@@ -12,6 +12,7 @@ import { UnitSustainDamageInput } from "./UnitSustainDamageInput";
 import { UnitCombatValueModInput } from "./UnitCombatValueModInput";
 import { UnitCombatRollsModInput } from "./UnitCombatRollsModInput";
 import { UnitPopoverActionButtons } from "./UnitPopoverActionButtons";
+import { UnitSustainDamageModInput } from "./UnitSustainDamageModInput";
 
 interface Props {
     unit: RichUnit;
@@ -62,6 +63,7 @@ export function UnitPopover({ unit, faction, role }: Props) {
             <Divider sx={{ mt: 1, mr: -1, mb: 1, ml: -1 }} />
             <UnitCombatValueModInput role={role} unit={unit} />
             <UnitCombatRollsModInput role={role} unit={unit} />
+            <UnitSustainDamageModInput role={role} unit={unit} />
         </Box>
     );
 }

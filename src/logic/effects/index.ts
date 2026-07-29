@@ -41,6 +41,7 @@ export * from "./solMark2AdvancedCarriers";
 export * from "./solVersatileCombatTactics";
 export * from "./unitCombatDiceMod";
 export * from "./unitCombatValueMod";
+export * from "./unitSustainDamageMod";
 export * from "./warSun";
 export * from "./xxchaArchonEnergyShell";
 export * from "./xxchaRound1Mod";

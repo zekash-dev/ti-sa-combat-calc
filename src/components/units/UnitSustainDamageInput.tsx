@@ -1,4 +1,4 @@
-import { Box, IconButton, Typography } from "@mui/material";
+import { Box, IconButton, Tooltip, Typography } from "@mui/material";
 import { useDispatch } from "react-redux";
 
 import { HitCounterImage } from "components/graphics";
@@ -23,7 +23,7 @@ export function UnitSustainDamageInput({ role, unit }: Props) {
                 role: role,
                 unitIndex: unit.unitIndex,
                 sustainedHits,
-            })
+            }),
         );
     };
 
@@ -32,16 +32,18 @@ export function UnitSustainDamageInput({ role, unit }: Props) {
         const isSustained: boolean = i < sustainedHits;
         const nextValue: number = i + 1 === sustainedHits ? i : i + 1;
         buttons.push(
-            <IconButton key={`hit-${i}-${nextValue}`} size="small" onClick={setSustainedHits(nextValue)}>
-                <HitCounterImage
-                    style={{
-                        width: 20,
-                        height: 20,
-                        filter: isSustained ? undefined : "grayscale(0.8)",
-                        opacity: isSustained ? undefined : "0.7",
-                    }}
-                />
-            </IconButton>
+            <Tooltip title="Number of sustained hits before combat" placement="right">
+                <IconButton key={`hit-${i}-${nextValue}`} size="small" onClick={setSustainedHits(nextValue)}>
+                    <HitCounterImage
+                        style={{
+                            width: 20,
+                            height: 20,
+                            filter: isSustained ? undefined : "grayscale(0.8)",
+                            opacity: isSustained ? undefined : "0.7",
+                        }}
+                    />
+                </IconButton>
+            </Tooltip>,
         );
     }
 

@@ -63,7 +63,7 @@ export function UnitInputImage({ unit, faction, role, scale, style, onClick }: P
 }
 
 function getUnitCustomModType(unit: UnitInput): "positive" | "negative" | undefined {
-    return getTagModType(UnitTag.COMBAT_VALUE_MOD) || getTagModType(UnitTag.COMBAT_DICE_MOD);
+    return getTagModType(UnitTag.COMBAT_VALUE_MOD) || getTagModType(UnitTag.COMBAT_DICE_MOD) || getTagModType(UnitTag.SUSTAIN_DAMAGE_MOD);
 
     function getTagModType(tag: UnitTag): "positive" | "negative" | undefined {
         if (!unit.tags) return undefined;

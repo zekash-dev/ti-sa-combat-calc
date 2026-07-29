@@ -1,4 +1,4 @@
-import { Box, IconButton, Typography } from "@mui/material";
+import { Box, IconButton, Tooltip, Typography } from "@mui/material";
 import { useDispatch } from "react-redux";
 
 import { ScientistImage } from "components/graphics";
@@ -25,7 +25,7 @@ export function UnitScientistInput({ role, unit }: Props) {
                     role: role,
                     unitIndex: unit.unitIndex,
                     tag: UnitTag.SCIENTIST,
-                })
+                }),
             );
         } else {
             dispatch(
@@ -34,7 +34,7 @@ export function UnitScientistInput({ role, unit }: Props) {
                     unitIndex: unit.unitIndex,
                     tag: UnitTag.SCIENTIST,
                     value: true,
-                })
+                }),
             );
         }
     };
@@ -43,20 +43,22 @@ export function UnitScientistInput({ role, unit }: Props) {
             <Typography variant="body2" sx={{ display: "inline", marginRight: 1 }}>
                 Scientist
             </Typography>
-            <IconButton size="small" onClick={toggleScientist}>
-                <ScientistImage
-                    style={{
-                        width: 20,
-                        height: 20,
-                        filter: hasScientist ? undefined : "grayscale(0.8)",
-                        opacity: hasScientist ? undefined : "0.7",
-                        borderRadius: "50%",
-                        borderStyle: "solid",
-                        borderWidth: "2px",
-                        borderColor: hasScientist ? "#DDDDDD" : "transparent",
-                    }}
-                />
-            </IconButton>
+            <Tooltip title="A scientist is present with the unit" placement="right">
+                <IconButton size="small" onClick={toggleScientist}>
+                    <ScientistImage
+                        style={{
+                            width: 20,
+                            height: 20,
+                            filter: hasScientist ? undefined : "grayscale(0.8)",
+                            opacity: hasScientist ? undefined : "0.7",
+                            borderRadius: "50%",
+                            borderStyle: "solid",
+                            borderWidth: "2px",
+                            borderColor: hasScientist ? "#DDDDDD" : "transparent",
+                        }}
+                    />
+                </IconButton>
+            </Tooltip>
         </Box>
     );
 }

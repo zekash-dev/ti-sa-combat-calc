@@ -110,6 +110,7 @@ export enum UnitTag {
     KEEP_ALIVE = 903,
     COMBAT_VALUE_MOD = 904,
     COMBAT_DICE_MOD = 905,
+    SUSTAIN_DAMAGE_MOD = 906,
 }
 
 export interface UnitTagResources {
