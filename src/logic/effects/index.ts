@@ -31,6 +31,7 @@ export * from "./nebula";
 export * from "./participantCombatValueMod";
 export * from "./planetaryShield";
 export * from "./saarChaosMapping";
+export * from "./saimocInfusedHulls";
 export * from "./sardakkBerzerkerGenome";
 export * from "./sardakkFlagship";
 export * from "./sardakkUnitMod";
