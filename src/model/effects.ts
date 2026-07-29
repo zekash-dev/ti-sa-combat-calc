@@ -23,7 +23,20 @@ export interface PreAssignHitsOutput {
     newHits?: SparseDictionary<HitType, number>;
     newUnits?: ComputedUnitSnapshot[];
     newTagState?: number | undefined;
-    // newCombatState?: CombatState | undefined;
+}
+
+export interface PostAssignHitsInput {
+    calculationInput: CalculationInput;
+    combatState: CombatState;
+    role: ParticipantRole;
+    stage: CombatStage;
+    units: ComputedUnitSnapshot[];
+    tagState: number | undefined;
+}
+
+export interface PostAssignHitsOutput {
+    newUnits?: ComputedUnitSnapshot[];
+    newTagState?: number | undefined;
 }
 
 export interface OnCalculateHitsInput {
@@ -73,6 +86,11 @@ export interface ParticipantTagImplementation<T = any> {
      * 'role' in the input describes the tag owner's role, not the opponent's role.
      */
     preAssignOpponentHits?: (input: PreAssignHitsInput) => PreAssignHitsOutput;
+
+    /**
+     * Called after assigning hits to your own units.
+     */
+    postAssignHits?: (input: PostAssignHitsInput) => PostAssignHitsOutput;
 
     /**
      * Called when calculating hits, for each possible outcome of combat rolls.

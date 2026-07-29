@@ -195,6 +195,7 @@ export interface ComputedUnitSnapshot {
     sustainedHits: number;
     planetaryShield: number;
     tagEffects: UnitSnapshotTag[];
+    hasSustainedHitsInCurrentStage: boolean;
 }
 
 /**

@@ -405,9 +405,12 @@ const factionAbilityResources: KeyedDictionary<FactionAbility, ParticipantTagRes
 const factionUpgradeResources: KeyedDictionary<FactionUpgrade, ParticipantTagResources> = {
     [FactionUpgrade.LETNEV_SAIMOC_INFUSED_HULLS]: {
         name: "Saimoc-Infused Hulls",
-        description: "Hits from Fighters may not be assigned to your non-Fighter ships during the first round of Space Battles.",
+        description: [
+            "After each combat round, repair one of your participating ships that did not use Sustain Damage this round.",
+            "Hits from Fighters may not be assigned to your non-Fighter ships during the first round of Space Battles.",
+        ],
         color: factionResources[Faction.BARONY_OF_LETNEV].color,
-        implementation: effects.saimocInfusedHulls,
+        implementation: effects.letnevSaimocInfusedHulls,
     },
     [FactionUpgrade.SAAR_CHAOS_MAPPING]: {
         name: "Chaos Mapping",

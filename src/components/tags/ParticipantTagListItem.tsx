@@ -45,7 +45,7 @@ export function ParticipantTagListItem({ participant, tag, icon, iconBadge, open
         (newSettings: any) => {
             onChange(tag, true, newSettings);
         },
-        [onChange, tag]
+        [onChange, tag],
     );
 
     let listItem: JSX.Element = (
