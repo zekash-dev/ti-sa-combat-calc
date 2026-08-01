@@ -38,7 +38,17 @@ export function ResultView() {
         }
     };
 
-    if (!output) return null;
+    if (!output) {
+        return (
+            <Accordion disableGutters>
+                <AccordionSummary expandIcon={<ExpandMore />}>
+                    <Typography variant="subtitle1" color="text.primary" sx={{ minWidth: "400px" }}>
+                        Add units to start calculating outcomes...
+                    </Typography>
+                </AccordionSummary>
+            </Accordion>
+        );
+    }
 
     return (
         <>

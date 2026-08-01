@@ -21,6 +21,7 @@ import {
     FactionResources,
     FactionUpgrade,
     FlagshipTag,
+    HitAssignmentStrategy,
     ParticipantTag,
     ParticipantTagResources,
     Technology,
@@ -34,6 +35,10 @@ import { allUnitTypes, FlagshipDefinition, unitDefinitions, UnitType } from "mod
 import { getInitialState, getUnitSnapshots } from "./calculator";
 import { getAllEnumValues } from "./common";
 import * as effects from "./effects";
+
+export const defaultParticipantTags: ParticipantInputTags = {
+    [CommonParticipantTag.HIT_ASSIGNMENT_STRATEGY]: HitAssignmentStrategy.SustainFirst,
+};
 
 export function grantDefaultFactionAbilities(participantTags: ParticipantInputTags, faction: Faction): ParticipantInputTags {
     const newTags: ParticipantInputTags = {
@@ -530,6 +535,12 @@ const commonParticipantTagResources: KeyedDictionary<CommonParticipantTag, Parti
         color: "white",
         implementation: effects.participantCombatValueMod,
     },
+    [CommonParticipantTag.HIT_ASSIGNMENT_STRATEGY]: {
+        name: "Hit assignment strategy",
+        description: "Strategy to use when assigning hits to units.",
+        color: "white",
+        implementation: effects.participantHitAssignmentStrategy,
+    },
 };
 
 const combatTagResources: KeyedDictionary<CombatTag, ParticipantTagResources> = {
@@ -741,7 +752,7 @@ export const unitTagResources: KeyedDictionary<UnitTag, UnitTagResources> = {
         implementation: false,
     },
     [UnitTag.COMBAT_VALUE_MOD]: {
-        name: "Combat roll mod",
+        name: "Combat value mod",
         implementation: effects.unitCombatValueMod,
     },
     [UnitTag.COMBAT_DICE_MOD]: {

@@ -29,7 +29,7 @@ export function UnitCombatValueModInput({ role, unit }: Props) {
                         unitIndex: unit.unitIndex,
                         tag: UnitTag.COMBAT_VALUE_MOD,
                         value: newValue,
-                    })
+                    }),
                 );
             } else {
                 dispatch(
@@ -37,11 +37,11 @@ export function UnitCombatValueModInput({ role, unit }: Props) {
                         role: role,
                         unitIndex: unit.unitIndex,
                         tag: UnitTag.COMBAT_VALUE_MOD,
-                    })
+                    }),
                 );
             }
         },
-        [dispatch, role, unit.unitIndex]
+        [dispatch, role, unit.unitIndex],
     );
 
     const handleIncrement = useCallback(() => setModValue(currentValue + 1), [setModValue, currentValue]);
@@ -58,7 +58,7 @@ export function UnitCombatValueModInput({ role, unit }: Props) {
                     lineHeight: "30px",
                 }}
             >
-                Combat roll mod
+                Combat value mod
             </Typography>
             <IconButton size="small" onClick={handleDecrement}>
                 <Remove sx={{ width: 20, height: 20 }} />

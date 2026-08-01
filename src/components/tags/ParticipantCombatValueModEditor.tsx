@@ -35,7 +35,7 @@ export function ParticipantCombatValueModEditor({ role, open }: Props) {
                 dispatch(unsetParticipantTag({ role, key: CommonParticipantTag.COMBAT_VALUE_MOD }));
             }
         },
-        [dispatch, role]
+        [dispatch, role],
     );
 
     const handleIncrement = useCallback(() => setModValue(currentValue + 1), [setModValue, currentValue]);
@@ -45,12 +45,12 @@ export function ParticipantCombatValueModEditor({ role, open }: Props) {
         return (
             <>
                 <ListItem sx={{ mt: 2, display: "flex" }}>
-                    <Typography sx={{ flexGrow: 1 }}>Combat roll modifier</Typography>
+                    <Typography sx={{ flexGrow: 1 }}>Combat value modifier</Typography>
                     <IconButton onClick={handleDecrement}>
                         <Remove />
                     </IconButton>
                     <Tooltip
-                        title={`Combat roll modifier for all ${role} units.`}
+                        title={`Combat value modifier for all ${role} units.`}
                         placement="right"
                         PopperProps={{ modifiers: [{ name: "offset", options: { offset: [0, 55] } }] }}
                     >
@@ -86,7 +86,7 @@ export function ParticipantCombatValueModEditor({ role, open }: Props) {
                     pr: 1,
                 }}
             >
-                <Tooltip title={`Combat roll modifier for all ${role} units.`} placement="right">
+                <Tooltip title={`Combat value modifier for all ${role} units.`} placement="right">
                     <Box
                         sx={{
                             borderRadius: 1,

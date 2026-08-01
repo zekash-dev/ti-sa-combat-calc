@@ -4,7 +4,7 @@ import { cloneDeep } from "lodash";
 import { getInitialState, getUnitSnapshots } from "logic/calculator";
 import { uniqueFilter } from "logic/common";
 import { encodeParticipantsState } from "logic/compression";
-import { getSelectableUnitTypes, grantDefaultFactionAbilities, richUnitSizeComparer } from "logic/participant";
+import { defaultParticipantTags, getSelectableUnitTypes, grantDefaultFactionAbilities, richUnitSizeComparer } from "logic/participant";
 import {
     CalculationInput,
     CombatStage,
@@ -38,12 +38,12 @@ export const initialState: ParticipantSliceState = {
         attacker: {
             faction: Faction.EMIRATES_OF_HACAN,
             units: [],
-            tags: grantDefaultFactionAbilities({}, Faction.EMIRATES_OF_HACAN),
+            tags: grantDefaultFactionAbilities(defaultParticipantTags, Faction.EMIRATES_OF_HACAN),
         },
         defender: {
             faction: Faction.WINNU_SOVEREIGNTY,
             units: [],
-            tags: grantDefaultFactionAbilities({}, Faction.WINNU_SOVEREIGNTY),
+            tags: grantDefaultFactionAbilities(defaultParticipantTags, Faction.WINNU_SOVEREIGNTY),
         },
     },
     tags: {},
@@ -214,9 +214,9 @@ const participantSlice = createSlice({
             return action.payload;
         },
         resetTagsAndUnits: (state: ParticipantSliceState, action: Action) => {
-            state.participants.attacker.tags = grantDefaultFactionAbilities({}, state.participants.attacker.faction);
+            state.participants.attacker.tags = grantDefaultFactionAbilities(defaultParticipantTags, state.participants.attacker.faction);
             state.participants.attacker.units = [];
-            state.participants.defender.tags = grantDefaultFactionAbilities({}, state.participants.defender.faction);
+            state.participants.defender.tags = grantDefaultFactionAbilities(defaultParticipantTags, state.participants.defender.faction);
             state.participants.defender.units = [];
         },
         switchRoles: (state: ParticipantSliceState, action: Action) => {
@@ -332,7 +332,7 @@ export const selectRichParticipantsInput = createSelector(
             [ParticipantRole.Attacker]: createRichParticipantInput(calculationInput, ParticipantRole.Attacker),
             [ParticipantRole.Defender]: createRichParticipantInput(calculationInput, ParticipantRole.Defender),
         };
-    }
+    },
 );
 
 function createRichParticipantInput(calculationInput: CalculationInput, role: ParticipantRole): RichParticipant {
@@ -391,7 +391,7 @@ function createRichUnits(calculationInput: CalculationInput, role: ParticipantRo
 function createUnitStageStats(
     snapshot: ComputedUnitSnapshot | undefined,
     baseline: UnitStageStats | undefined,
-    stage: CombatStage
+    stage: CombatStage,
 ): UnitStageStats | undefined {
     if (!snapshot) return undefined;
 

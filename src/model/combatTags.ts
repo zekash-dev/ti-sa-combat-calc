@@ -81,6 +81,7 @@ export enum CommonParticipantTag {
     GENERAL = 502,
     AGENT = 503,
     COMBAT_VALUE_MOD = 504,
+    HIT_ASSIGNMENT_STRATEGY = 505,
 }
 
 export enum FlagshipTag {
@@ -136,4 +137,9 @@ export interface ParticipantTagResources {
 export interface TechnologyResources extends ParticipantTagResources {
     type: TechnologyType;
     shortName: string;
+}
+
+export enum HitAssignmentStrategy {
+    SustainFirst = 1,
+    PreservePower = 2,
 }

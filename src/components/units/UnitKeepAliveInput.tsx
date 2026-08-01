@@ -41,7 +41,7 @@ export function UnitKeepAliveInput({ role, unit }: Props) {
             <Typography variant="body2" sx={{ display: "inline", marginRight: 1 }}>
                 Keep alive
             </Typography>
-            <Tooltip title="Assign hits to this unit last" placement="right">
+            <Tooltip title="Destroy this unit last" placement="right">
                 <IconButton size="small" onClick={toggleKeepAlive}>
                     <Favorite
                         color="error"

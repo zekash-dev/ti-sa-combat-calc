@@ -32,8 +32,8 @@ export function UnitSustainDamageInput({ role, unit }: Props) {
         const isSustained: boolean = i < sustainedHits;
         const nextValue: number = i + 1 === sustainedHits ? i : i + 1;
         buttons.push(
-            <Tooltip title="Number of sustained hits before combat" placement="right">
-                <IconButton key={`hit-${i}-${nextValue}`} size="small" onClick={setSustainedHits(nextValue)}>
+            <Tooltip key={`hit-${i}-${nextValue}`} title="Number of sustained hits before combat" placement="right">
+                <IconButton size="small" onClick={setSustainedHits(nextValue)}>
                     <HitCounterImage
                         style={{
                             width: 20,

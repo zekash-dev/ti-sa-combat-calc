@@ -34,7 +34,15 @@ import {
     ParticipantState,
     UnitState,
 } from "model/combatState";
-import { ConstantTag, FlagshipTag, ParticipantTag, UnitTag, UnitTagResources } from "model/combatTags";
+import {
+    CommonParticipantTag,
+    ConstantTag,
+    FlagshipTag,
+    HitAssignmentStrategy,
+    ParticipantTag,
+    UnitTag,
+    UnitTagResources,
+} from "model/combatTags";
 import { KeyedDictionary, SparseDictionary } from "model/common";
 import {
     OnCalculateHitsInput,
@@ -600,12 +608,14 @@ function assignHits(
 ): CombatState {
     ({ combatState, hits, units } = applyPreAssignHitTags(combatState, input, role, units, hits));
     ({ combatState, hits, units } = applyOpponentPreAssignHitTags(combatState, input, getOpponentRole(role), units, hits));
+    const assignmentStrategy: HitAssignmentStrategy = input[role].tags[CommonParticipantTag.HIT_ASSIGNMENT_STRATEGY];
+
     let newUnits: ComputedUnitSnapshot[] = [...units];
     for (let hitTypeStr of Object.keys(hits)) {
         const hitType: HitType = Number(hitTypeStr);
         const numberOfHits: number = hits[hitType]!;
         for (let i = 0; i < numberOfHits; i++) {
-            assignHit(combatState, input, newUnits, hitType);
+            assignHit(combatState, input, newUnits, hitType, assignmentStrategy);
         }
     }
 
@@ -749,8 +759,14 @@ function applyPostAssignHitTags(
     };
 }
 
-function assignHit(combatState: CombatState, input: CalculationInput, units: ComputedUnitSnapshot[], hitType: HitType) {
-    const hitIndex: number = determineHitTarget(combatState, input, units, hitType);
+function assignHit(
+    combatState: CombatState,
+    input: CalculationInput,
+    units: ComputedUnitSnapshot[],
+    hitType: HitType,
+    strategy: HitAssignmentStrategy,
+) {
+    const hitIndex: number = determineHitTarget(combatState, input, units, hitType, strategy);
     if (hitIndex !== -1) {
         // account for "can't assign fighter hits" etc.? Loop list until we find a unit that it can be assigned to?
         const selectedUnit: ComputedUnitSnapshot | undefined = units[hitIndex];
@@ -784,13 +800,14 @@ export function determineHitTarget(
     input: CalculationInput,
     units: ComputedUnitSnapshot[],
     hitType: HitType,
+    strategy: HitAssignmentStrategy = HitAssignmentStrategy.SustainFirst,
 ): number {
     let maxPrioIndex: number = -1;
     let maxPrioValue: number = NaN;
     for (let i = 0; i < units.length; i++) {
         if (!canAssignHitToUnit(units[i].base, hitType, input.combatType)) continue;
 
-        const prio = calculateHitPriority(units[i], hitType, combatState.stage);
+        const prio = calculateHitPriority(units[i], hitType, combatState.stage, strategy);
 
         if (isNaN(maxPrioValue) || prio > maxPrioValue) {
             maxPrioIndex = i;
@@ -819,7 +836,7 @@ export function unitIsCombatant(unitType: UnitType, combatType: CombatType): boo
     return unitDefinitions[unitType].combatantIn.includes(combatType);
 }
 
-function calculateHitPriority(unit: ComputedUnitSnapshot, hitType: HitType, stage: CombatStage): number {
+function calculateHitPriority(unit: ComputedUnitSnapshot, hitType: HitType, stage: CombatStage, strategy: HitAssignmentStrategy): number {
     let priority: number = unit.combatValue;
     if (hitType === HitType.AssignToNonFighterFirst && unit.type === UnitType.Fighter) {
         // Fighters can't be assigned AssignToNonFighterFirst hits
@@ -842,8 +859,10 @@ function calculateHitPriority(unit: ComputedUnitSnapshot, hitType: HitType, stag
         priority -= 0.5;
     }
     if (canSustainWithoutDying(unit, stage)) {
-        // Units that can sustain hits should be assigned hits first
-        priority += 10;
+        // Sustain if using "SustainFirst" strategy or if the unit only has one combat roll (because it wouldn't lose any power by sustaining)
+        if (strategy === HitAssignmentStrategy.SustainFirst || unit.rolls === 1) {
+            priority += 10;
+        }
     } else if (unit.base.hasTag(UnitTag.KEEP_ALIVE)) {
         // Units with the KEEP_ALIVE tag that can't sustain any more hits should not be assigned hits before other units, if possible.
         priority -= 20;

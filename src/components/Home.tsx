@@ -12,6 +12,7 @@ import { ParticipantTagEditor } from "./tags/ParticipantTagEditor";
 import { ParticipantBattlefieldRepresentation } from "./units/ParticipantBattlefieldRepresentation";
 import { ParticipantUnitEditor } from "./units/ParticipantUnitEditor";
 import { UrlParamsTrigger } from "./UrlParamsTrigger";
+import { ParticipantHitAssignmentStrategyInput } from "./units/ParticipantHitAssignmentStrategyInput";
 
 export function Home() {
     const [attackerOpen, setAttackerOpen] = useState<boolean>(false);
@@ -45,17 +46,29 @@ export function Home() {
                         <Grid item sx={{ width: 290 }}>
                             <ParticipantUnitEditor role={ParticipantRole.Attacker} />
                         </Grid>
-                        <Grid item sx={{ width: "calc(50% - 290px)" }}>
+                        <Grid item sx={{ width: "calc(50% - 290px)", position: "relative" }}>
                             <ParticipantBattlefieldRepresentation
                                 role={ParticipantRole.Attacker}
                                 participant={richParticipants[ParticipantRole.Attacker]}
                             />
+                            <Grid sx={{ right: 0, bottom: 0, position: "absolute" }}>
+                                <ParticipantHitAssignmentStrategyInput
+                                    role={ParticipantRole.Attacker}
+                                    participant={richParticipants[ParticipantRole.Attacker]}
+                                />
+                            </Grid>
                         </Grid>
-                        <Grid item sx={{ width: "calc(50% - 290px)" }}>
+                        <Grid item sx={{ width: "calc(50% - 290px)", position: "relative" }}>
                             <ParticipantBattlefieldRepresentation
                                 role={ParticipantRole.Defender}
                                 participant={richParticipants[ParticipantRole.Defender]}
                             />
+                            <Grid sx={{ left: 0, bottom: 0, position: "absolute" }}>
+                                <ParticipantHitAssignmentStrategyInput
+                                    role={ParticipantRole.Defender}
+                                    participant={richParticipants[ParticipantRole.Defender]}
+                                />
+                            </Grid>
                         </Grid>
                         <Grid item sx={{ width: 290 }}>
                             <ParticipantUnitEditor role={ParticipantRole.Defender} />
