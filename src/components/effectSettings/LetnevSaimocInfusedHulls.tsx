@@ -1,4 +1,4 @@
-import { TableCell, TableRow, Typography } from "@mui/material";
+import { TableBody, TableCell, TableRow, Typography } from "@mui/material";
 
 import { IncrementalNumberInput, UnstyledSmallTable } from "components/common";
 import { LetnevSaimocInfusedHullsSettings } from "logic/effects";
@@ -15,14 +15,16 @@ export function LetnevSaimocInfusedHulls({
     };
     return (
         <UnstyledSmallTable>
-            <TableRow>
-                <TableCell>
-                    <Typography>Max usages</Typography>
-                </TableCell>
-                <TableCell>
-                    <IncrementalNumberInput value={settings.maxRepairCount} onChange={onMaxRepairCountChanged} />
-                </TableCell>
-            </TableRow>
+            <TableBody>
+                <TableRow>
+                    <TableCell>
+                        <Typography>Max usages</Typography>
+                    </TableCell>
+                    <TableCell>
+                        <IncrementalNumberInput value={settings.maxRepairCount} onChange={onMaxRepairCountChanged} />
+                    </TableCell>
+                </TableRow>
+            </TableBody>
         </UnstyledSmallTable>
     );
 }

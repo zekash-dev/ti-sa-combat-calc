@@ -1,4 +1,4 @@
-import { Switch, TableCell, TableRow, Typography } from "@mui/material";
+import { Switch, TableBody, TableCell, TableRow, Typography } from "@mui/material";
 
 import { IncrementalNumberInput, UnstyledSmallTable } from "components/common";
 import { MentakAdaptableOrdnanceRigsSettings } from "logic/effects";
@@ -22,22 +22,24 @@ export function MentakAdaptableOrdnanceRigs({
     };
     return (
         <UnstyledSmallTable>
-            <TableRow>
-                <TableCell>
-                    <Typography>Cruisers carrying GF</Typography>
-                </TableCell>
-                <TableCell>
-                    <IncrementalNumberInput value={settings.cruisersCarryingGroundForces} onChange={onCarryingChanged} />
-                </TableCell>
-            </TableRow>
-            <TableRow>
-                <TableCell>
-                    <Typography>Use sustain ability</Typography>
-                </TableCell>
-                <TableCell sx={{ textAlign: "center" }}>
-                    <Switch disableRipple size="small" checked={settings.useSustain} onChange={onToggleUseSustain} />
-                </TableCell>
-            </TableRow>
+            <TableBody>
+                <TableRow>
+                    <TableCell>
+                        <Typography>Cruisers carrying GF</Typography>
+                    </TableCell>
+                    <TableCell>
+                        <IncrementalNumberInput value={settings.cruisersCarryingGroundForces} onChange={onCarryingChanged} />
+                    </TableCell>
+                </TableRow>
+                <TableRow>
+                    <TableCell>
+                        <Typography>Use sustain ability</Typography>
+                    </TableCell>
+                    <TableCell sx={{ textAlign: "center" }}>
+                        <Switch disableRipple size="small" checked={settings.useSustain} onChange={onToggleUseSustain} />
+                    </TableCell>
+                </TableRow>
+            </TableBody>
         </UnstyledSmallTable>
     );
 }

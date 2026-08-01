@@ -1,4 +1,4 @@
-import { TableCell, TableRow, Typography } from "@mui/material";
+import { TableBody, TableCell, TableRow, Typography } from "@mui/material";
 
 import { IncrementalNumberInput, UnstyledSmallTable } from "components/common";
 import { MuaatMagmusReactorSettings } from "logic/effects/muaatMagmusReactor";
@@ -13,14 +13,16 @@ export function MuaatMagmusReactor({ settings, onSettingsChange }: ParticipantTa
     };
     return (
         <UnstyledSmallTable>
-            <TableRow>
-                <TableCell>
-                    <Typography>Affected war suns</Typography>
-                </TableCell>
-                <TableCell>
-                    <IncrementalNumberInput value={settings.warSunsLeavingSupernova} onChange={onWarSunCountChanged} />
-                </TableCell>
-            </TableRow>
+            <TableBody>
+                <TableRow>
+                    <TableCell>
+                        <Typography>Affected war suns</Typography>
+                    </TableCell>
+                    <TableCell>
+                        <IncrementalNumberInput value={settings.warSunsLeavingSupernova} onChange={onWarSunCountChanged} />
+                    </TableCell>
+                </TableRow>
+            </TableBody>
         </UnstyledSmallTable>
     );
 }
