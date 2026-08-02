@@ -1,7 +1,19 @@
-import { ChevronLeft, ChevronRight } from "@mui/icons-material";
-import { Divider, Drawer as MuiDrawer, List, ListItem, ListItemIcon, ListItemText, styled, Theme, Typography } from "@mui/material";
+import { AddCircle, ChevronLeft, ChevronRight } from "@mui/icons-material";
+import {
+    Divider,
+    Drawer as MuiDrawer,
+    List,
+    ListItem,
+    ListItemIcon,
+    ListItemText,
+    styled,
+    Theme,
+    Typography,
+    ListItemButton,
+    Tooltip,
+} from "@mui/material";
 import { OverlayScrollbarsComponent } from "overlayscrollbars-react";
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 import { FactionImage } from "components/graphics";
@@ -24,6 +36,8 @@ import { SelectFactionDialog } from "./SelectFactionDialog";
 import { TagStarIcon } from "./TagStarIcon";
 import { TechnologyIcon } from "./TechnologyIcon";
 import { ParticipantCombatValueModEditor } from "./ParticipantCombatValueModEditor";
+import { AdditionalAbilitiesDialog } from "./AdditionalAbilitiesDialog";
+import { getAllEnumValues } from "logic/common";
 
 interface Props {
     location: "left" | "right";
@@ -55,13 +69,21 @@ interface DrawerContentProps extends Props {
 function DrawerContent({ role, open }: DrawerContentProps) {
     const dispatch = useDispatch();
     const [factionDialogOpen, setFactionDialogOpen] = useState(false);
-    const openFactionDialog = () => setFactionDialogOpen(true);
-    const closeFactionDialog = () => setFactionDialogOpen(false);
+    const [abilityDialogOpen, setAbilityDialogOpen] = useState(false);
+    const openFactionDialog = useCallback(() => setFactionDialogOpen(true), []);
+    const closeFactionDialog = useCallback(() => setFactionDialogOpen(false), []);
+    const openAbilityDialog = useCallback(() => setAbilityDialogOpen(true), []);
+    const closeAbilityDialog = useCallback(() => setAbilityDialogOpen(false), []);
 
     const participant: ParticipantInput = useSelector(selectParticipant(role));
     const faction: FactionResources = factionResources[participant.faction];
     const factionAbilities: FactionAbility[] = defaultFactionAbilities[participant.faction];
     const factionUpgrades: FactionUpgrade[] = availableFactionUpgrades[participant.faction];
+
+    const additionalAbilities: ParticipantTag[] = [
+        ...getAllEnumValues<FactionAbility>(FactionAbility).filter((x) => participant.tags[x] && !factionAbilities.includes(x)),
+        ...getAllEnumValues<FactionUpgrade>(FactionUpgrade).filter((x) => participant.tags[x] && !factionUpgrades.includes(x)),
+    ];
 
     const handleSelectFaction = (newValue: Faction) => dispatch(setFaction({ role: role, faction: newValue }));
     const handleTagChanged = (tag: ParticipantTag, selected: boolean, value: any) => {
@@ -79,9 +101,9 @@ function DrawerContent({ role, open }: DrawerContentProps) {
                         <ListItemText>Faction</ListItemText>
                     </ListItem>
                 )}
-                <ListItem button disableRipple disableGutters onClick={openFactionDialog}>
+                <ListItemButton disableRipple disableGutters onClick={openFactionDialog}>
                     <ListItemIcon>
-                        <FactionImage faction={participant.faction} style={{ width: "30px", marginLeft: "auto", marginRight: "auto" }} />
+                        <FactionImage faction={participant.faction} style={{ width: "30px", margin: "2px auto" }} />
                     </ListItemIcon>
                     {open && (
                         <ListItemText>
@@ -90,7 +112,7 @@ function DrawerContent({ role, open }: DrawerContentProps) {
                             </Typography>
                         </ListItemText>
                     )}
-                </ListItem>
+                </ListItemButton>
                 {factionAbilities.map((tag: FactionAbility) => (
                     <ParticipantTagListItem
                         key={tag}
@@ -120,6 +142,43 @@ function DrawerContent({ role, open }: DrawerContentProps) {
                         ))}
                     </>
                 )}
+                {open && (
+                    <ListItem>
+                        <ListItemText>Additional abilities</ListItemText>
+                    </ListItem>
+                )}
+                <Tooltip title="Add an ability from another faction" placement="right">
+                    <ListItemButton disableRipple disableGutters onClick={openAbilityDialog}>
+                        <ListItemIcon>
+                            <AddCircle
+                                style={{
+                                    fontSize: 32,
+                                    color: "#d0e4ff",
+                                    width: "28px",
+                                    marginLeft: "auto",
+                                    marginRight: "auto",
+                                }}
+                            />
+                        </ListItemIcon>
+                        {open && (
+                            <ListItemText>
+                                <Typography variant="body1" sx={{ overflow: "hidden", textOverflow: "ellipsis" }}>
+                                    Add ability
+                                </Typography>
+                            </ListItemText>
+                        )}
+                    </ListItemButton>
+                </Tooltip>
+                {additionalAbilities.map((tag: ParticipantTag) => (
+                    <ParticipantTagListItem
+                        key={tag}
+                        participant={participant}
+                        tag={tag}
+                        icon={<TagStarIcon tag={tag} selected={participant.tags[tag] !== undefined} />}
+                        open={open}
+                        onChange={handleTagChanged}
+                    />
+                ))}
                 {open && (
                     <ListItem>
                         <ListItemText>Technologies</ListItemText>
@@ -185,6 +244,7 @@ function DrawerContent({ role, open }: DrawerContentProps) {
                 currentValue={participant.faction}
                 onSelect={handleSelectFaction}
             />
+            <AdditionalAbilitiesDialog open={abilityDialogOpen} onClose={closeAbilityDialog} role={role} participant={participant} />
         </>
     );
 }
