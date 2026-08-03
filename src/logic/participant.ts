@@ -609,9 +609,9 @@ export const flagshipDefinitions: KeyedDictionary<Faction, FlagshipDefinition> =
     [Faction.FEDERATION_OF_SOL]: {
         ...unitDefinitions[UnitType.Flagship],
         flagshipName: "Genesis I",
-        combatValue: 7,
+        combatValue: 8,
         combatRolls: 2,
-        sustainDamage: 2,
+        sustainDamage: 1,
     },
     [Faction.MENTAK_COALITION]: {
         ...unitDefinitions[UnitType.Flagship],
@@ -661,11 +661,9 @@ export const flagshipDefinitions: KeyedDictionary<Faction, FlagshipDefinition> =
     [Faction.WINNU_SOVEREIGNTY]: {
         ...unitDefinitions[UnitType.Flagship],
         flagshipName: "Salai Sai Corian",
-        combatValue: 8,
-        combatRolls: 4,
-        sustainDamage: 1,
-        notes: "Force opponent to reroll one die",
-        nyi: true,
+        combatValue: 7,
+        combatRolls: 1,
+        sustainDamage: 2,
     },
     [Faction.XXCHA_KINGDOM]: {
         ...unitDefinitions[UnitType.Flagship],
