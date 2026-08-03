@@ -188,6 +188,11 @@ export enum HitType {
      * Hit that must be assigned to a non-fighter if possible, for example L1z1x flagship
      */
     AssignToNonFighterFirst = 0b0100,
+
+    /**
+     * Hit that represents a successful Yin conversion roll
+     */
+    YinConversionRoll = 0b0101,
 }
 
 export const HIT_TYPE_BITMASK = 0b00111111;

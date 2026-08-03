@@ -25,20 +25,6 @@ export interface PreAssignHitsOutput {
     newTagState?: number | undefined;
 }
 
-export interface PostAssignHitsInput {
-    calculationInput: CalculationInput;
-    combatState: CombatState;
-    role: ParticipantRole;
-    stage: CombatStage;
-    units: ComputedUnitSnapshot[];
-    tagState: number | undefined;
-}
-
-export interface PostAssignHitsOutput {
-    newUnits?: ComputedUnitSnapshot[];
-    newTagState?: number | undefined;
-}
-
 export interface OnCalculateHitsInput {
     calculationInput: CalculationInput;
     combatState: CombatState;
@@ -49,6 +35,20 @@ export interface OnCalculateHitsInput {
 
 export interface OnCalculateHitsOutput {
     newOutcomes?: HitsProbabilityIntermediateOutcome[];
+}
+
+export interface OnEndOfStageInput {
+    calculationInput: CalculationInput;
+    combatState: CombatState;
+    role: ParticipantRole;
+    stage: CombatStage;
+    units: ComputedUnitSnapshot[];
+    tagState: number | undefined;
+}
+
+export interface OnEndOfStageOutput {
+    newUnits?: ComputedUnitSnapshot[];
+    newTagState?: number | undefined;
 }
 
 export interface ParticipantTagSettings<T> {
@@ -88,14 +88,14 @@ export interface ParticipantTagImplementation<T = any> {
     preAssignOpponentHits?: (input: PreAssignHitsInput) => PreAssignHitsOutput;
 
     /**
-     * Called after assigning hits to your own units.
-     */
-    postAssignHits?: (input: PostAssignHitsInput) => PostAssignHitsOutput;
-
-    /**
      * Called when calculating hits, for each possible outcome of combat rolls.
      */
     onCalculateHits?: (input: OnCalculateHitsInput) => OnCalculateHitsOutput;
+
+    /**
+     * Called at the end of a combat stage, after hits have been assigned.
+     */
+    onEndOfStage?: (input: OnEndOfStageInput) => OnEndOfStageOutput;
 
     /**
      * Custom settings for the tag

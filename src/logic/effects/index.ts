@@ -46,4 +46,6 @@ export * from "./unitSustainDamageMod";
 export * from "./warSun";
 export * from "./xxchaArchonEnergyShell";
 export * from "./xxchaRound1Mod";
+export * from "./yinIndoctrinate";
+export * from "./yinSubliminalCommand";
 export * from "./yssarilFlagship";

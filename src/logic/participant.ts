@@ -379,10 +379,11 @@ const factionAbilityResources: KeyedDictionary<FactionAbility, ParticipantTagRes
         implementation: false,
     },
     [FactionAbility.YIN_INVASION_CONVERSION]: {
-        name: "Indoctrination",
-        description: "This ability is not yet implemented.",
+        name: "Indoctrinate",
+        description:
+            "At the start of invasion combats in which you are the attacker and have ships in the system, roll one die. On a result of 5+, destroy and replace an enemy Ground Force with one of your own.",
         color: factionResources[Faction.YIN_BROTHERHOOD].color,
-        implementation: false,
+        implementation: effects.yinIndoctrinate,
     },
     [FactionAbility.LIZIX_DREADNOUGHT_MOD]: {
         name: "Tyrant Class",
@@ -476,9 +477,9 @@ const factionUpgradeResources: KeyedDictionary<FactionUpgrade, ParticipantTagRes
     },
     [FactionUpgrade.YIN_SUBLIMINAL_COMMAND]: {
         name: "Subliminal Command",
-        description: "This ability is not yet implemented.",
+        description: "When using your Indoctrinate ability, you may execute the ability an additional time.",
         color: factionResources[Faction.YIN_BROTHERHOOD].color,
-        implementation: false,
+        implementation: effects.yinSubliminalCommand,
     },
     [FactionUpgrade.MUAAT_MAGMUS_REACTOR]: {
         name: "Magmus Reactor",

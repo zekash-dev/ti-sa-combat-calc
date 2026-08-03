@@ -46,9 +46,9 @@ import {
 import { KeyedDictionary, SparseDictionary } from "model/common";
 import {
     OnCalculateHitsInput,
+    OnEndOfStageInput,
     ParticipantOnComputeSnapshotInput,
     ParticipantTagImplementation,
-    PostAssignHitsInput,
     PreAssignHitsInput,
     UnitOnComputeSnapshotInput,
 } from "model/effects";
@@ -191,6 +191,8 @@ function resolveCombatStage(state: CombatState, input: CalculationInput): Resolv
             let nextState: CombatState = state;
             nextState = assignHits(nextState, input, ParticipantRole.Attacker, attackerUnits, defenderHits.hits);
             nextState = assignHits(nextState, input, ParticipantRole.Defender, defenderUnits, attackerHits.hits);
+            nextState = applyEndOfStageTags(nextState, input, ParticipantRole.Attacker, attackerUnits);
+            nextState = applyEndOfStageTags(nextState, input, ParticipantRole.Defender, defenderUnits);
             nextState = nextState.setStage(getNextStage(input.combatType, nextState.stage));
             const identicalState: CombatStateProbability | undefined = findIdenticalCombatState(nextStates, nextState);
             if (identicalState) {
@@ -619,8 +621,6 @@ function assignHits(
         }
     }
 
-    ({ combatState, newUnits } = applyPostAssignHitTags(combatState, input, role, newUnits));
-
     return combatState.setParticipantUnits(
         role,
         newUnits.map((u) => u.base),
@@ -717,48 +717,6 @@ function applyOpponentPreAssignHitTags(
     };
 }
 
-interface ApplyPostAssignHitTagsResponse {
-    combatState: CombatState;
-    newUnits: ComputedUnitSnapshot[];
-}
-
-function applyPostAssignHitTags(
-    combatState: CombatState,
-    calculationInput: CalculationInput,
-    role: ParticipantRole,
-    units: ComputedUnitSnapshot[],
-): ApplyPostAssignHitTagsResponse {
-    let modifiedCombatState: CombatState = combatState;
-    let modifiedUnits: ComputedUnitSnapshot[] = units;
-    const participant: ParticipantState = combatState[role];
-    const participantInput: ParticipantInput = calculationInput[role];
-    const tagValues: ParticipantTagValueAndState[] = getParticipantTagValues(calculationInput, participantInput, participant);
-    for (let { tag, implementation, state } of tagValues) {
-        if (!!implementation && !!implementation.postAssignHits) {
-            const effectInput: PostAssignHitsInput = {
-                calculationInput,
-                combatState: modifiedCombatState,
-                role,
-                stage: modifiedCombatState.stage,
-                units: modifiedUnits,
-                tagState: state,
-            };
-            const { newUnits, newTagState } = implementation.postAssignHits(effectInput);
-            if (newUnits !== undefined) {
-                modifiedUnits = newUnits;
-            }
-            if (newTagState !== undefined) {
-                modifiedCombatState = modifiedCombatState.setParticipantTagValue(role, tag, newTagState);
-            }
-        }
-    }
-
-    return {
-        combatState: modifiedCombatState,
-        newUnits: modifiedUnits,
-    };
-}
-
 function assignHit(
     combatState: CombatState,
     input: CalculationInput,
@@ -821,6 +779,8 @@ export function canAssignHitToUnit(unit: UnitState, hitType: HitType, combatType
     if (!unitIsCombatant(unit.type, combatType)) return false;
 
     switch (hitType & HIT_TYPE_BITMASK) {
+        case HitType.YinConversionRoll:
+            return false;
         case HitType.AssignToFighter:
             return unit.type === UnitType.Fighter;
         case HitType.AssignToNonFighter:
@@ -895,6 +855,47 @@ export function calculateAverageHits(hitChances: number[]): number {
         hitChances.reduce((prev, curr, i) => prev + curr * i, 0),
         2,
     );
+}
+
+function applyEndOfStageTags(
+    combatState: CombatState,
+    calculationInput: CalculationInput,
+    role: ParticipantRole,
+    units: ComputedUnitSnapshot[],
+): CombatState {
+    let modifiedCombatState: CombatState = combatState;
+    let modifiedUnits: ComputedUnitSnapshot[] = units;
+    const participant: ParticipantState = combatState[role];
+    const participantInput: ParticipantInput = calculationInput[role];
+    const tagValues: ParticipantTagValueAndState[] = getParticipantTagValues(calculationInput, participantInput, participant);
+    for (let { tag, implementation, state } of tagValues) {
+        if (!!implementation && !!implementation.onEndOfStage) {
+            const effectInput: OnEndOfStageInput = {
+                calculationInput,
+                combatState: modifiedCombatState,
+                role,
+                stage: modifiedCombatState.stage,
+                units: modifiedUnits,
+                tagState: state,
+            };
+            const { newUnits, newTagState } = implementation.onEndOfStage(effectInput);
+            if (newUnits !== undefined) {
+                modifiedUnits = newUnits;
+            }
+            if (newTagState !== undefined) {
+                modifiedCombatState = modifiedCombatState.setParticipantTagValue(role, tag, newTagState);
+            }
+        }
+    }
+
+    if (modifiedUnits !== units) {
+        modifiedCombatState = modifiedCombatState.setParticipantUnits(
+            role,
+            modifiedUnits.map((u) => u.base),
+        );
+    }
+
+    return modifiedCombatState;
 }
 
 function popNextActiveState(dict: CombatStateDictionary, combatType: CombatType): CombatStateProbability | undefined {

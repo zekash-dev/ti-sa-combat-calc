@@ -1,7 +1,7 @@
 import { CombatStage, CombatType, HitType } from "model/calculation";
 import { ComputedUnitSnapshot, UnitState } from "model/combatState";
 import { FactionUpgrade } from "model/combatTags";
-import { ParticipantOnComputeSnapshotInput, ParticipantTagImplementation, PostAssignHitsInput, PostAssignHitsOutput } from "model/effects";
+import { OnEndOfStageInput, OnEndOfStageOutput, ParticipantOnComputeSnapshotInput, ParticipantTagImplementation } from "model/effects";
 import { UnitType } from "model/unit";
 
 const repairApplicableCombatStages: CombatStage[] = [CombatStage.Round1, CombatStage.Round2, CombatStage.RoundN];
@@ -23,7 +23,7 @@ export const letnevSaimocInfusedHulls: ParticipantTagImplementation<LetnevSaimoc
             }
         }
     },
-    postAssignHits: ({ calculationInput, role, stage, units, tagState }: PostAssignHitsInput): PostAssignHitsOutput => {
+    onEndOfStage: ({ calculationInput, role, stage, units, tagState }: OnEndOfStageInput): OnEndOfStageOutput => {
         // "After each combat round, repair one of your participating ships that did not use Sustain Damage this round."
         if (calculationInput.combatType !== CombatType.SpaceBattle) return {};
         if (!repairApplicableCombatStages.includes(stage)) return {};

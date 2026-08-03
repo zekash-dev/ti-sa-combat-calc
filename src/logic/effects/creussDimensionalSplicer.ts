@@ -22,7 +22,7 @@ export const creussDimensionalSplicer: ParticipantTagImplementation<CreussDimens
             settings.wormholePresent
         ) {
             const newHits = { ...hits };
-            const splicerHitType: HitType = HitType.AssignToNonFighter & HitTypeFlags.NotCombatRoll;
+            const splicerHitType: HitType = HitType.AssignToNonFighter | HitTypeFlags.NotCombatRoll;
             newHits[splicerHitType] = (newHits[splicerHitType] ?? 0) + 1;
             return { newHits };
         }
