@@ -191,8 +191,8 @@ function resolveCombatStage(state: CombatState, input: CalculationInput): Resolv
             let nextState: CombatState = state;
             nextState = assignHits(nextState, input, ParticipantRole.Attacker, attackerUnits, defenderHits.hits);
             nextState = assignHits(nextState, input, ParticipantRole.Defender, defenderUnits, attackerHits.hits);
-            nextState = applyEndOfStageTags(nextState, input, ParticipantRole.Attacker, attackerUnits);
-            nextState = applyEndOfStageTags(nextState, input, ParticipantRole.Defender, defenderUnits);
+            nextState = applyEndOfStageTags(state, nextState, input, ParticipantRole.Attacker, attackerUnits);
+            nextState = applyEndOfStageTags(state, nextState, input, ParticipantRole.Defender, defenderUnits);
             nextState = nextState.setStage(getNextStage(input.combatType, nextState.stage));
             const identicalState: CombatStateProbability | undefined = findIdenticalCombatState(nextStates, nextState);
             if (identicalState) {
@@ -858,6 +858,7 @@ export function calculateAverageHits(hitChances: number[]): number {
 }
 
 function applyEndOfStageTags(
+    previousCombatState: CombatState,
     combatState: CombatState,
     calculationInput: CalculationInput,
     role: ParticipantRole,
@@ -872,6 +873,7 @@ function applyEndOfStageTags(
         if (!!implementation && !!implementation.onEndOfStage) {
             const effectInput: OnEndOfStageInput = {
                 calculationInput,
+                previousCombatState,
                 combatState: modifiedCombatState,
                 role,
                 stage: modifiedCombatState.stage,

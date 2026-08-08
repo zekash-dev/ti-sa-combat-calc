@@ -43,6 +43,7 @@ export * from "./solVersatileCombatTactics";
 export * from "./unitCombatDiceMod";
 export * from "./unitCombatValueMod";
 export * from "./unitSustainDamageMod";
+export * from "./virusFlagship";
 export * from "./warSun";
 export * from "./xxchaArchonEnergyShell";
 export * from "./xxchaRound1Mod";

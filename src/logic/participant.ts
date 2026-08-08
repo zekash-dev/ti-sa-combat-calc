@@ -636,8 +636,8 @@ export const flagshipDefinitions: KeyedDictionary<Faction, FlagshipDefinition> =
         combatValue: 6,
         combatRolls: 1,
         sustainDamage: 1,
-        notes: "Reanimate a destroyed opposing ship after every round",
-        nyi: true,
+        effect: effects.virusFlagship,
+        notes: "Reanimate a destroyed opposing ship after every round (max 5 uses)",
     },
     [Faction.HIVES_OF_SARDAKK_NORR]: {
         ...unitDefinitions[UnitType.Flagship],

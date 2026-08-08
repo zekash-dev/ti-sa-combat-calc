@@ -39,6 +39,7 @@ export interface OnCalculateHitsOutput {
 
 export interface OnEndOfStageInput {
     calculationInput: CalculationInput;
+    previousCombatState: CombatState;
     combatState: CombatState;
     role: ParticipantRole;
     stage: CombatStage;
