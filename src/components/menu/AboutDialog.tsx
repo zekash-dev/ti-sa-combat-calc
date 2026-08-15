@@ -39,7 +39,7 @@ export function AboutDialog({ open, onClose }: Props) {
                         .
                     </Paragraph>
                     <Paragraph sx={{ marginTop: 4 }}>
-                        Version {process.env.REACT_APP_VERSION}, built on <BuildTimeDisplay />. Made by Zekash.
+                        Version {import.meta.env.VITE_VERSION}, built on <BuildTimeDisplay />. Made by Zekash.
                     </Paragraph>
                 </DialogContent>
             </OverlayScrollbarsComponent>
@@ -53,7 +53,7 @@ export function AboutDialog({ open, onClose }: Props) {
                         marginRight: "auto",
                     }}
                 >
-                    <ImageLink src={`${process.env.PUBLIC_URL}/images/GitHub-Mark-Light-64px.png`} alt="Github logo" />
+                    <ImageLink src={`${import.meta.env.BASE_URL}/images/GitHub-Mark-Light-64px.png`} alt="Github logo" />
                 </Link>
                 <Button onClick={onClose}>Close</Button>
             </DialogActions>

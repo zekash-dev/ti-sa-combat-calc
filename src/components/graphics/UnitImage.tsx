@@ -44,7 +44,7 @@ export const UnitImage = React.memo(({ unitType, faction, role, scale, badges }:
                 },
             });
         },
-        [badges.length, role, scale, unitDef.imageSize.x]
+        [badges.length, role, scale, unitDef.imageSize.x],
     );
 
     // Let the image load before showing it, to prevent flickers while the SvgProxys are being handled
@@ -86,7 +86,7 @@ function isBadgeWithTooltip(badgeDef: JSX.Element | BadgeWithTooltip): badgeDef 
 }
 
 function getSvgPath(unitType: UnitType): string {
-    const base = process.env.PUBLIC_URL;
+    const base = import.meta.env.BASE_URL;
     const subfolder = "images/units";
     let imageName: string;
     switch (unitType) {

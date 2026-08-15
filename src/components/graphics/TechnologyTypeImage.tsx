@@ -14,7 +14,7 @@ export const TechnologyTypeImage = React.memo(({ technologyType, style }: Props)
 });
 
 function getImagePath(technologyType: TechnologyType): string {
-    const base = process.env.PUBLIC_URL;
+    const base = import.meta.env.BASE_URL;
     const subfolder = "images/technologyTypes";
     let imageName: string;
     switch (technologyType) {

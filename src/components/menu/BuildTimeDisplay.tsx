@@ -1,7 +1,6 @@
 import moment from "moment";
-import preval from "preval.macro";
 
-const buildTimestamp = preval`module.exports = new Date().getTime();`;
+const buildTimestamp = Number(import.meta.env.VITE_BUILD_TIMESTAMP);
 
 export function BuildTimeDisplay() {
     const mom = moment(buildTimestamp);

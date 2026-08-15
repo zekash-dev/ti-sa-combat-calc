@@ -13,7 +13,7 @@ export const CommonParticipantTagImage = React.memo(({ tag, style }: Props) => {
 });
 
 function getImagePath(tag: CommonParticipantTag): string {
-    const base = process.env.PUBLIC_URL;
+    const base = import.meta.env.BASE_URL;
     const subfolder = "images";
     let imageName: string;
     switch (tag) {

@@ -1,11 +1,9 @@
-import Worker from "worker";
+import Worker from "worker/index";
 
 import { CalculationInput, CalculationOutput } from "model/calculation";
 import { selectCalculationInput } from "redux/participant/participantSlice";
 import { selectCalculating, selectPending, setCalculating, setOutput, setPending } from "redux/result/resultSlice";
 import { AppThunk } from "redux/store";
-
-const worker = new Worker();
 
 export const runCalculation = (): AppThunk => async (dispatch, getState) => {
     // If a calculation is in progress, set "pending=true" and return
@@ -17,7 +15,7 @@ export const runCalculation = (): AppThunk => async (dispatch, getState) => {
     while (true) {
         dispatch(setCalculating());
         const input: CalculationInput = selectCalculationInput(getState());
-        const output: CalculationOutput | null = await worker.runCalculationWorker(input);
+        const output: CalculationOutput | null = await Worker.runCalculationWorker(input);
         // If no new calculation has been set as pending, send the output to state
         if (!selectPending(getState())) {
             dispatch(setOutput({ output }));

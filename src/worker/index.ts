@@ -1,4 +1,5 @@
-// eslint-disable-next-line import/no-webpack-loader-syntax
-import Worker from "comlink-loader!./worker"; // inline loader
+import * as Comlink from "comlink";
 
-export default Worker;
+const worker = new Worker(new URL("./worker.ts", import.meta.url), { type: "module" });
+
+export default Comlink.wrap<typeof import("./worker")>(worker);

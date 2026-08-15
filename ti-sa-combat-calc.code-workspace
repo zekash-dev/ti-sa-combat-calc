@@ -1,13 +1,12 @@
 {
     "folders": [
         {
-            "path": "."
-        }
+            "path": ".",
+        },
     ],
     "settings": {
         "editor.defaultFormatter": "esbenp.prettier-vscode",
         "editor.formatOnSave": true,
-        "typescript.tsdk": "node_modules\\typescript\\lib",
         "importSorter.sortConfiguration.customOrderingRules.defaultNumberOfEmptyLinesAfterGroup": 1,
         "importSorter.importStringConfiguration.maximumNumberOfImportExpressionsPerLine.count": 140,
         "importSorter.sortConfiguration.customOrderingRules.rules": [
@@ -15,32 +14,35 @@
                 "type": "importMember",
                 "regex": "^$",
                 "orderLevel": 5,
-                "disableSort": true
+                "disableSort": true,
             },
             {
                 "regex": "^[.]|^(components|logic|model|redux|)(/|$)",
-                "orderLevel": 30
+                "orderLevel": 30,
             },
             {
                 "regex": "^$",
-                "orderLevel": 10
-            }
+                "orderLevel": 10,
+            },
         ],
         "importSorter.importStringConfiguration.maximumNumberOfImportExpressionsPerLine.type": "newLineEachExpressionAfterCountLimitExceptIfOnlyOne",
         "importSorter.importStringConfiguration.quoteMark": "double",
         "[typescript]": {
-            "editor.defaultFormatter": "esbenp.prettier-vscode"
+            "editor.defaultFormatter": "esbenp.prettier-vscode",
         },
         "[javascript]": {
-            "editor.defaultFormatter": "esbenp.prettier-vscode"
+            "editor.defaultFormatter": "esbenp.prettier-vscode",
         },
         "[typescriptreact]": {
-            "editor.defaultFormatter": "esbenp.prettier-vscode"
+            "editor.defaultFormatter": "esbenp.prettier-vscode",
         },
-        "emmet.excludeLanguages": ["markdown", "typescript", "typescriptreact"]
+        "emmet.excludeLanguages": ["markdown", "typescript", "typescriptreact"],
+        "search.exclude": {
+            "**/dist": true,
+        },
     },
     "extensions": {
         "recommendations": ["dbaeumer.vscode-eslint", "esbenp.prettier-vscode", "mike-co.import-sorter"],
-        "unwantedRecommendations": ["ms-azuretools.vscode-docker", "googlecloudtools.cloudcode"]
-    }
+        "unwantedRecommendations": ["ms-azuretools.vscode-docker", "googlecloudtools.cloudcode"],
+    },
 }

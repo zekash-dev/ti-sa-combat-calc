@@ -5,7 +5,7 @@ interface Props {
 }
 
 export const HitCounterImage = React.memo(({ style }: Props) => {
-    const path = `${process.env.PUBLIC_URL}/images/sustain_damage.png`;
+    const path = `${import.meta.env.BASE_URL}/images/sustain_damage.png`;
 
     return <img src={path} alt="Hit counter" style={style} />;
 });

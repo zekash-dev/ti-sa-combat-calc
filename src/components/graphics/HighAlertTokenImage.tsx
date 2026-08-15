@@ -5,7 +5,7 @@ interface Props {
 }
 
 export const HighAlertTokenImage = React.memo(({ style }: Props) => {
-    const path = `${process.env.PUBLIC_URL}/images/highalert.png`;
+    const path = `${import.meta.env.BASE_URL}/images/highalert.png`;
 
     return <img src={path} alt="High alert token" style={style} />;
 });

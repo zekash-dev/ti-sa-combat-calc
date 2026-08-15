@@ -13,7 +13,7 @@ export const CombatTagImage = React.memo(({ tag, style }: Props) => {
 });
 
 function getImagePath(tag: CombatTag): string {
-    const base = process.env.PUBLIC_URL;
+    const base = import.meta.env.BASE_URL;
     const subfolder = "images";
     let imageName: string;
     switch (tag) {

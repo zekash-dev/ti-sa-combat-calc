@@ -5,7 +5,7 @@ interface Props {
 }
 
 export const AgentImage = React.memo(({ style }: Props) => {
-    const path = `${process.env.PUBLIC_URL}/images/leaders/agent.png`;
+    const path = `${import.meta.env.BASE_URL}/images/leaders/agent.png`;
 
     return <img src={path} alt="Agent" style={style} />;
 });
