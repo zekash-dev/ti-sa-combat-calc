@@ -1,4 +1,4 @@
-import { Box, Grid, Typography } from "@mui/material";
+import { Box, Stack, Typography } from "@mui/material";
 import { useState } from "react";
 import { useSelector } from "react-redux";
 
@@ -27,60 +27,58 @@ export function Home() {
             <ParticipantTagEditor location="right" role={ParticipantRole.Defender} open={defenderOpen} onOpenChange={setDefenderOpen} />
             <div style={{ margin: "0 56px" }}>
                 <Box sx={{ position: "relative" }}>
-                    <Grid container>
-                        <Grid item sx={{ width: 290 }}>
-                            <Typography variant="h4" color="text.primary" sx={{ textAlign: "center" }}>
+                    <Stack direction="row">
+                        <Box sx={{ width: 290 }}>
+                            <Typography variant="h4" color="textPrimary" sx={{ textAlign: "center" }}>
                                 {ParticipantRole.Attacker}
                             </Typography>
-                        </Grid>
-                        <Grid item sx={{ width: "calc(100% - 580px)" }}>
+                        </Box>
+                        <Box sx={{ width: "calc(100% - 580px)" }}>
                             <HeaderMenu />
-                        </Grid>
-                        <Grid item sx={{ width: 290 }}>
-                            <Typography variant="h4" color="text.primary" sx={{ textAlign: "center" }}>
+                        </Box>
+                        <Box sx={{ width: 290 }}>
+                            <Typography variant="h4" color="textPrimary" sx={{ textAlign: "center" }}>
                                 {ParticipantRole.Defender}
                             </Typography>
-                        </Grid>
-                    </Grid>
-                    <Grid container sx={{ position: "relative" }}>
-                        <Grid item sx={{ width: 290 }}>
+                        </Box>
+                    </Stack>
+                    <Stack direction="row" sx={{ position: "relative" }}>
+                        <Box sx={{ width: 290 }}>
                             <ParticipantUnitEditor role={ParticipantRole.Attacker} />
-                        </Grid>
-                        <Grid item sx={{ width: "calc(50% - 290px)", position: "relative" }}>
+                        </Box>
+                        <Box sx={{ width: "calc(50% - 290px)", position: "relative" }}>
                             <ParticipantBattlefieldRepresentation
                                 role={ParticipantRole.Attacker}
                                 participant={richParticipants[ParticipantRole.Attacker]}
                             />
-                            <Grid sx={{ right: 0, bottom: 0, position: "absolute" }}>
+                            <Box sx={{ right: 0, bottom: 0, position: "absolute" }}>
                                 <ParticipantHitAssignmentStrategyInput
                                     role={ParticipantRole.Attacker}
                                     participant={richParticipants[ParticipantRole.Attacker]}
                                 />
-                            </Grid>
-                        </Grid>
-                        <Grid item sx={{ width: "calc(50% - 290px)", position: "relative" }}>
+                            </Box>
+                        </Box>
+                        <Box sx={{ width: "calc(50% - 290px)", position: "relative" }}>
                             <ParticipantBattlefieldRepresentation
                                 role={ParticipantRole.Defender}
                                 participant={richParticipants[ParticipantRole.Defender]}
                             />
-                            <Grid sx={{ left: 0, bottom: 0, position: "absolute" }}>
+                            <Box sx={{ left: 0, bottom: 0, position: "absolute" }}>
                                 <ParticipantHitAssignmentStrategyInput
                                     role={ParticipantRole.Defender}
                                     participant={richParticipants[ParticipantRole.Defender]}
                                 />
-                            </Grid>
-                        </Grid>
-                        <Grid item sx={{ width: 290 }}>
+                            </Box>
+                        </Box>
+                        <Box sx={{ width: 290 }}>
                             <ParticipantUnitEditor role={ParticipantRole.Defender} />
-                        </Grid>
+                        </Box>
                         <ParticipantsDivider />
-                    </Grid>
+                    </Stack>
                 </Box>
-                <Grid container>
-                    <Grid item xs={12}>
-                        <ResultView />
-                    </Grid>
-                </Grid>
+                <Box>
+                    <ResultView />
+                </Box>
             </div>
         </div>
     );

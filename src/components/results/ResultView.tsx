@@ -20,9 +20,10 @@ import { CasualtiesView } from "./CasualtiesView";
 import { CombatStageResultView } from "./CombatStageResultView";
 import { ResultPercentageBars } from "./ResultPercentageBars";
 import { ResultPercentageLabels } from "./ResultPercentageLabels";
+import { AppDispatch } from "redux/store";
 
 export function ResultView() {
-    const dispatch = useDispatch();
+    const dispatch = useDispatch<AppDispatch>();
     const [expanded, setExpanded] = useState(true);
     const input: CalculationInput = useSelector(selectCalculationInput);
     const output: CalculationOutput | null = useSelector(selectOutput);
@@ -42,7 +43,7 @@ export function ResultView() {
         return (
             <Accordion disableGutters>
                 <AccordionSummary expandIcon={<ExpandMore />}>
-                    <Typography variant="subtitle1" color="text.primary" sx={{ minWidth: "400px" }}>
+                    <Typography variant="subtitle1" sx={{ minWidth: "400px" }}>
                         Add units to start calculating outcomes...
                     </Typography>
                 </AccordionSummary>
@@ -55,7 +56,7 @@ export function ResultView() {
             <CombatStageResultView input={input} output={output} participants={participants} />
             <Accordion expanded={expanded} disableGutters onChange={() => setExpanded((prev) => !prev)}>
                 <AccordionSummary expandIcon={<ExpandMore />}>
-                    <Typography variant="h6" color="text.primary" sx={{ minWidth: "400px" }}>
+                    <Typography variant="h6" color="textPrimary" sx={{ minWidth: "400px" }}>
                         Final results
                     </Typography>
                     <TrackedValuesDisplay settings={output.settings} trackedValues={output.trackedValues} />

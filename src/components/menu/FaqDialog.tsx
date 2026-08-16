@@ -11,7 +11,7 @@ interface Props {
 export function FaqDialog({ open, onClose }: Props) {
     return (
         <Dialog open={open} onClose={onClose} maxWidth="md">
-            <DialogTitle color="text.primary">FAQ</DialogTitle>
+            <DialogTitle color="textPrimary">FAQ</DialogTitle>
             <OverlayScrollbarsComponent>
                 <DialogContent>
                     <Subheading first>What is a Draw?</Subheading>
@@ -38,17 +38,6 @@ export function FaqDialog({ open, onClose }: Props) {
                     </Paragraph>
                     <Paragraph>
                         Effects such as Impulsion shields and Berzerker genome can also cause the expected hits and assigned hits to differ.
-                    </Paragraph>
-                    <Subheading>Hit assignment priority</Subheading>
-                    <Paragraph>Currently, hit assignment priority works as follows:</Paragraph>
-                    <ol>
-                        <li>Assign hits to units that can sustain damage</li>
-                        <li>Assign hits to the unit with the worst combat value (except units with "Keep alive" set)</li>
-                        <li>Assign hits to units with "Keep alive" set that can't sustain more hits</li>
-                    </ol>
-                    <Paragraph>
-                        The plan is to implement some ways for the user to modify this priority, such as prioritizing by unit resource
-                        value. Suggestions for other hit assignment rules are welcome.
                     </Paragraph>
                 </DialogContent>
             </OverlayScrollbarsComponent>

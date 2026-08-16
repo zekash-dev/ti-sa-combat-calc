@@ -6,6 +6,7 @@ import { ParticipantRole, RichUnit } from "model/calculation";
 import { UnitTag } from "model/combatTags";
 import { setUnitTag, unsetUnitTag } from "redux/participant/participantSlice";
 import { useCallback } from "react";
+import { AppDispatch } from "redux/store";
 
 interface Props {
     role: ParticipantRole;
@@ -13,7 +14,7 @@ interface Props {
 }
 
 export function UnitCombatRollsModInput({ role, unit }: Props) {
-    const dispatch = useDispatch();
+    const dispatch = useDispatch<AppDispatch>();
 
     const currentValue: number = Number(unit.input.tags?.[UnitTag.COMBAT_DICE_MOD] ?? 0);
     const currentValueDisplay = currentValue > 0 ? `+${currentValue}` : currentValue === 0 ? `±0` : String(currentValue);
@@ -29,7 +30,7 @@ export function UnitCombatRollsModInput({ role, unit }: Props) {
                         unitIndex: unit.unitIndex,
                         tag: UnitTag.COMBAT_DICE_MOD,
                         value: newValue,
-                    })
+                    }),
                 );
             } else {
                 dispatch(
@@ -37,25 +38,25 @@ export function UnitCombatRollsModInput({ role, unit }: Props) {
                         role: role,
                         unitIndex: unit.unitIndex,
                         tag: UnitTag.COMBAT_DICE_MOD,
-                    })
+                    }),
                 );
             }
         },
-        [dispatch, role, unit.unitIndex]
+        [dispatch, role, unit.unitIndex],
     );
 
     const handleIncrement = useCallback(() => setModValue(currentValue + 1), [setModValue, currentValue]);
     const handleDecrement = useCallback(() => setModValue(currentValue - 1), [setModValue, currentValue]);
 
     return (
-        <Box display="flex" flexWrap="nowrap">
+        <Box sx={{ display: "flex", flexWrap: "nowrap" }}>
             <Typography
                 variant="body2"
-                flexGrow={1}
                 sx={{
                     display: "inline",
                     marginRight: 1,
                     lineHeight: "30px",
+                    flexGrow: 1,
                 }}
             >
                 Combat dice count
@@ -66,7 +67,9 @@ export function UnitCombatRollsModInput({ role, unit }: Props) {
             <Tooltip
                 title="Modify the number of combat rolls performed in normal combat rounds"
                 placement="right"
-                PopperProps={{ modifiers: [{ name: "offset", options: { offset: [0, 30] } }] }}
+                slotProps={{
+                    popper: { modifiers: [{ name: "offset", options: { offset: [0, 30] } }] },
+                }}
             >
                 <Box
                     sx={{

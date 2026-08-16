@@ -23,7 +23,7 @@ export function SelectFactionDialog({ open, currentValue, onClose, onSelect }: P
             <DialogContent>
                 <Grid container spacing={1}>
                     {getAllEnumValues<Faction>(Faction).map((faction: Faction) => (
-                        <Grid key={faction} item xs={12} sm={6} md={4}>
+                        <Grid key={faction} size={{ xs: 12, sm: 6, md: 4 }}>
                             <Button
                                 variant="outlined"
                                 sx={{
@@ -41,7 +41,7 @@ export function SelectFactionDialog({ open, currentValue, onClose, onSelect }: P
                                 onClick={handleSelectFaction(faction)}
                             >
                                 <FactionImage faction={faction} style={{ width: "50px" }} />
-                                <Typography variant="body1" color="text.primary" sx={{ m: 2 }}>
+                                <Typography variant="body1" color="textPrimary" sx={{ m: 2 }}>
                                     {factionResources[faction].name}
                                 </Typography>
                             </Button>

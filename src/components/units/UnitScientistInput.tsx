@@ -6,6 +6,7 @@ import { ParticipantRole, RichUnit } from "model/calculation";
 import { UnitTag } from "model/combatTags";
 import { UnitType } from "model/unit";
 import { setUnitTag, unsetUnitTag } from "redux/participant/participantSlice";
+import { AppDispatch } from "redux/store";
 
 interface Props {
     role: ParticipantRole;
@@ -13,7 +14,7 @@ interface Props {
 }
 
 export function UnitScientistInput({ role, unit }: Props) {
-    const dispatch = useDispatch();
+    const dispatch = useDispatch<AppDispatch>();
     if (unit.input.type !== UnitType.PDS) return null;
 
     const hasScientist: boolean = !!unit.input.tags && unit.input.tags[UnitTag.SCIENTIST] === true;

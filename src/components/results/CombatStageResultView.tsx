@@ -19,6 +19,7 @@ import { selectShowStatisticsForStage, setShowStatisticsForStage } from "redux/o
 import { CasualtiesView } from "./CasualtiesView";
 import { ResultPercentageBars } from "./ResultPercentageBars";
 import { ResultPercentageLabels } from "./ResultPercentageLabels";
+import { AppDispatch } from "redux/store";
 
 interface CombatStageResultViewProps {
     input: CalculationInput;
@@ -49,7 +50,7 @@ interface CombatStageViewProps {
 }
 
 function CombatStageView({ input, output, participants, stage }: CombatStageViewProps) {
-    const dispatch = useDispatch();
+    const dispatch = useDispatch<AppDispatch>();
     const [expanded, setExpanded] = useState(false);
     const showStatistics = useSelector(selectShowStatisticsForStage(stage));
 
@@ -67,7 +68,7 @@ function CombatStageView({ input, output, participants, stage }: CombatStageView
     return (
         <Accordion expanded={expanded} disableGutters onChange={() => setExpanded((prev) => !prev)}>
             <AccordionSummary expandIcon={<ExpandMore />}>
-                <Typography variant="h6" color="text.primary" sx={{ minWidth: "400px" }}>
+                <Typography variant="h6" color="textPrimary" sx={{ minWidth: "400px" }}>
                     {combatStageResources[stage].name}
                 </Typography>
                 <ParticipantHitsDisplay label="Attacker" participant={stageOutput.statistics.attacker} />

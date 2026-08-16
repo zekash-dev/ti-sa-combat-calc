@@ -6,6 +6,7 @@ import { getParticipantTagDefaultValue, participantTagResources } from "logic/pa
 import { ParticipantInputTags } from "model/calculation";
 import { CombatTag, ParticipantTagResources } from "model/combatTags";
 import { selectCombatTags, setCombatTag, unsetCombatTag } from "redux/participant/participantSlice";
+import { AppDispatch } from "redux/store";
 import { CombatTagIcon } from "./CombatTagIcon";
 import { ParticipantTagTooltip } from "./ParticipantTagTooltip";
 
@@ -14,7 +15,7 @@ interface Props {
 }
 
 export function CombatTagButton({ tag }: Props) {
-    const dispatch = useDispatch();
+    const dispatch = useDispatch<AppDispatch>();
     const tags: ParticipantInputTags = useSelector(selectCombatTags);
     const tagResources: ParticipantTagResources = participantTagResources[tag];
     const selected: boolean = tags[tag] !== undefined;

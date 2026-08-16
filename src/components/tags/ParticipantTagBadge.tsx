@@ -2,7 +2,7 @@ import { styled } from "@mui/material";
 
 interface Props {
     text: string;
-    children: JSX.Element;
+    children: React.JSX.Element;
 }
 
 export function ParticipantTagBadge({ text, children }: Props) {

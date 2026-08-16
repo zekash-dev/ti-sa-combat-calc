@@ -35,10 +35,10 @@ interface CasualtiesViewProps {
 export function CasualtiesView(props: CasualtiesViewProps) {
     return (
         <Grid container>
-            <Grid item xs={6}>
+            <Grid size={{ xs: 6 }}>
                 <CasualtiesParticipantView {...props} participant={ParticipantRole.Attacker} />
             </Grid>
-            <Grid item xs={6}>
+            <Grid size={{ xs: 6 }}>
                 <CasualtiesParticipantView {...props} participant={ParticipantRole.Defender} />
             </Grid>
         </Grid>
@@ -147,7 +147,7 @@ export function CasualtiesParticipantView(props: CasualtiesParticipantViewProps)
             statistics[ParticipantRole.Attacker].survivingUnitProbabilities.length,
             statistics[ParticipantRole.Defender].survivingUnitProbabilities.length,
         ])! * 40,
-        800
+        800,
     );
 
     return (

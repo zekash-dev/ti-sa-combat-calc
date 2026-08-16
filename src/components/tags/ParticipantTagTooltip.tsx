@@ -4,7 +4,7 @@ import React from "react";
 
 interface TooltipContentProps {
     tag: ParticipantTagResources;
-    children: React.ReactElement;
+    children: React.JSX.Element;
     placement?:
         | "bottom-end"
         | "bottom-start"

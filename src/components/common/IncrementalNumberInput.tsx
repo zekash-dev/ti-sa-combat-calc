@@ -48,8 +48,10 @@ export function IncrementalNumberInput({ value, onChange }: Props) {
                 value={tempValue}
                 onChange={(e) => setTempValue(e.target.value)}
                 onKeyDown={onInputKeyDown}
-                inputProps={{
-                    style: { paddingTop: 4, paddingRight: 8, paddingBottom: 4, paddingLeft: 8, textAlign: "center" },
+                slotProps={{
+                    htmlInput: {
+                        style: { paddingTop: "4px", paddingRight: "8px", paddingBottom: "4px", paddingLeft: "8px", textAlign: "center" },
+                    },
                 }}
                 onBlur={onInputBlur}
             />

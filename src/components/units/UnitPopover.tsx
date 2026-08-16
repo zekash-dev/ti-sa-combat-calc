@@ -1,4 +1,4 @@
-import { Box, Divider, Typography } from "@mui/material";
+import { Box, Divider, Stack, Typography } from "@mui/material";
 
 import { combatStageResources, flagshipDefinitions } from "logic/participant";
 import { CombatStage, ParticipantRole, RichUnit } from "model/calculation";
@@ -25,8 +25,8 @@ export function UnitPopover({ unit, faction, role }: Props) {
         unit.input.type === UnitType.Flagship ? flagshipDefinitions[faction] : undefined;
     return (
         <Box sx={{ p: 1 }}>
-            <Box display="flex">
-                <Box flexGrow={1}>
+            <Stack direction="row">
+                <Box sx={{ flexGrow: 1 }}>
                     <Typography variant="body1" sx={{ fontWeight: "bold" }}>
                         {unitDefinitions[unit.input.type].name}
                     </Typography>
@@ -37,7 +37,7 @@ export function UnitPopover({ unit, faction, role }: Props) {
                     )}
                 </Box>
                 <UnitPopoverActionButtons role={role} unit={unit} />
-            </Box>
+            </Stack>
 
             {Object.keys(unit.byStage).map((stageKey: string) => {
                 const stage: CombatStage = Number(stageKey);

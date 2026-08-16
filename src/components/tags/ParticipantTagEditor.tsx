@@ -38,6 +38,7 @@ import { TechnologyIcon } from "./TechnologyIcon";
 import { ParticipantCombatValueModEditor } from "./ParticipantCombatValueModEditor";
 import { AdditionalAbilitiesDialog } from "./AdditionalAbilitiesDialog";
 import { getAllEnumValues } from "logic/common";
+import { AppDispatch } from "redux/store";
 
 interface Props {
     location: "left" | "right";
@@ -51,11 +52,11 @@ export function ParticipantTagEditor(props: Props) {
     const toggleDrawer = () => onOpenChange(!open);
     return (
         <Drawer variant="permanent" open={open} anchor={location} sx={{ ".MuiDrawer-paper": { maxHeight: "100vh", overflow: "hidden" } }}>
-            <ListItem button onClick={toggleDrawer} sx={{ justifyContent: location === "right" ? "left" : "right" }}>
+            <ListItemButton onClick={toggleDrawer} sx={{ justifyContent: location === "right" ? "left" : "right" }}>
                 {(location === "right") !== open ? <ChevronLeft fontSize="large" /> : <ChevronRight fontSize="large" />}
-            </ListItem>
+            </ListItemButton>
             <Divider />
-            <OverlayScrollbarsComponent style={{ height: "calc(100% - 10px)" }} options={{ overflowBehavior: { x: "hidden" } }}>
+            <OverlayScrollbarsComponent style={{ height: "calc(100% - 10px)" }} options={{ overflow: { x: "hidden" } }}>
                 <DrawerContent {...props} open={open} />
             </OverlayScrollbarsComponent>
         </Drawer>
@@ -67,7 +68,7 @@ interface DrawerContentProps extends Props {
 }
 
 function DrawerContent({ role, open }: DrawerContentProps) {
-    const dispatch = useDispatch();
+    const dispatch = useDispatch<AppDispatch>();
     const [factionDialogOpen, setFactionDialogOpen] = useState(false);
     const [abilityDialogOpen, setAbilityDialogOpen] = useState(false);
     const openFactionDialog = useCallback(() => setFactionDialogOpen(true), []);

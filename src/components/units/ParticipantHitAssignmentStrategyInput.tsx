@@ -7,6 +7,7 @@ import { CommonParticipantTag, HitAssignmentStrategy } from "model/combatTags";
 import { setParticipantTag } from "redux/participant/participantSlice";
 import { Bolt, Shield } from "@mui/icons-material";
 import { toDarkerHue } from "logic/styling";
+import { AppDispatch } from "redux/store";
 
 interface Props {
     role: ParticipantRole;
@@ -14,7 +15,7 @@ interface Props {
 }
 
 export function ParticipantHitAssignmentStrategyInput({ role, participant }: Props) {
-    const dispatch = useDispatch();
+    const dispatch = useDispatch<AppDispatch>();
 
     const currentValue: HitAssignmentStrategy = participant.tags[CommonParticipantTag.HIT_ASSIGNMENT_STRATEGY];
     const left: boolean = role === ParticipantRole.Attacker;
@@ -53,7 +54,7 @@ export function ParticipantHitAssignmentStrategyInput({ role, participant }: Pro
     }, [dispatch, role, currentValue]);
 
     return (
-        <Box display="flex" flexWrap="nowrap">
+        <Box>
             <Tooltip title={tooltipContent} placement="top" disableInteractive>
                 <Button
                     variant="contained"

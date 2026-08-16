@@ -6,13 +6,14 @@ import { getSelectableUnitTypes } from "logic/participant";
 import { CalculationInput, ParticipantInput, ParticipantRole } from "model/calculation";
 import { unitDefinitions, UnitType } from "model/unit";
 import { getUnitCount, selectCalculationInput, selectParticipant, setUnitCount } from "redux/participant/participantSlice";
+import { AppDispatch } from "redux/store";
 
 interface Props {
     role: ParticipantRole;
 }
 
 export function ParticipantUnitEditor({ role }: Props) {
-    const dispatch = useDispatch();
+    const dispatch = useDispatch<AppDispatch>();
     const calculationInput: CalculationInput = useSelector(selectCalculationInput);
     const participant: ParticipantInput = useSelector(selectParticipant(role));
     const handleSetUnitCount = (unit: UnitType, count: number) => dispatch(setUnitCount({ role, unit, count }));

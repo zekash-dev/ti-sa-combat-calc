@@ -1,5 +1,5 @@
 import { QuestionAnswer, QuestionMark, Replay, Settings, SwapHoriz } from "@mui/icons-material";
-import { Button, ButtonGroup, Grid, IconButton, Tooltip } from "@mui/material";
+import { Box, Button, ButtonGroup, Grid, IconButton, Tooltip } from "@mui/material";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -10,11 +10,12 @@ import { resetTagsAndUnits, selectCombatType, setCombatType, switchRoles } from 
 import { AboutDialog } from "./AboutDialog";
 import { FaqDialog } from "./FaqDialog";
 import { SettingsDialog } from "./SettingsDialog";
+import { AppDispatch } from "redux/store";
 
 type FloatingMenuDialog = "about" | "faq" | "settings";
 
 export function HeaderMenu() {
-    const dispatch = useDispatch();
+    const dispatch = useDispatch<AppDispatch>();
     const combatType: CombatType = useSelector(selectCombatType);
     const [currentDialog, setCurrentDialog] = useState<FloatingMenuDialog | undefined>(undefined);
 
@@ -36,9 +37,9 @@ export function HeaderMenu() {
                 borderBottomRightRadius: 10,
             }}
         >
-            <Grid item xs={5}>
+            <Grid size={{ xs: 4 }}>
                 <Grid container sx={{ justifyContent: "flex-start", alignItems: "center", height: "100%" }}>
-                    <Grid item>
+                    <Grid>
                         <Tooltip placement="bottom" title="Reset all units and effects">
                             <IconButton color="primary" onClick={onReset}>
                                 <Replay />
@@ -50,39 +51,37 @@ export function HeaderMenu() {
                             </IconButton>
                         </Tooltip>
                     </Grid>
-                    <Grid item sx={{ marginLeft: 4 }}>
+                    <Grid sx={{ marginLeft: 4 }}>
                         <CombatTagButton tag={CombatTag.ION_STORM} />
                         <CombatTagButton tag={CombatTag.NEBULA} />
                     </Grid>
                 </Grid>
             </Grid>
-            <Grid item xs={2}>
+            <Grid size={{ xs: 4 }}>
                 <Grid container sx={{ justifyContent: "center", alignItems: "center", height: "100%" }}>
-                    <Grid item>
-                        <ButtonGroup>
-                            <Button
-                                color="primary"
-                                variant={combatType === CombatType.SpaceBattle ? "contained" : "outlined"}
-                                onClick={onChangeCombatType(CombatType.SpaceBattle)}
-                                sx={{ width: "50%", whiteSpace: "nowrap" }}
-                            >
-                                Space battle
-                            </Button>
-                            <Button
-                                color="primary"
-                                variant={combatType === CombatType.InvasionCombat ? "contained" : "outlined"}
-                                onClick={onChangeCombatType(CombatType.InvasionCombat)}
-                                sx={{ width: "50%", whiteSpace: "nowrap" }}
-                            >
-                                Invasion combat
-                            </Button>
-                        </ButtonGroup>
-                    </Grid>
+                    <ButtonGroup>
+                        <Button
+                            color="primary"
+                            variant={combatType === CombatType.SpaceBattle ? "contained" : "outlined"}
+                            onClick={onChangeCombatType(CombatType.SpaceBattle)}
+                            sx={{ width: "50%", whiteSpace: "nowrap" }}
+                        >
+                            Space battle
+                        </Button>
+                        <Button
+                            color="primary"
+                            variant={combatType === CombatType.InvasionCombat ? "contained" : "outlined"}
+                            onClick={onChangeCombatType(CombatType.InvasionCombat)}
+                            sx={{ width: "50%", whiteSpace: "nowrap" }}
+                        >
+                            Invasion combat
+                        </Button>
+                    </ButtonGroup>
                 </Grid>
             </Grid>
-            <Grid item xs={5}>
+            <Grid size={{ xs: 4 }}>
                 <Grid container sx={{ height: "100%" }}>
-                    <Grid item sx={{ marginLeft: "auto" }}>
+                    <Grid sx={{ marginLeft: "auto" }}>
                         <Tooltip placement="bottom" title="Settings">
                             <IconButton color="primary" onClick={onOpen("settings")}>
                                 <Settings />

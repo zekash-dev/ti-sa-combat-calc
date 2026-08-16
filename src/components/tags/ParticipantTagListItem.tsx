@@ -13,7 +13,7 @@ import { ParticipantTagTooltip } from "./ParticipantTagTooltip";
 interface Props {
     participant: ParticipantInput;
     tag: ParticipantTag;
-    icon?: JSX.Element;
+    icon?: React.JSX.Element;
     iconBadge?: string;
     open: boolean;
     onChange: (key: ParticipantTag, selected: boolean, value?: any) => void;
@@ -25,7 +25,7 @@ export function ParticipantTagListItem({ participant, tag, icon, iconBadge, open
     const tagTitle: string = (tagResources.implementation ? "" : "[NYI] ") + tagResources.name;
     const selected: boolean = participant.tags[tag] !== undefined;
 
-    let iconElement: JSX.Element | undefined = undefined;
+    let iconElement: React.JSX.Element | undefined = undefined;
     if (icon) {
         iconElement = <ListItemIcon>{icon}</ListItemIcon>;
         if (iconBadge) {
@@ -48,7 +48,7 @@ export function ParticipantTagListItem({ participant, tag, icon, iconBadge, open
         [onChange, tag],
     );
 
-    let listItem: JSX.Element = (
+    let listItem: React.JSX.Element = (
         <ParticipantTagTooltip tag={tagResources} placement="right">
             <ListItemButton disabled={!tagResources.implementation} disableRipple onClick={onToggle} disableGutters>
                 {iconElement}

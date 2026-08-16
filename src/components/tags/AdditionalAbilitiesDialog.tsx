@@ -16,6 +16,7 @@ import { setParticipantTag, unsetParticipantTag } from "redux/participant/partic
 import { FactionImage } from "components/graphics";
 import { Stars } from "@mui/icons-material";
 import { ParticipantTagTooltip } from "./ParticipantTagTooltip";
+import { AppDispatch } from "redux/store";
 
 interface Props {
     open: boolean;
@@ -30,7 +31,7 @@ interface FactionAndTag {
 }
 
 export function AdditionalAbilitiesDialog({ open, role, participant, onClose }: Props) {
-    const dispatch = useDispatch();
+    const dispatch = useDispatch<AppDispatch>();
 
     const tags: FactionAndTag[] = useMemo(() => {
         const otherFaction: Faction[] = getAllEnumValues<Faction>(Faction).filter((f) => f !== participant.faction);
@@ -59,7 +60,7 @@ export function AdditionalAbilitiesDialog({ open, role, participant, onClose }: 
             <DialogContent>
                 <Grid container spacing={1}>
                     {tags.map((tag: FactionAndTag) => (
-                        <Grid key={tag.tag} item xs={12} sm={6} md={4}>
+                        <Grid key={tag.tag} size={{ xs: 12, sm: 6, md: 4 }}>
                             <AbilityButton participant={participant} faction={tag.faction} tag={tag.tag} onChange={onChange} />
                         </Grid>
                     ))}
@@ -117,7 +118,7 @@ function AbilityButton({ participant, faction, tag, onChange }: AbilityButtonPro
                     },
                 }}
             >
-                <Stack direction="row" spacing={2} alignItems="center" sx={{ width: "100%" }}>
+                <Stack direction="row" spacing={2} sx={{ width: "100%", alignItems: "center" }}>
                     <FactionImage faction={faction} style={{ width: "32px", opacity: selected ? 1.0 : 0.5 }} />
 
                     {/* Middle text */}
@@ -128,13 +129,13 @@ function AbilityButton({ participant, faction, tag, onChange }: AbilityButtonPro
                             minWidth: 0, // Required for ellipsis inside flex layouts
                         }}
                     >
-                        <Typography variant="subtitle1" color="text.primary" noWrap>
+                        <Typography variant="subtitle1" color="textPrimary" noWrap>
                             {title}
                         </Typography>
 
                         <Typography
                             variant="body2"
-                            color="text.primary"
+                            color="textPrimary"
                             sx={{
                                 fontSize: "0.7em",
                                 textTransform: "none",

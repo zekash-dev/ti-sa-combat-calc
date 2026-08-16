@@ -96,7 +96,7 @@ interface PercentageLabelProps {
 
 function PercentageLabel({ label, percentage, small }: PercentageLabelProps) {
     return (
-        <Typography variant="body1" color="text.primary" style={{ fontSize: small ? "1em" : "1.1em" }}>
+        <Typography variant="body1" color="textPrimary" style={{ fontSize: small ? "1em" : "1.1em" }}>
             {label}: {formatPercent(percentage)}
         </Typography>
     );

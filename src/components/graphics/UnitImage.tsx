@@ -14,12 +14,12 @@ interface Props {
     faction: Faction;
     role: ParticipantRole;
     scale: number;
-    badges: (JSX.Element | BadgeWithTooltip | false)[];
+    badges: (React.JSX.Element | BadgeWithTooltip | false)[];
 }
 
 interface BadgeWithTooltip {
     key: string;
-    element: JSX.Element;
+    element: React.JSX.Element;
     tooltip: string;
 }
 
@@ -33,7 +33,7 @@ export const UnitImage = React.memo(({ unitType, faction, role, scale, badges }:
     const unitDef: UnitDefinition = unitDefinitions[unitType];
 
     const createBadgeContent = useCallback(
-        (element: JSX.Element): React.ReactElement => {
+        (element: React.JSX.Element): React.JSX.Element => {
             return React.cloneElement(element, {
                 style: {
                     float: role === ParticipantRole.Attacker ? "left" : "right",
@@ -65,8 +65,8 @@ export const UnitImage = React.memo(({ unitType, faction, role, scale, badges }:
             </SvgLoader>
             <BadgeContainer role={role} scale={scale} anchor={unitDef.imageBadgeAnchor}>
                 {badges
-                    .filter((badge: JSX.Element | BadgeWithTooltip | false): badge is JSX.Element | BadgeWithTooltip => !!badge)
-                    .map((badge: JSX.Element | BadgeWithTooltip) => {
+                    .filter((badge: React.JSX.Element | BadgeWithTooltip | false): badge is React.JSX.Element | BadgeWithTooltip => !!badge)
+                    .map((badge: React.JSX.Element | BadgeWithTooltip) => {
                         if (isBadgeWithTooltip(badge)) {
                             return (
                                 <Tooltip key={badge.key} title={badge.tooltip}>
@@ -81,7 +81,7 @@ export const UnitImage = React.memo(({ unitType, faction, role, scale, badges }:
     );
 });
 
-function isBadgeWithTooltip(badgeDef: JSX.Element | BadgeWithTooltip): badgeDef is BadgeWithTooltip {
+function isBadgeWithTooltip(badgeDef: React.JSX.Element | BadgeWithTooltip): badgeDef is BadgeWithTooltip {
     return typeof (badgeDef as any).tooltip === "string";
 }
 

@@ -21,7 +21,7 @@ interface SubheaderProps {
 
 export function Subheading({ first, children }: SubheaderProps) {
     return (
-        <Typography variant="body1" color="text.primary" sx={{ marginTop: first ? 0 : 3, fontSize: "1.5em" }}>
+        <Typography variant="body1" color="textPrimary" sx={{ marginTop: first ? 0 : 3, fontSize: "1.5em" }}>
             {children}
         </Typography>
     );

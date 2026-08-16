@@ -3,10 +3,11 @@ import { Box, IconButton, ListItem, ListItemButton, Tooltip, Typography } from "
 import { useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
+import { participantCombatValueMod, ParticipantCombatValueModSettings } from "logic/effects/participantCombatValueMod";
 import { ParticipantInput, ParticipantRole } from "model/calculation";
 import { CommonParticipantTag } from "model/combatTags";
 import { selectParticipant, setParticipantTag, unsetParticipantTag } from "redux/participant/participantSlice";
-import { ParticipantCombatValueModSettings, participantCombatValueMod } from "logic/effects/participantCombatValueMod";
+import { AppDispatch } from "redux/store";
 
 interface Props {
     open: boolean;
@@ -14,7 +15,7 @@ interface Props {
 }
 
 export function ParticipantCombatValueModEditor({ role, open }: Props) {
-    const dispatch = useDispatch();
+    const dispatch = useDispatch<AppDispatch>();
 
     const participant: ParticipantInput = useSelector(selectParticipant(role));
     const tagSettings: ParticipantCombatValueModSettings =
@@ -52,7 +53,9 @@ export function ParticipantCombatValueModEditor({ role, open }: Props) {
                     <Tooltip
                         title={`Combat value modifier for all ${role} units.`}
                         placement="right"
-                        PopperProps={{ modifiers: [{ name: "offset", options: { offset: [0, 55] } }] }}
+                        slotProps={{
+                            popper: { modifiers: [{ name: "offset", options: { offset: [0, 55] } }] },
+                        }}
                     >
                         <Box
                             sx={{

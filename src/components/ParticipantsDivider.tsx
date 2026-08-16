@@ -4,10 +4,11 @@ import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 import { selectCalculating } from "redux/result/resultSlice";
+import { AppDispatch } from "redux/store";
 import { runCalculation } from "redux/thunks/runCalculation";
 
 export function ParticipantsDivider() {
-    const dispatch = useDispatch();
+    const dispatch = useDispatch<AppDispatch>();
     const calculating: boolean = useSelector(selectCalculating);
 
     const onClickCalculate = () => {

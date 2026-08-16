@@ -4,7 +4,7 @@ import optionsReducer, { defaultState as initialOptionsState, OptionsState } fro
 import participantReducer, { initialState as initialParticipantState, ParticipantSliceState } from "./participant/participantSlice";
 import resultReducer, { initialState as initialResultState, ResultState } from "./result/resultSlice";
 
-export default configureStore({
+const store = configureStore({
     reducer: {
         options: optionsReducer,
         participant: participantReducer,
@@ -12,11 +12,15 @@ export default configureStore({
     },
 });
 
+export default store;
+
 export interface RootState {
     options: OptionsState;
     participant: ParticipantSliceState;
     result: ResultState;
 }
+
+export type AppDispatch = typeof store.dispatch;
 
 export type AppThunk<ReturnType = void> = ThunkAction<ReturnType, RootState, unknown, Action<string>>;
 

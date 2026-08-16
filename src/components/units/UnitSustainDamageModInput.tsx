@@ -7,6 +7,7 @@ import { UnitTag } from "model/combatTags";
 import { setUnitTag, unsetUnitTag } from "redux/participant/participantSlice";
 import { useCallback } from "react";
 import { UnitType } from "model/unit";
+import { AppDispatch } from "redux/store";
 
 interface Props {
     role: ParticipantRole;
@@ -14,7 +15,7 @@ interface Props {
 }
 
 export function UnitSustainDamageModInput({ role, unit }: Props) {
-    const dispatch = useDispatch();
+    const dispatch = useDispatch<AppDispatch>();
 
     const currentValue: number = Number(unit.input.tags?.[UnitTag.SUSTAIN_DAMAGE_MOD] ?? 0);
     const currentValueDisplay = currentValue > 0 ? `+${currentValue}` : currentValue === 0 ? `±0` : String(currentValue);
@@ -51,14 +52,14 @@ export function UnitSustainDamageModInput({ role, unit }: Props) {
     if (unit.input.type === UnitType.PDS) return null;
 
     return (
-        <Box display="flex" flexWrap="nowrap">
+        <Box sx={{ display: "flex", flexWrap: "nowrap" }}>
             <Typography
-                flexGrow={1}
                 variant="body2"
                 sx={{
                     display: "inline",
                     marginRight: 1,
                     lineHeight: "30px",
+                    flexGrow: 1,
                 }}
             >
                 Sustain damage mod
@@ -69,7 +70,9 @@ export function UnitSustainDamageModInput({ role, unit }: Props) {
             <Tooltip
                 title="Modify sustain damage ability by this number"
                 placement="right"
-                PopperProps={{ modifiers: [{ name: "offset", options: { offset: [0, 30] } }] }}
+                slotProps={{
+                    popper: { modifiers: [{ name: "offset", options: { offset: [0, 30] } }] },
+                }}
             >
                 <Box
                     sx={{

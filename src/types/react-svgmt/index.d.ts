@@ -29,6 +29,6 @@ declare module "react-svgmt" {
          */
         onElementSelected?: (node: SVGElement) => void;
     };
-    export const SvgLoader: (props: SvgLoaderProps) => JSX.Element;
-    export const SvgProxy: (props: SvgProxyProps) => JSX.Element;
+    export const SvgLoader: (props: SvgLoaderProps) => React.JSX.Element;
+    export const SvgProxy: (props: SvgProxyProps) => React.JSX.Element;
 }

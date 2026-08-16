@@ -2,10 +2,11 @@ import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 import { selectParticipantState } from "redux/participant/participantSlice";
+import { AppDispatch } from "redux/store";
 import { runCalculation } from "redux/thunks/runCalculation";
 
 export function CalculationTrigger() {
-    const dispatch = useDispatch();
+    const dispatch = useDispatch<AppDispatch>();
     const participantState = useSelector(selectParticipantState);
     useEffect(() => {
         dispatch(runCalculation());

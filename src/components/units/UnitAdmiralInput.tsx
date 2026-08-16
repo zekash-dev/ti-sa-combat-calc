@@ -6,6 +6,7 @@ import { unitIsCombatant } from "logic/calculator";
 import { CombatType, ParticipantRole, RichUnit } from "model/calculation";
 import { UnitTag } from "model/combatTags";
 import { setUnitTag, unsetUnitTag } from "redux/participant/participantSlice";
+import { AppDispatch } from "redux/store";
 
 interface Props {
     role: ParticipantRole;
@@ -13,7 +14,7 @@ interface Props {
 }
 
 export function UnitAdmiralInput({ role, unit }: Props) {
-    const dispatch = useDispatch();
+    const dispatch = useDispatch<AppDispatch>();
     if (!unitIsCombatant(unit.input.type, CombatType.SpaceBattle)) return null;
 
     const hasAdmiral: boolean = !!unit.input.tags && unit.input.tags[UnitTag.ADMIRAL] === true;

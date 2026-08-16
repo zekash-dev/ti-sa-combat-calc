@@ -56,5 +56,12 @@ export const theme: Theme = createTheme({
                 },
             },
         },
+        MuiListItemIcon: {
+            styleOverrides: {
+                root: {
+                    width: "56px",
+                },
+            },
+        },
     },
 });

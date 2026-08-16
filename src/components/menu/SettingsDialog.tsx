@@ -22,6 +22,7 @@ import {
     setShowStatisticsForAllStages,
     updateOptions,
 } from "redux/options/optionsSlice";
+import { AppDispatch } from "redux/store";
 
 interface Props {
     open: boolean;
@@ -29,7 +30,7 @@ interface Props {
 }
 
 export function SettingsDialog({ open, onClose }: Props) {
-    const dispatch = useDispatch();
+    const dispatch = useDispatch<AppDispatch>();
     const options: OptionsState = useSelector(selectOptions);
     const showStatistics: "all" | "none" | "some" = useSelector(selectShowStatisticsSettingState);
     const [currentSimplificationTarget, setCurrentSimplificationTarget] = useState<number>(options.simplificationTarget);
@@ -39,10 +40,10 @@ export function SettingsDialog({ open, onClose }: Props) {
             dispatch(
                 updateOptions({
                     [key]: e.target.checked,
-                })
+                }),
             );
         },
-        [dispatch]
+        [dispatch],
     );
 
     const HandleToggleShowStatistics = useCallback(
@@ -50,7 +51,7 @@ export function SettingsDialog({ open, onClose }: Props) {
             const newValue = showStatistics !== "all";
             dispatch(setShowStatisticsForAllStages(newValue));
         },
-        [dispatch, showStatistics]
+        [dispatch, showStatistics],
     );
 
     const updateCurrentSimplificationTarget = useCallback((_event: unknown, value: number | number[]) => {
@@ -65,16 +66,16 @@ export function SettingsDialog({ open, onClose }: Props) {
                 dispatch(
                     updateOptions({
                         simplificationTarget: value,
-                    })
+                    }),
                 );
             }
         },
-        [dispatch]
+        [dispatch],
     );
 
     return (
         <Dialog open={open} onClose={onClose}>
-            <DialogTitle color="text.primary">Settings</DialogTitle>
+            <DialogTitle color="textPrimary">Settings</DialogTitle>
             <OverlayScrollbarsComponent>
                 <DialogContent sx={{ minWidth: 600 }}>
                     <FormGroup>

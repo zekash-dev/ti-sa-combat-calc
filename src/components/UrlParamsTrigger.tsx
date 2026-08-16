@@ -5,9 +5,10 @@ import { useSearchParams } from "react-router-dom";
 import { decodeParticipantsState } from "logic/compression";
 import { selectOptions } from "redux/options/optionsSlice";
 import { importParticipantsState, selectEncodedState } from "redux/participant/participantSlice";
+import { AppDispatch } from "redux/store";
 
 export function UrlParamsTrigger() {
-    const dispatch = useDispatch();
+    const dispatch = useDispatch<AppDispatch>();
     const encodedState: string = useSelector(selectEncodedState);
     const { useSearchParam } = useSelector(selectOptions);
     const [params, setParams] = useSearchParams();

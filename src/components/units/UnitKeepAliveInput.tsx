@@ -5,6 +5,7 @@ import { useDispatch } from "react-redux";
 import { ParticipantRole, RichUnit } from "model/calculation";
 import { UnitTag } from "model/combatTags";
 import { setUnitTag, unsetUnitTag } from "redux/participant/participantSlice";
+import { AppDispatch } from "redux/store";
 
 interface Props {
     role: ParticipantRole;
@@ -12,7 +13,7 @@ interface Props {
 }
 
 export function UnitKeepAliveInput({ role, unit }: Props) {
-    const dispatch = useDispatch();
+    const dispatch = useDispatch<AppDispatch>();
 
     const hasKeepAlive: boolean = !!unit.input.tags && unit.input.tags[UnitTag.KEEP_ALIVE] === true;
 

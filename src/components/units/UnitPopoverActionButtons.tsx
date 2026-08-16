@@ -5,6 +5,7 @@ import { useDispatch } from "react-redux";
 import { ParticipantRole, RichUnit } from "model/calculation";
 import { createUnitDuplicate, removeUnit, resetUnitModifications } from "redux/participant/participantSlice";
 import { useCallback } from "react";
+import { AppDispatch } from "redux/store";
 
 interface Props {
     role: ParticipantRole;
@@ -12,7 +13,7 @@ interface Props {
 }
 
 export function UnitPopoverActionButtons({ role, unit }: Props) {
-    const dispatch = useDispatch();
+    const dispatch = useDispatch<AppDispatch>();
 
     const hasModifications = unit.input.sustainedHits > 0 || (unit.input.tags !== undefined && Object.keys(unit.input.tags).length > 0);
 

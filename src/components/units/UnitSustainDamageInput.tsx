@@ -4,6 +4,7 @@ import { useDispatch } from "react-redux";
 import { HitCounterImage } from "components/graphics";
 import { ParticipantRole, RichUnit } from "model/calculation";
 import { setUnitSustainedHits } from "redux/participant/participantSlice";
+import { AppDispatch } from "redux/store";
 
 interface Props {
     role: ParticipantRole;
@@ -11,7 +12,7 @@ interface Props {
 }
 
 export function UnitSustainDamageInput({ role, unit }: Props) {
-    const dispatch = useDispatch();
+    const dispatch = useDispatch<AppDispatch>();
     const sustainDamage: number = unit.baseline?.sustainDamage ?? 0;
 
     if (sustainDamage === 0) return null;
@@ -27,7 +28,7 @@ export function UnitSustainDamageInput({ role, unit }: Props) {
         );
     };
 
-    const buttons: JSX.Element[] = [];
+    const buttons: React.JSX.Element[] = [];
     for (let i = 0; i < sustainDamage; i++) {
         const isSustained: boolean = i < sustainedHits;
         const nextValue: number = i + 1 === sustainedHits ? i : i + 1;

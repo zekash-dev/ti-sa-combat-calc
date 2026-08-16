@@ -12,7 +12,7 @@ interface Props {
 export function AboutDialog({ open, onClose }: Props) {
     return (
         <Dialog open={open} onClose={onClose} maxWidth="md">
-            <DialogTitle color="text.primary">About</DialogTitle>
+            <DialogTitle color="textPrimary">About</DialogTitle>
             <OverlayScrollbarsComponent>
                 <DialogContent>
                     <Paragraph>
