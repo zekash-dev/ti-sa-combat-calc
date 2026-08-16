@@ -21,7 +21,7 @@ export function ParticipantBattlefieldRepresentation({ role, participant }: Prop
                 setScale(newScale);
             }
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps, react-hooks/refs
     }, [containerRef.current?.offsetWidth, participant.units]);
 
     return (

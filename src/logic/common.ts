@@ -26,9 +26,9 @@ export function getSignificantBitCount(n: number): number {
 }
 
 export function leftShiftWithMask(n: number, mask: number): number {
-    return (n <<= getSignificantBitCount(mask));
+    return n << getSignificantBitCount(mask);
 }
 
 export function rightShiftWithMask(n: number, mask: number): number {
-    return (n >>= getSignificantBitCount(mask));
+    return n >> getSignificantBitCount(mask);
 }

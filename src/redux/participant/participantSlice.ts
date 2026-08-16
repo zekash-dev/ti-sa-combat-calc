@@ -1,4 +1,4 @@
-import { Action, createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { cloneDeep } from "lodash";
 
 import { getInitialState, getUnitSnapshots } from "logic/calculator";
@@ -213,13 +213,13 @@ const participantSlice = createSlice({
         importParticipantsState: (state: ParticipantSliceState, action: PayloadAction<ParticipantSliceState>) => {
             return action.payload;
         },
-        resetTagsAndUnits: (state: ParticipantSliceState, action: Action) => {
+        resetTagsAndUnits: (state: ParticipantSliceState) => {
             state.participants.attacker.tags = grantDefaultFactionAbilities(defaultParticipantTags, state.participants.attacker.faction);
             state.participants.attacker.units = [];
             state.participants.defender.tags = grantDefaultFactionAbilities(defaultParticipantTags, state.participants.defender.faction);
             state.participants.defender.units = [];
         },
-        switchRoles: (state: ParticipantSliceState, action: Action) => {
+        switchRoles: (state: ParticipantSliceState) => {
             return {
                 ...state,
                 participants: {

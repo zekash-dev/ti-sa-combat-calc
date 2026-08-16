@@ -68,19 +68,19 @@ export const setShowStatisticsForStage =
                     ...getState().options.showStatistics,
                     [stage]: value,
                 },
-            })
+            }),
         );
     };
 
 export const setShowStatisticsForAllStages =
     (value: boolean): AppThunk =>
-    (dispatch, getState) => {
+    (dispatch) => {
         dispatch(
             updateOptions({
                 showStatistics: value
                     ? Object.fromEntries(getAllEnumValues<CombatStage>(CombatStage).map((stage: CombatStage) => [stage, true]))
                     : {},
-            })
+            }),
         );
     };
 function saveOptionsToLocalStorage(options: OptionsState) {

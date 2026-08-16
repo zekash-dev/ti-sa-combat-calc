@@ -26,6 +26,7 @@ export function UrlParamsTrigger() {
                 console.error(e);
             }
         }
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setInitiated(true);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);

@@ -121,7 +121,7 @@ export interface CombatStageParticipantStatistics extends StatisticsBase {
     assignedHits: number;
 }
 
-export interface CalculationOutputStatistics extends StatisticsBase {}
+export type CalculationOutputStatistics = StatisticsBase;
 
 export interface StatisticsBase {
     /**

@@ -82,7 +82,7 @@ export const UnitImage = React.memo(({ unitType, faction, role, scale, badges }:
 });
 
 function isBadgeWithTooltip(badgeDef: React.JSX.Element | BadgeWithTooltip): badgeDef is BadgeWithTooltip {
-    return typeof (badgeDef as any).tooltip === "string";
+    return typeof (badgeDef as BadgeWithTooltip).tooltip === "string";
 }
 
 function getSvgPath(unitType: UnitType): string {

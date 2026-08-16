@@ -1,4 +1,4 @@
-import { Fade, Paper, PopoverPosition, Popper, Typography } from "@mui/material";
+import { Fade, Paper, Popper, Typography } from "@mui/material";
 import { useDebounce } from "hooks/useDebounce";
 import { round } from "lodash";
 import { useEffect, useState } from "react";
@@ -14,21 +14,11 @@ import {
     UnitInput,
 } from "model/calculation";
 import { KeyedDictionary } from "model/common";
+import { defaultTooltipContext, TooltipContext } from "./defaultTooltipContext";
 
 type VirtualElement = {
     getBoundingClientRect: () => DOMRect;
     contextElement?: Element;
-};
-export interface TooltipContext {
-    open: boolean;
-    position: PopoverPosition;
-    dataIndex: number;
-}
-
-export const defaultTooltipContext: TooltipContext = {
-    open: false,
-    position: { left: 0, top: 0 },
-    dataIndex: -1,
 };
 
 interface CasualtiesViewTooltipProps {
@@ -59,6 +49,7 @@ export function CasualtiesViewTooltip(props: CasualtiesViewTooltipProps) {
 
     useEffect(() => {
         if (tooltipContext.position !== defaultTooltipContext.position) {
+            // eslint-disable-next-line react-hooks/set-state-in-effect
             setAnchorEl(createVirtualElement(tooltipContext.position.left, tooltipContext.position.top));
 
             // Reposition the popper after rendering to make sure it's positioned correctly
@@ -70,6 +61,7 @@ export function CasualtiesViewTooltip(props: CasualtiesViewTooltipProps) {
     useEffect(() => {
         // Retain the previous data index to prevent flickers when fading out the popper
         if (tooltipContext.dataIndex !== defaultTooltipContext.dataIndex) {
+            // eslint-disable-next-line react-hooks/set-state-in-effect
             setStickyDataIndex(tooltipContext.dataIndex);
         }
     }, [setStickyDataIndex, tooltipContext.dataIndex]);

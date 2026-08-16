@@ -1,7 +1,8 @@
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle } from "@mui/material";
 import { OverlayScrollbarsComponent } from "overlayscrollbars-react";
 
-import { Paragraph, Subheading } from "./Common";
+import { Subheading } from "./Subheading";
+import { Paragraph } from "./Paragraph";
 
 interface Props {
     open: boolean;

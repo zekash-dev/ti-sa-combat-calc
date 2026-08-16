@@ -1,4 +1,3 @@
-import { Theme } from "@mui/material";
 import { grey } from "@mui/material/colors";
 import { makeStyles } from "@mui/styles";
 import classNames from "classnames";
@@ -54,7 +53,7 @@ function VictorBar({ probability, color, slanted, small }: VictorBarProps) {
     );
 }
 
-const useStyles = makeStyles((theme: Theme) => ({
+const useStyles = makeStyles(() => ({
     bars: {
         display: "flex",
         overflow: "hidden",

@@ -46,13 +46,10 @@ export function SettingsDialog({ open, onClose }: Props) {
         [dispatch],
     );
 
-    const HandleToggleShowStatistics = useCallback(
-        (e: React.ChangeEvent<HTMLInputElement>) => {
-            const newValue = showStatistics !== "all";
-            dispatch(setShowStatisticsForAllStages(newValue));
-        },
-        [dispatch, showStatistics],
-    );
+    const HandleToggleShowStatistics = useCallback(() => {
+        const newValue = showStatistics !== "all";
+        dispatch(setShowStatisticsForAllStages(newValue));
+    }, [dispatch, showStatistics]);
 
     const updateCurrentSimplificationTarget = useCallback((_event: unknown, value: number | number[]) => {
         if (typeof value === "number") {

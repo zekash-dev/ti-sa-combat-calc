@@ -20,7 +20,8 @@ import { factionResources } from "logic/participant";
 import { toDarkerHue } from "logic/styling";
 import { CalculationInput, ParticipantInput, ParticipantRole, StatisticsBase, SurvivingUnitsStatistics } from "model/calculation";
 import { KeyedDictionary } from "model/common";
-import { CasualtiesViewTooltip, defaultTooltipContext, TooltipContext } from "./CasualtiesViewTooltip";
+import { CasualtiesViewTooltip } from "./CasualtiesViewTooltip";
+import { defaultTooltipContext, TooltipContext } from "./defaultTooltipContext";
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 

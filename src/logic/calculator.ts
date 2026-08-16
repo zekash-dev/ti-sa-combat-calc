@@ -59,7 +59,7 @@ import { reduceValues, ValuesAndProbabilities } from "./probability";
 
 export function calculateCombatOutcome(input: CalculationInput): CalculationOutput | null {
     if (input.attacker.units.length === 0 && input.defender.units.length === 0) return null;
-    if (process.env.NODE_ENV === "development") {
+    if (import.meta.env.DEV) {
         console.profile();
     }
     const initialState: CombatStateProbability | undefined = {
@@ -80,7 +80,7 @@ export function calculateCombatOutcome(input: CalculationInput): CalculationOutp
         mergeTrackedValues(totalTrackedValues, trackedValues);
     }
     const output = createCalculationOutput(stateDictionary, statesByStage, input, totalTrackedValues);
-    if (process.env.NODE_ENV === "development") {
+    if (import.meta.env.DEV) {
         console.profileEnd();
     }
     return output;
@@ -152,6 +152,7 @@ interface ComputeNextStatesOutput {
 }
 
 function computeNextStates(currentState: CombatStateProbability, input: CalculationInput): ComputeNextStatesOutput {
+    // eslint-disable-next-line prefer-const
     let { nextStates, trackedValues } = resolveCombatStage(currentState.state, input);
 
     const identicalStateIdx: number = nextStates.findIndex((sp) => CombatState.compare(sp.state, currentState.state) === 0);

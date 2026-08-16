@@ -2,7 +2,8 @@ import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Link } from 
 import { OverlayScrollbarsComponent } from "overlayscrollbars-react";
 
 import { BuildTimeDisplay } from "./BuildTimeDisplay";
-import { ImageLink, Paragraph } from "./Common";
+import { ImageLink } from "./ImageLink";
+import { Paragraph } from "./Paragraph";
 
 interface Props {
     open: boolean;

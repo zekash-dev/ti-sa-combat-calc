@@ -1,4 +1,4 @@
-import { Action, createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 import { CalculationOutput } from "model/calculation";
 import { RootState } from "redux/store";
@@ -30,11 +30,11 @@ const resultSlice = createSlice({
                 state.calculating = false;
             }
         },
-        setCalculating: (state: ResultState, action: Action) => {
+        setCalculating: (state: ResultState) => {
             state.calculating = true;
             state.pending = false;
         },
-        setPending: (state: ResultState, action: Action) => {
+        setPending: (state: ResultState) => {
             state.pending = true;
         },
     },

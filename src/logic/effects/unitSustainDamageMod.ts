@@ -2,7 +2,7 @@ import { UnitTag } from "model/combatTags";
 import { UnitOnComputeSnapshotInput, UnitTagImplementation } from "model/effects";
 
 export const unitSustainDamageMod: UnitTagImplementation<number> = {
-    onComputeUnitSnapshot: ({ stage, unit }: UnitOnComputeSnapshotInput) => {
+    onComputeUnitSnapshot: ({ unit }: UnitOnComputeSnapshotInput) => {
         const value = Number(unit.base.tags?.[UnitTag.SUSTAIN_DAMAGE_MOD] ?? 0);
         if (!isNaN(value) && value !== 0) {
             unit.sustainDamage += value;
