@@ -35,7 +35,7 @@ function cancelHits(hits: SparseDictionary<HitType, number>, unit: ComputedUnitS
     let newTagState: number = prevTagState;
     let newHits: SparseDictionary<HitType, number> = hits;
     const orderedHitTypes: HitType[] = enumerateHitTypesByPriorityOrder(hits, cancelHitPriorityOrder);
-    for (let hitType of orderedHitTypes) {
+    for (const hitType of orderedHitTypes) {
         while (newTagState < unit.planetaryShield && (newHits[hitType] ?? 0) > 0) {
             newTagState++;
             newHits = {

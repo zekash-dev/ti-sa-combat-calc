@@ -214,7 +214,7 @@ function resolveCombatStage(state: CombatState, input: CalculationInput): Resolv
 }
 
 function findIdenticalCombatState(stateProbabilities: CombatStateProbability[], state: CombatState): CombatStateProbability | undefined {
-    for (let stateProbability of stateProbabilities) {
+    for (const stateProbability of stateProbabilities) {
         if (CombatState.compare(stateProbability.state, state) === 0) {
             return stateProbability;
         }
@@ -230,7 +230,7 @@ export function getUnitSnapshots(
 ): ComputedUnitSnapshot[] {
     const unitSnapshots: ComputedUnitSnapshot[] = [];
     const participant: ParticipantState = combatState[role];
-    for (let unit of participant.units) {
+    for (const unit of participant.units) {
         const def: UnitDefinition = unit.type === UnitType.Flagship ? flagshipDefinitions[input[role].faction] : unitDefinitions[unit.type];
         unitSnapshots.push({
             base: unit,
@@ -249,7 +249,7 @@ export function getUnitSnapshots(
     applyUnitSnapshotParticipantTags(combatState, input, role, stage, unitSnapshots);
     applyUnitSnapshotUnitTags(combatState, input, role, stage, unitSnapshots);
     applyOpponentUnitSnapshotParticipantTags(combatState, input, getOpponentRole(role), stage, unitSnapshots);
-    for (let unit of unitSnapshots) {
+    for (const unit of unitSnapshots) {
         // Tags can set a unit's rolls to NaN to indicate that it should never get any rolls, regardless of other effects.
         // Here we convert NaN -> 0 to allow the rest of the calculation to work as expected.
         if (isNaN(unit.rolls)) {
@@ -277,7 +277,7 @@ function applyUnitSnapshotParticipantTags(
         stage,
         units: unitSnapshots,
     };
-    for (let { implementation } of tagValues) {
+    for (const { implementation } of tagValues) {
         if (!!implementation && !!implementation.onComputeUnitSnapshots) {
             implementation.onComputeUnitSnapshots(effectInput);
         }
@@ -304,7 +304,7 @@ function applyOpponentUnitSnapshotParticipantTags(
         stage,
         units: unitSnapshots,
     };
-    for (let { implementation } of opponentTagValues) {
+    for (const { implementation } of opponentTagValues) {
         if (!!implementation && !!implementation.onComputeOpponentUnitSnapshots) {
             implementation.onComputeOpponentUnitSnapshots(effectInput);
         }
@@ -318,7 +318,7 @@ function applyUnitSnapshotUnitTags(
     stage: CombatStage,
     unitSnapshots: ComputedUnitSnapshot[],
 ) {
-    for (let unit of unitSnapshots) {
+    for (const unit of unitSnapshots) {
         if (unit.base.tags) {
             const unitInput: UnitOnComputeSnapshotInput = {
                 calculationInput,
@@ -327,7 +327,7 @@ function applyUnitSnapshotUnitTags(
                 stage,
                 unit,
             };
-            for (let tagStr of Object.keys(unit.base.tags)) {
+            for (const tagStr of Object.keys(unit.base.tags)) {
                 const tag: UnitTag = Number(tagStr);
                 const resources: UnitTagResources = unitTagResources[tag];
                 if (resources?.implementation && resources.implementation.onComputeUnitSnapshot) {
@@ -352,7 +352,7 @@ function getParticipantTagValues(
 ): ParticipantTagValueAndState[] {
     const values: ParticipantTagValueAndState[] = [];
 
-    for (let tagStr of Object.keys(calculationInput.tags)) {
+    for (const tagStr of Object.keys(calculationInput.tags)) {
         const tag: ParticipantTag = Number(tagStr);
         const tagInputValue: any = calculationInput.tags[tag];
         const tagState = state.tags[tag];
@@ -364,7 +364,7 @@ function getParticipantTagValues(
         });
     }
 
-    for (let tagStr of Object.keys(participantInput.tags)) {
+    for (const tagStr of Object.keys(participantInput.tags)) {
         const tag: ParticipantTag = Number(tagStr);
         if (tag === FlagshipTag.FLAGSHIP) continue; // Flagship has custom handling, see below.
         const tagInputValue: any = participantInput.tags[tag];
@@ -434,7 +434,7 @@ const sustainDamageReductionStages: CombatStage[] = [CombatStage.Bombardment, Co
 
 function adjustCombatRollsForSustainDamage(stage: CombatStage, units: ComputedUnitSnapshot[]) {
     if (sustainDamageReductionStages.includes(stage)) {
-        for (let unit of units) {
+        for (const unit of units) {
             if (unit.rolls > 0 && unit.sustainedHits > 0) {
                 unit.rolls = max([unit.rolls - unit.sustainedHits, 1])!;
             }
@@ -455,7 +455,7 @@ function calculateHits(
 ): CalculateHitsOutput {
     const hits: SparseDictionary<number, number[]> = {};
     // let hitChances: number[] = [1.0]; // Initial probability: 100% chance for 0 hits.
-    for (let unit of units) {
+    for (const unit of units) {
         const hitProbability: number = getUnitHitProbability(unit.combatValue);
         const rolls: number = unit.rolls;
         const maskedHitType: number = maskHitType(unit.hitType, unit.combatValue);
@@ -463,7 +463,7 @@ function calculateHits(
             // Initial probability: 100% chance for 0 hits.
             hits[maskedHitType] = addHitChance(hits[maskedHitType] ?? [1.0], hitProbability);
         }
-        for (let nonStandardRoll of unit.nonStandardRolls) {
+        for (const nonStandardRoll of unit.nonStandardRolls) {
             const nonStandardCombatValue: number = unit.combatValue + nonStandardRoll.valueMod;
             const nonStandardHitType: number = maskHitType(unit.hitType, nonStandardCombatValue);
             const modifiedHitProbability: number = getUnitHitProbability(nonStandardCombatValue);
@@ -475,7 +475,7 @@ function calculateHits(
     simplifyHitProbabilities(hits, calculationInput.settings);
 
     let outcomes: HitsProbabilityIntermediateOutcome[] = [{ hits: {}, probability: 1.0 }];
-    for (let hitTypeStr of Object.keys(hits)) {
+    for (const hitTypeStr of Object.keys(hits)) {
         const maskedHitType: HitType = Number(hitTypeStr);
         const probabilities: number[] = hits[maskedHitType]!;
         outcomes = outcomes
@@ -539,13 +539,13 @@ function toHitProbabilityOutcome(intermediateOutcome: HitsProbabilityIntermediat
 }
 
 export function maskHitType(hitType: HitType, combatValue: number): number {
-    let maskedCombatValue: number = leftShiftWithMask(combatValue, HIT_TYPE_AND_FLAGS_BITMASK);
+    const maskedCombatValue: number = leftShiftWithMask(combatValue, HIT_TYPE_AND_FLAGS_BITMASK);
     return hitType | maskedCombatValue;
 }
 
 export function unmaskHitType(maskedHitType: number): { hitType: HitType; combatValue: number } {
-    let hitType: HitType = maskedHitType & HIT_TYPE_BITMASK;
-    let combatValue: number = rightShiftWithMask(maskedHitType, HIT_TYPE_AND_FLAGS_BITMASK);
+    const hitType: HitType = maskedHitType & HIT_TYPE_BITMASK;
+    const combatValue: number = rightShiftWithMask(maskedHitType, HIT_TYPE_AND_FLAGS_BITMASK);
     return { hitType, combatValue };
 }
 
@@ -565,10 +565,10 @@ function applyOnCalculateHitsTags(
     const participantInput: ParticipantInput = calculationInput[role];
     const tagValues: ParticipantTagValueAndState[] = getParticipantTagValues(calculationInput, participantInput, participant);
 
-    for (let { implementation, state } of tagValues) {
+    for (const { implementation, state } of tagValues) {
         if (!!implementation && !!implementation.onCalculateHits) {
             const outcomesForTag: HitsProbabilityIntermediateOutcome[] = [];
-            for (let outcome of newOutcomes) {
+            for (const outcome of newOutcomes) {
                 const effectInput: OnCalculateHitsInput = {
                     calculationInput,
                     combatState,
@@ -612,8 +612,8 @@ function assignHits(
     ({ combatState, hits, units } = applyOpponentPreAssignHitTags(combatState, input, getOpponentRole(role), units, hits));
     const assignmentStrategy: HitAssignmentStrategy = input[role].tags[CommonParticipantTag.HIT_ASSIGNMENT_STRATEGY];
 
-    let newUnits: ComputedUnitSnapshot[] = [...units];
-    for (let hitTypeStr of Object.keys(hits)) {
+    const newUnits: ComputedUnitSnapshot[] = [...units];
+    for (const hitTypeStr of Object.keys(hits)) {
         const hitType: HitType = Number(hitTypeStr);
         const numberOfHits: number = hits[hitType]!;
         for (let i = 0; i < numberOfHits; i++) {
@@ -646,7 +646,7 @@ function applyPreAssignHitTags(
     const participant: ParticipantState = combatState[role];
     const participantInput: ParticipantInput = calculationInput[role];
     const tagValues: ParticipantTagValueAndState[] = getParticipantTagValues(calculationInput, participantInput, participant);
-    for (let { tag, implementation, state } of tagValues) {
+    for (const { tag, implementation, state } of tagValues) {
         if (!!implementation && !!implementation.preAssignHits) {
             const effectInput: PreAssignHitsInput = {
                 calculationInput,
@@ -688,7 +688,7 @@ function applyOpponentPreAssignHitTags(
     const opponent: ParticipantState = combatState[opponentRole];
     const opponentInput: ParticipantInput = calculationInput[opponentRole];
     const opponentTagValues: ParticipantTagValueAndState[] = getParticipantTagValues(calculationInput, opponentInput, opponent);
-    for (let { tag, implementation, state } of opponentTagValues) {
+    for (const { tag, implementation, state } of opponentTagValues) {
         if (!!implementation && !!implementation.preAssignOpponentHits) {
             const effectInput: PreAssignHitsInput = {
                 calculationInput,
@@ -869,7 +869,7 @@ function applyEndOfStageTags(
     const participant: ParticipantState = combatState[role];
     const participantInput: ParticipantInput = calculationInput[role];
     const tagValues: ParticipantTagValueAndState[] = getParticipantTagValues(calculationInput, participantInput, participant);
-    for (let { tag, implementation, state } of tagValues) {
+    for (const { tag, implementation, state } of tagValues) {
         if (!!implementation && !!implementation.onEndOfStage) {
             const effectInput: OnEndOfStageInput = {
                 calculationInput,
@@ -906,7 +906,7 @@ function popNextActiveState(dict: CombatStateDictionary, combatType: CombatType)
     let nextDictKey: string = "";
     let nextArrayIdx: number = 0;
 
-    for (let key of Object.keys(dict)) {
+    for (const key of Object.keys(dict)) {
         for (let i = 0; i < dict[key].length; i++) {
             const stateProbability: CombatStateProbability = dict[key][i];
             if (!combatStateIsFinished(stateProbability.state, combatType)) {
@@ -964,7 +964,7 @@ function participantIsAlive(units: UnitInput[], combatType: CombatType, combatSt
 }
 
 function appendCombatStateProbabilities(combatStateDictionary: CombatStateDictionary, stateProbabilities: CombatStateProbability[]) {
-    for (let stateProbability of stateProbabilities) {
+    for (const stateProbability of stateProbabilities) {
         appendCombatStateProbability(combatStateDictionary, stateProbability);
     }
 }
@@ -997,7 +997,7 @@ function addStatesByStage(
     stateProbabilities: CombatStateProbability[],
 ) {
     // Gather intermediate statistics for all stages up until RoundN
-    for (let stateProbability of stateProbabilities.filter((sp) => sp.state.stage !== CombatStage.RoundN)) {
+    for (const stateProbability of stateProbabilities.filter((sp) => sp.state.stage !== CombatStage.RoundN)) {
         // Clone to prevent mutation issues
         const clone: CombatStateProbability = {
             ...stateProbability,
@@ -1017,7 +1017,7 @@ function getMemoizedResolutions(state: CombatState, dict: CombatStateResolutionD
     let nextStates: CombatStateProbability[] | undefined = undefined;
 
     if (list) {
-        for (let resolution of list) {
+        for (const resolution of list) {
             if (CombatState.compare(resolution.input, state) === 0) {
                 nextStates = resolution.nextStates;
                 break;
@@ -1091,7 +1091,7 @@ function createCombatStageOutputs(
     );
     let previousVictorProbabilities: KeyedDictionary<CombatVictor, number> | undefined = undefined;
 
-    for (let stage of outputStages) {
+    for (const stage of outputStages) {
         const beforeStates: CombatStateProbability[] | undefined = byStage[stage];
         const afterStates: CombatStateProbability[] | undefined = byStage[getNextStage(input.combatType, stage)];
         if (!beforeStates || !afterStates) continue;
@@ -1149,7 +1149,7 @@ function calculateCombatStageParticipantStatistics(
     let expectedHits: number = 0;
     let opponentHealthBefore: number = 0;
     let opponentHealthAfter: number = 0;
-    for (let stateProbability of beforeStates) {
+    for (const stateProbability of beforeStates) {
         const units: ComputedUnitSnapshot[] = getUnitSnapshots(stateProbability.state, input, role, stage);
         const expHits: number = sum(units.map(getUnitExpectedHits));
         expectedHits += expHits * stateProbability.probability;
@@ -1161,7 +1161,7 @@ function calculateCombatStageParticipantStatistics(
             opponentHealthAfter += health;
         }
     }
-    for (let stateProbability of afterStates) {
+    for (const stateProbability of afterStates) {
         const opponentUnits: ComputedUnitSnapshot[] = getUnitSnapshots(stateProbability.state, input, opponent, stage);
         opponentHealthAfter += getTotalUnitHealth(opponentUnits, input.combatType) * stateProbability.probability;
     }
@@ -1189,7 +1189,7 @@ function getSurvivingUnitsStatistics(
 ): SurvivingUnitsStatistics[] {
     const unitProbabilities: SurvivingUnitsStatistics[] = [];
 
-    for (let stateProbability of stateProbabilities) {
+    for (const stateProbability of stateProbabilities) {
         const units: UnitInput[] = stateProbability.state[participant].units;
         const existingEntry: SurvivingUnitsStatistics | undefined = unitProbabilities.find((u) => isEqual(u.units, units));
         if (existingEntry) {
@@ -1209,7 +1209,7 @@ function getSurvivingUnitsStatistics(
     unitProbabilities.sort(unitHealthComparer(combatType));
 
     let aggregatedProbability: number = 0;
-    for (let unitProbability of unitProbabilities) {
+    for (const unitProbability of unitProbabilities) {
         unitProbability.probabilityThisOrWorse = 1.0 - aggregatedProbability;
         aggregatedProbability += unitProbability.probability;
         unitProbability.probabilityThisOrBetter = aggregatedProbability;
@@ -1260,7 +1260,7 @@ export function getVictorProbabilities(
         defender: 0,
         draw: 0,
     };
-    for (let state of combatStates) {
+    for (const state of combatStates) {
         const victor: CombatVictor | undefined = determineVictor(state.state, input.combatType);
         if (victor) {
             victorProbabilities[victor] += state.probability;

@@ -97,7 +97,7 @@ export class ParticipantState {
 
     private calculateHash(): number {
         let hash: number = 0;
-        for (let unit of this.units) {
+        for (const unit of this.units) {
             hash = (hash << 5) - hash + unit.hash;
         }
         hash = (hash << 5) - hash + hashCombatStateTags(this.tags);
@@ -222,7 +222,7 @@ export interface CombatStateTags {
 function hashCombatStateTags(tags: CombatStateTags | undefined): number {
     if (tags === undefined) return 0;
     let hash: number = 0;
-    for (let key of Object.keys(tags).sort()) {
+    for (const key of Object.keys(tags).sort()) {
         const nKey: number = Number(key);
         hash = (hash << 5) - hash + nKey;
         hash = (hash << 5) - hash + tags[nKey];
@@ -237,7 +237,7 @@ function compareCombatStateTags(a: CombatStateTags | undefined, b: CombatStateTa
         const aKeys: string[] = Object.keys(a);
         const bKeys: string[] = Object.keys(b);
         if (aKeys.length !== bKeys.length) return aKeys.length - bKeys.length;
-        for (let key of aKeys) {
+        for (const key of aKeys) {
             const nKey = Number(key);
             if (a[nKey] !== b[nKey]) return (a[nKey] ?? 0) - (b[nKey] ?? 0);
         }

@@ -11,7 +11,7 @@ const applicableGroundUnitTypes: UnitType[] = [UnitType.Mech, UnitType.GroundFor
 export const magenDefenseGrid: ParticipantTagImplementation = {
     onComputeUnitSnapshots: ({ calculationInput, role, stage, units }: ParticipantOnComputeSnapshotInput) => {
         if (stage === CombatStage.SpaceCannon || stage === CombatStage.InvasionDefence) {
-            for (let unit of units.filter((u: ComputedUnitSnapshot) => u.type === UnitType.PDS)) {
+            for (const unit of units.filter((u: ComputedUnitSnapshot) => u.type === UnitType.PDS)) {
                 unit.combatValue--;
             }
         }
@@ -20,7 +20,7 @@ export const magenDefenseGrid: ParticipantTagImplementation = {
             role === ParticipantRole.Defender &&
             units.some((u) => u.type === UnitType.PDS)
         ) {
-            for (let unit of units.filter((u: ComputedUnitSnapshot) => applicableGroundUnitTypes.includes(u.type))) {
+            for (const unit of units.filter((u: ComputedUnitSnapshot) => applicableGroundUnitTypes.includes(u.type))) {
                 unit.combatValue--;
             }
         }
@@ -58,7 +58,7 @@ function cancelHits(hits: SparseDictionary<HitType, number>, unit: ComputedUnitS
     let newTagState: number = prevTagState;
     let newHits: SparseDictionary<HitType, number> = hits;
     const orderedHitTypes: HitType[] = enumerateHitTypesByPriorityOrder(hits, cancelHitPriorityOrder);
-    for (let hitType of orderedHitTypes) {
+    for (const hitType of orderedHitTypes) {
         while (newTagState < unit.planetaryShield && (newHits[hitType] ?? 0) > 0) {
             newTagState++;
             newHits = {

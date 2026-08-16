@@ -17,7 +17,7 @@ export const sardakkFlagship: ParticipantTagImplementation = {
             role === ParticipantRole.Attacker &&
             applicableCombatStages.includes(stage)
         ) {
-            for (let unit of units) {
+            for (const unit of units) {
                 unit.combatValue--;
             }
         }

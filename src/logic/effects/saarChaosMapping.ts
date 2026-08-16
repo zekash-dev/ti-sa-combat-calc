@@ -6,7 +6,7 @@ const applicableCombatStages: CombatStage[] = [CombatStage.PreCombat, CombatStag
 export const saarChaosMapping: ParticipantTagImplementation = {
     onComputeOpponentUnitSnapshots: ({ stage, units }: ParticipantOnComputeSnapshotInput) => {
         if (applicableCombatStages.includes(stage)) {
-            for (let unit of units) {
+            for (const unit of units) {
                 unit.combatValue++;
             }
         }

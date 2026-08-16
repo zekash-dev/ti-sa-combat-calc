@@ -9,7 +9,7 @@ export const impulsionShields: ParticipantTagImplementation = {
             return {};
         }
         const orderedHitTypes: HitType[] = enumerateHitTypesByPriorityOrder(hits, defaultCancelHitPriorityOrder);
-        for (let hitType of orderedHitTypes) {
+        for (const hitType of orderedHitTypes) {
             // Can't cancel hits not scored by combat rolls
             if (hitType & HitTypeFlags.NotCombatRoll) continue;
 

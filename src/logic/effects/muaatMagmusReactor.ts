@@ -16,7 +16,7 @@ export const muaatMagmusReactor: ParticipantTagImplementation<MuaatMagmusReactor
         const settings: MuaatMagmusReactorSettings =
             calculationInput[role].tags[FactionUpgrade.MUAAT_MAGMUS_REACTOR] ?? muaatMagmusReactorDefaultSettings;
         let currentUnit: number = 0;
-        for (let unit of units.filter((u: ComputedUnitSnapshot) => u.type === UnitType.WarSun)) {
+        for (const unit of units.filter((u: ComputedUnitSnapshot) => u.type === UnitType.WarSun)) {
             if (currentUnit++ < settings.warSunsLeavingSupernova) {
                 unit.combatValue--;
             }

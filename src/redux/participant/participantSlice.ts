@@ -350,7 +350,7 @@ function createRichUnits(calculationInput: CalculationInput, role: ParticipantRo
     const snapshotsByStage: SparseDictionary<CombatStage, ComputedUnitSnapshot>[] = Array.from(participant.units.map(() => ({})));
     const combatStages: CombatStage[] = combatStagesByCombatType[calculationInput.combatType];
 
-    for (let stage of combatStages) {
+    for (const stage of combatStages) {
         const snapshots: ComputedUnitSnapshot[] = getUnitSnapshots(combatState, calculationInput, role, stage);
         for (let i = 0; i < participant.units.length; i++) {
             snapshotsByStage[i][stage] = snapshots[i];
@@ -362,7 +362,7 @@ function createRichUnits(calculationInput: CalculationInput, role: ParticipantRo
 
         const baseline: UnitStageStats | undefined = createUnitStageStats(snapshots[CombatStage.RoundN], undefined, CombatStage.RoundN);
         const byStage: SparseDictionary<CombatStage, UnitStageStats> = {};
-        for (let stage of combatStages.filter((s): s is CombatStage => s !== CombatStage.RoundN)) {
+        for (const stage of combatStages.filter((s): s is CombatStage => s !== CombatStage.RoundN)) {
             const snapshot: ComputedUnitSnapshot | undefined = snapshots[stage];
             if (!snapshot) continue;
             const stageDescription: UnitStageStats | undefined = createUnitStageStats(snapshot, baseline, stage);

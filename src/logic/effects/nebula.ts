@@ -8,7 +8,7 @@ export const nebula: ParticipantTagImplementation = {
             role === ParticipantRole.Defender &&
             duringSpaceBattlesStages.includes(stage)
         ) {
-            for (let unit of units) {
+            for (const unit of units) {
                 unit.combatValue--;
             }
         }

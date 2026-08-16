@@ -17,7 +17,7 @@ export const solVersatileCombatTactics: ParticipantTagImplementation = {
         const myRollCount: number = determineCombatRolls(combatState[role].units, calculationInput.combatType);
         const opponentRollCount: number = determineCombatRolls(combatState[opponentRole].units, calculationInput.combatType);
         if (myRollCount < opponentRollCount) {
-            for (let unit of units.filter((u: ComputedUnitSnapshot) => applicableUnitTypes.includes(u.type))) {
+            for (const unit of units.filter((u: ComputedUnitSnapshot) => applicableUnitTypes.includes(u.type))) {
                 unit.combatValue -= 2;
             }
         }
@@ -43,7 +43,7 @@ export const solVersatileCombatTactics: ParticipantTagImplementation = {
 
 function determineCombatRolls(units: UnitState[], combatType: CombatType): number {
     let totalRolls = 0;
-    for (let unit of units.filter((u) => unitIsCombatant(u.type, combatType))) {
+    for (const unit of units.filter((u) => unitIsCombatant(u.type, combatType))) {
         let unitRolls = unitDefinitions[unit.type].combatRolls;
         if (unitRolls > 0 && unit.sustainedHits > 0) {
             unitRolls = max([unitRolls - unit.sustainedHits, 1])!;

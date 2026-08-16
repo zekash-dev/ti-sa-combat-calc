@@ -14,7 +14,7 @@ export const participantCombatValueMod: ParticipantTagImplementation<Participant
         const settings: ParticipantCombatValueModSettings =
             calculationInput[role].tags[CommonParticipantTag.COMBAT_VALUE_MOD] ?? defaultSettings;
         if (settings.mod !== 0) {
-            for (let unit of units) {
+            for (const unit of units) {
                 unit.combatValue -= settings.mod;
             }
         }

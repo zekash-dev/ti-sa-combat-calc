@@ -16,7 +16,7 @@ export const solAdvancedFleetTactics: ParticipantTagImplementation = {
 
         let grantedFighterShots = 0;
         let grantedCarrierShots = 0;
-        for (let unit of units.filter((u: ComputedUnitSnapshot) => applicableUnitTypes.includes(u.type))) {
+        for (const unit of units.filter((u: ComputedUnitSnapshot) => applicableUnitTypes.includes(u.type))) {
             if (unit.type === UnitType.Fighter && grantedFighterShots < FIGHTER_SHOTS_LIMIT) {
                 unit.combatValue -= 2;
                 grantedFighterShots++;

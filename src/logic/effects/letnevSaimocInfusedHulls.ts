@@ -18,7 +18,7 @@ export const letnevSaimocInfusedHulls: ParticipantTagImplementation<LetnevSaimoc
     onComputeOpponentUnitSnapshots: ({ calculationInput, stage, units }: ParticipantOnComputeSnapshotInput) => {
         // "Hits from Fighters may not be assigned to your non-Fighter ships during the first round of Space Battles"
         if (calculationInput.combatType === CombatType.SpaceBattle && stage === CombatStage.Round1) {
-            for (let unit of units.filter((u: ComputedUnitSnapshot) => u.type === UnitType.Fighter)) {
+            for (const unit of units.filter((u: ComputedUnitSnapshot) => u.type === UnitType.Fighter)) {
                 unit.hitType = HitType.AssignToFighter;
             }
         }
@@ -66,9 +66,10 @@ function findRepairIndex(units: ComputedUnitSnapshot[]): number {
     for (let i = 0; i < units.length; i++) {
         const unit: ComputedUnitSnapshot = units[i];
         if (unit.sustainedHits > 0 && unit.sustainDamage > 0 && !unit.hasSustainedHitsInCurrentStage) {
-            let unitRepairValue = unit.sustainedHits + unit.combatValue;
+            const unitRepairValue = unit.sustainedHits + unit.combatValue;
             if (isNaN(repairValue) || unitRepairValue > repairValue) {
                 repairIndex = i;
+                repairValue = unitRepairValue;
             }
         }
     }

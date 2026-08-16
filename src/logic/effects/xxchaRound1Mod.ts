@@ -5,7 +5,7 @@ export const xxchaRound1Mod: ParticipantTagImplementation = {
     onComputeOpponentUnitSnapshots: ({ role, stage, units }: ParticipantOnComputeSnapshotInput) => {
         // 'role' here indicates the xxcha's own role
         if (role === ParticipantRole.Defender && stage === CombatStage.Round1) {
-            for (let unit of units) {
+            for (const unit of units) {
                 unit.combatValue++;
             }
         }

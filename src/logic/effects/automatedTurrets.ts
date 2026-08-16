@@ -13,7 +13,7 @@ export const automatedTurrets: ParticipantTagImplementation = {
             if (calculationInput[role].tags[Technology.HYLAR_V_LASER] !== undefined) {
                 bonus = 1;
             }
-            for (let unit of units.filter((u: ComputedUnitSnapshot) => u.type === UnitType.Destroyer)) {
+            for (const unit of units.filter((u: ComputedUnitSnapshot) => u.type === UnitType.Destroyer)) {
                 unit.rolls++;
                 unit.combatValue -= bonus;
             }

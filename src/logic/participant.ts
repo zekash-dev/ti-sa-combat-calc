@@ -44,21 +44,21 @@ export function grantDefaultFactionAbilities(participantTags: ParticipantInputTa
     const newTags: ParticipantInputTags = {
         ...participantTags,
     };
-    for (let oldAbility of getAllEnumValues<FactionAbility>(FactionAbility)) {
+    for (const oldAbility of getAllEnumValues<FactionAbility>(FactionAbility)) {
         delete newTags[oldAbility];
     }
-    for (let oldAbility of getAllEnumValues<FactionUpgrade>(FactionUpgrade)) {
+    for (const oldAbility of getAllEnumValues<FactionUpgrade>(FactionUpgrade)) {
         delete newTags[oldAbility];
     }
-    for (let oldAbility of getAllEnumValues<Technology>(Technology)) {
+    for (const oldAbility of getAllEnumValues<Technology>(Technology)) {
         delete newTags[oldAbility];
     }
-    for (let newAbility of defaultFactionAbilities[faction]) {
+    for (const newAbility of defaultFactionAbilities[faction]) {
         if (participantTagResources[newAbility].implementation !== false) {
             newTags[newAbility] = getParticipantTagDefaultValue(newAbility);
         }
     }
-    for (let newAbility of defaultFactionTechnologies[faction]) {
+    for (const newAbility of defaultFactionTechnologies[faction]) {
         if (participantTagResources[newAbility].implementation !== false) {
             newTags[newAbility] = getParticipantTagDefaultValue(newAbility);
         }

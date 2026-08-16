@@ -10,7 +10,7 @@ const applicableCombatStages: CombatStage[] = [CombatStage.Round1, CombatStage.R
 export const muaatFlagship: ParticipantTagImplementation = {
     onComputeUnitSnapshots: ({ calculationInput, combatState, role, stage, units }: ParticipantOnComputeSnapshotInput) => {
         if (!applicableCombatStages.includes(stage)) return;
-        for (let unit of units.filter((u: ComputedUnitSnapshot) => u.type === UnitType.Flagship)) {
+        for (const unit of units.filter((u: ComputedUnitSnapshot) => u.type === UnitType.Flagship)) {
             const opponentRole: ParticipantRole = getOpponentRole(role);
             const opposingNonFighterShips: number = combatState[opponentRole].units.filter(
                 (u: UnitState) => unitIsCombatant(u.type, calculationInput.combatType) && u.type !== UnitType.Fighter

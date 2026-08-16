@@ -58,7 +58,7 @@ export function CasualtiesParticipantView(props: CasualtiesParticipantViewProps)
     const [tooltipContext, setTooltipContext] = useState<TooltipContext>(defaultTooltipContext);
 
     const survivingUnitsStatistics: SurvivingUnitsStatistics[] = statistics[participant].survivingUnitProbabilities;
-    for (let survivingUnits of survivingUnitsStatistics) {
+    for (const survivingUnits of survivingUnitsStatistics) {
         let percentage = survivingUnits.probability * 100;
         if (participant === ParticipantRole.Defender) {
             percentage *= -1;

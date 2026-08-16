@@ -10,7 +10,7 @@ export const mentakPreCombatShots: ParticipantTagImplementation = {
         if (stage !== CombatStage.PreCombat) return;
 
         let grantedShots = 0;
-        for (let unit of units.filter((u: ComputedUnitSnapshot) => applicableUnitTypes.includes(u.type)).sort(unitCombatStrengthComparer)) {
+        for (const unit of units.filter((u: ComputedUnitSnapshot) => applicableUnitTypes.includes(u.type)).sort(unitCombatStrengthComparer)) {
             if (++grantedShots > 2) break;
             unit.rolls++;
         }

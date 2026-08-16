@@ -2,7 +2,7 @@ import { ParticipantOnComputeSnapshotInput, ParticipantTagImplementation } from 
 
 export const sardakkUnitMod: ParticipantTagImplementation = {
     onComputeUnitSnapshots: ({ units }: ParticipantOnComputeSnapshotInput) => {
-        for (let unit of units) {
+        for (const unit of units) {
             unit.combatValue--;
         }
     },

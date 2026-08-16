@@ -11,7 +11,7 @@ export const lizixGroundForceMod: ParticipantTagImplementation = {
         if (role === ParticipantRole.Attacker && units.some((u) => u.type === UnitType.Mech)) {
             bonus = 2;
         }
-        for (let unit of units.filter((u: ComputedUnitSnapshot) => applicableUnitTypes.includes(u.type))) {
+        for (const unit of units.filter((u: ComputedUnitSnapshot) => applicableUnitTypes.includes(u.type))) {
             unit.combatValue -= bonus;
         }
     },

@@ -102,7 +102,7 @@ function decodeParticipant(str: string): ParticipantInput {
 }
 
 function decodeFaction(letter: string): Faction {
-    for (let key of Object.keys(factionResources)) {
+    for (const key of Object.keys(factionResources)) {
         const faction: Faction = Number(key);
         if (factionResources[faction].letter === letter) {
             return faction;
@@ -113,12 +113,12 @@ function decodeFaction(letter: string): Faction {
 
 function encodeUnits(units: UnitInput[]): string {
     const dict: Dictionary<number> = {};
-    for (let unit of units) {
+    for (const unit of units) {
         const str = encodeUnit(unit);
         dict[str] = (dict[str] ?? 0) + 1;
     }
     const unitStrings: string[] = [];
-    for (let str of Object.keys(dict)) {
+    for (const str of Object.keys(dict)) {
         const count = dict[str] ?? 1;
         let unitStr = str;
         if (count > 1) {
@@ -132,7 +132,7 @@ function encodeUnits(units: UnitInput[]): string {
 function decodeUnits(str: string): UnitInput[] {
     const units: UnitInput[] = [];
     const splits: string[] = str.split("x");
-    for (let splitStr of splits) {
+    for (const splitStr of splits) {
         if (splitStr.length === 0) continue;
         let unitStr = splitStr;
         let count = 1;
@@ -156,7 +156,7 @@ function encodeUnit(unit: UnitInput): string {
     }
     if (unit.tags) {
         const tagStrings: string[] = [];
-        for (let key of Object.keys(unit.tags)) {
+        for (const key of Object.keys(unit.tags)) {
             const tag: UnitTag = Number(key);
             let tagStr = encodeInteger(tag);
             if (unit.tags[tag] !== true) {
@@ -192,7 +192,7 @@ function decodeUnit(str: string): UnitInput {
     const tags: UnitInputTags = {};
     str = trim(str, ".");
     const splits: string[] = str.split(".");
-    for (let splitStr of splits) {
+    for (const splitStr of splits) {
         if (splitStr.length === 0) continue;
         let tagStr: string = splitStr;
         let tagValue: any = true;
@@ -215,7 +215,7 @@ function decodeUnit(str: string): UnitInput {
 }
 
 function decodeUnitType(letter: string): UnitType {
-    for (let key of Object.keys(unitDefinitions)) {
+    for (const key of Object.keys(unitDefinitions)) {
         const unitType: UnitType = Number(key);
         if (unitDefinitions[unitType].letter === letter) {
             return unitType;
@@ -226,7 +226,7 @@ function decodeUnitType(letter: string): UnitType {
 
 function encodeTags(tags: ParticipantInputTags): string {
     const tagStrings: string[] = [];
-    for (let key of Object.keys(tags)) {
+    for (const key of Object.keys(tags)) {
         const tag: ParticipantTag = Number(key);
         let tagStr = encodeInteger(tag);
         if (tags[tag] !== true) {
@@ -244,7 +244,7 @@ function encodeTags(tags: ParticipantInputTags): string {
 function decodeTags(str: string): ParticipantInputTags {
     const tags: ParticipantInputTags = {};
     const splits: string[] = str.split(".");
-    for (let splitStr of splits) {
+    for (const splitStr of splits) {
         if (splitStr.length === 0) continue;
         let tagStr: string = splitStr;
         let tagValue: any = true;
@@ -322,7 +322,7 @@ function encodeInteger(value: number) {
         return "" + toChar[0];
     }
     while (value > 0) {
-        var val = value % intCharMap.length;
+        const val = value % intCharMap.length;
         value = floor(value / intCharMap.length);
         res += toChar[val];
     }
@@ -331,9 +331,9 @@ function encodeInteger(value: number) {
 
 function decodeInteger(encoded: string) {
     let res: number = 0;
-    for (var i = encoded.length - 1; i >= 0; i--) {
-        var ch = encoded[i];
-        var val = toInteger[ch];
+    for (let i = encoded.length - 1; i >= 0; i--) {
+        const ch = encoded[i];
+        const val = toInteger[ch];
         res = res * intCharMap.length + val;
     }
     return res;

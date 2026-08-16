@@ -53,7 +53,7 @@ export const mentakAdaptableOrdnanceRigs: ParticipantTagImplementation<MentakAda
             calculationInput[role].tags[FactionUpgrade.MENTAK_ADAPTABLE_ORDNANCE_RIGS] ?? mentakAdaptableOrdnanceRigsDefaultSettings;
         if (role === ParticipantRole.Attacker) {
             let currentUnit: number = 0;
-            for (let unit of units.filter((u) => u.type === UnitType.Cruiser)) {
+            for (const unit of units.filter((u) => u.type === UnitType.Cruiser)) {
                 // If the unit has used the sustain ability, mark it as used (to reduce shots granted by an admiral etc.)
                 if (unit.base.hasTagValue(FactionUpgrade.MENTAK_ADAPTABLE_ORDNANCE_RIGS, 1)) {
                     unit.sustainDamage++;
@@ -90,7 +90,7 @@ interface SustainHitOutput {
 
 function sustainHitIfRequired(hits: SparseDictionary<HitType, number>, unit: ComputedUnitSnapshot): SustainHitOutput | undefined {
     const orderedHitTypes: HitType[] = enumerateHitTypesByPriorityOrder(hits, cancelHitPriorityOrder);
-    for (let hitType of orderedHitTypes) {
+    for (const hitType of orderedHitTypes) {
         const hitsOfType: number | undefined = hits[hitType];
         if (hitsOfType === undefined || hitsOfType === 0) continue; // No hits of type
 

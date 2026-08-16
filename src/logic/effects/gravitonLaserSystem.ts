@@ -10,7 +10,7 @@ export const gravitonLaserSystem: ParticipantTagImplementation = {
     onComputeUnitSnapshots: ({ stage, units }: ParticipantOnComputeSnapshotInput) => {
         if (stage !== CombatStage.SpaceCannon) return;
 
-        for (let unit of units.filter((u: ComputedUnitSnapshot) => u.type === UnitType.PDS)) {
+        for (const unit of units.filter((u: ComputedUnitSnapshot) => u.type === UnitType.PDS)) {
             unit.rolls++;
             break;
         }

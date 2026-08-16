@@ -10,7 +10,7 @@ export const assaultCannons: ParticipantTagImplementation = {
     onComputeUnitSnapshots: ({ calculationInput, role, stage, units }: ParticipantOnComputeSnapshotInput) => {
         if (calculationInput.combatType === CombatType.SpaceBattle && stage === CombatStage.PreCombat) {
             const hasHylar: boolean = calculationInput[role].tags[Technology.HYLAR_V_LASER] !== undefined;
-            for (let unit of units.filter((u: ComputedUnitSnapshot) => applicableUnitTypes.includes(u.type))) {
+            for (const unit of units.filter((u: ComputedUnitSnapshot) => applicableUnitTypes.includes(u.type))) {
                 if (hasHylar && unit.type === UnitType.Cruiser) {
                     // Grant a combat roll with a value mod of +1 (i.e. not buffed by Hylar)
                     unit.nonStandardRolls.push({ valueMod: +1 });

@@ -16,7 +16,7 @@ export const xxchaArchonEnergyShell: ParticipantTagImplementation = {
         let newHits: SparseDictionary<HitType, number> = hits;
 
         const orderedHitTypes: HitType[] = enumerateHitTypesByPriorityOrder(hits, defaultCancelHitPriorityOrder);
-        for (let hitType of orderedHitTypes) {
+        for (const hitType of orderedHitTypes) {
             if (newTagState >= CANCEL_HIT_LIMIT) break;
             if (determineHitTarget(combatState, calculationInput, units, hitType) === -1) continue; // Hit of type can't be assigned to any of your units
             while (newTagState < CANCEL_HIT_LIMIT && (newHits[hitType] ?? 0) > 0) {

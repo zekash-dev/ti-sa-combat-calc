@@ -10,7 +10,7 @@ export const gravitonNegator: ParticipantTagImplementation = {
         if (stage === CombatStage.Bombardment) {
             const hasHylar: boolean = calculationInput[role].tags[Technology.HYLAR_V_LASER] !== undefined;
 
-            for (let unit of units) {
+            for (const unit of units) {
                 if (applicableUnits.includes(unit.type)) {
                     unit.rolls++;
                 }

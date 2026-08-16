@@ -101,9 +101,9 @@ function ParticipantHitsDisplay({ label, participant }: ParticipantHitsDisplayPr
     ) {
         precision = 2;
     }
-    let expected: number = round(participant.expectedHits, precision);
-    let assigned: number = round(participant.assignedHits, precision);
-    let expectedEqualsAssigned: boolean = expected === assigned;
+    const expected: number = round(participant.expectedHits, precision);
+    const assigned: number = round(participant.assignedHits, precision);
+    const expectedEqualsAssigned: boolean = expected === assigned;
 
     return (
         <Typography sx={{ width: "200px", color: "text.secondary" }}>

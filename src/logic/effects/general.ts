@@ -26,7 +26,7 @@ const applicableUnitTypes: UnitType[] = [UnitType.GroundForce, UnitType.ShockTro
 export const general: ParticipantTagImplementation<GeneralSettings> = {
     onComputeUnitSnapshots: ({ calculationInput, units }: ParticipantOnComputeSnapshotInput) => {
         if (calculationInput.combatType === CombatType.InvasionCombat) {
-            for (let unit of units.filter((u: ComputedUnitSnapshot) => applicableUnitTypes.includes(u.type))) {
+            for (const unit of units.filter((u: ComputedUnitSnapshot) => applicableUnitTypes.includes(u.type))) {
                 unit.combatValue--;
             }
         }
@@ -34,7 +34,7 @@ export const general: ParticipantTagImplementation<GeneralSettings> = {
     onComputeOpponentUnitSnapshots: ({ role, stage, units }: ParticipantOnComputeSnapshotInput) => {
         // 'role' here indicates the role of the effect owner
         if (role === ParticipantRole.Defender && stage === CombatStage.Bombardment) {
-            for (let unit of units) {
+            for (const unit of units) {
                 unit.combatValue += 3;
             }
         }
@@ -73,7 +73,7 @@ function rerollBestValueMiss(
     const maskedHitTypes: number[] = Object.keys(outcome.hits).map((k) => Number(k));
 
     let bestValueMissKey: number = NaN;
-    for (let maskedHitType of maskedHitTypes) {
+    for (const maskedHitType of maskedHitTypes) {
         const { combatValue, hitType } = unmaskHitType(maskedHitType);
         const hitCount: HitCount = outcome.hits[maskedHitType]!;
         if (hitCount.hits < hitCount.rolls && opponentUnits.some((unit) => canAssignHitToUnit(unit, hitType, combatType))) {
